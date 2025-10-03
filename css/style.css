@@ -126,3 +126,5 @@ a{color:var(--brand);text-decoration:none}
 .modal-content label{display:block;margin:.5rem 0 .25rem}
 .modal-content input, .modal-content select{width:100%;padding:.6rem .8rem;border:1px solid #cfd7e6;border-radius:8px}
 
+.book-form .status{min-height:1.1rem;color:var(--muted);margin-top:.35rem}
+
