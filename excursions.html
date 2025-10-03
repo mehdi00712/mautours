@@ -1,25 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Excursions – IslandVista Tours</title>
-  <meta name="description" content="Premium Mauritius tours, transfers, and experiences with instant booking.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Excursions – mautours</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/script.js"></script>
-  <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "TouristInformationCenter", "name": "IslandVista Tours", "image": "assets/placeholder.png", "address": {"@type": "PostalAddress", "addressCountry": "MU"}, "areaServed": "Mauritius", "sameAs": ["https://www.instagram.com/", "https://www.facebook.com/"], "telephone": "+230 000 0000", "url": "https://example.com"}
-  </script>
 </head>
 <body>
 <header class="topbar">
   <div class="container row between center">
-    <a class="brand" href="index.html"><span class="brand-mark">IslandVista</span> Tours</a>
+    <a class="brand" href="index.html"><span class="brand-mark">mau</span>tours</a>
     <nav class="nav" id="nav">
-      <a href="excursions.html" data-i18n="nav_excursions">Excursions</a>
+      <a href="excursions.html" class="active" data-i18n="nav_excursions">Excursions</a>
       <a href="transfers.html" data-i18n="nav_transfers">Transfers</a>
       <a href="about.html" data-i18n="nav_about">About</a>
       <a href="contact.html" class="btn primary" data-i18n="nav_contact">Contact</a>
@@ -30,52 +24,133 @@
 </header>
 
 <main class="container section">
-  <h1 data-i18n="exc_title">Excursions</h1>
-  <p class="lead" data-i18n="exc_intro">Hand‑picked tours across Mauritius. Book instantly or message us to customise.</p>
-  <div class="filters row wrap gap">
+  <h1 class="page-title">Excursions</h1>
+  <p class="lead">Hand-picked tours across Mauritius. Book instantly or message us to customise.</p>
+
+  <!-- Filters (optional—kept in case you want search later) -->
+  <div class="filters row wrap gap" style="margin-bottom:1.25rem">
     <input id="q" placeholder="Search tours…" aria-label="Search">
     <select id="filterType">
-      <option value="all" data-i18n="f_all">All</option>
-      <option value="sea" data-i18n="f_sea">Sea</option>
-      <option value="land" data-i18n="f_land">Land</option>
-      <option value="private" data-i18n="f_private">Private</option>
-      <option value="sharing" data-i18n="f_sharing">Sharing</option>
+      <option value="all">All</option>
+      <option value="sea">Sea</option>
+      <option value="land">Land</option>
+      <option value="private">Private</option>
+      <option value="sharing">Sharing</option>
     </select>
   </div>
-  <div class="cards" id="tourList">
-    <!-- Tours populated by JS -->
-  </div>
-</main>
 
-<script>
-window.TOURS = [
-  {id:"ile-aux-cerfs", title:"Île aux Cerfs Catamaran", type:["sea","sharing"], price:3400, duration:"Full day", summary:"Cruise, BBQ, snorkel.", rating:4.9},
-  {id:"wild-south", title:"Wild South Discovery", type:["land","sharing"], price:6300, duration:"Full day", summary:"Grand Bassin, Chamarel, 7 Coloured Earth.", rating:4.8},
-  {id:"dolphins", title:"Dolphins & Crystal Rock", type:["sea","private"], price:4900, duration:"Half day", summary:"Speedboat, snorkel with dolphins (respectful viewing).", rating:4.7}
-];
-</script>
+  <!-- Alternating image/text list -->
+  <div id="excList" class="exc-list"></div>
+</main>
 
 <footer class="footer">
   <div class="container grid-3">
     <div>
-      <div class="brand ft"><span class="brand-mark">IslandVista</span> Tours</div>
-      <p data-i18n="ft_tag">Authentic Mauritius. Seamless booking.</p>
+      <div class="brand ft"><span class="brand-mark">mau</span>tours</div>
+      <p>Authentic Mauritius. Seamless booking.</p>
     </div>
     <div>
-      <h4 data-i18n="ft_links">Links</h4>
+      <h4>Links</h4>
       <ul>
-        <li><a href="excursions.html" data-i18n="nav_excursions">Excursions</a></li>
-        <li><a href="transfers.html" data-i18n="nav_transfers">Transfers</a></li>
-        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+        <li><a href="excursions.html">Excursions</a></li>
+        <li><a href="transfers.html">Transfers</a></li>
+        <li><a href="about.html">About</a></li>
       </ul>
     </div>
     <div>
-      <h4 data-i18n="ft_contact">Contact</h4>
+      <h4>Contact</h4>
       <p>Email: hello@example.com<br>Phone: +230 000 0000</p>
-      <a class="btn ghost" href="https://wa.me/2300000000" target="_blank" rel="noopener" data-i18n="ft_whatsapp">Chat on WhatsApp</a>
+      <a class="btn ghost" href="https://wa.me/2300000000" target="_blank" rel="noopener">Chat on WhatsApp</a>
     </div>
   </div>
-  <div class="sub">© 2025 IslandVista Tours • <a href="#" data-i18n="ft_terms">Terms</a> • <a href="#" data-i18n="ft_privacy">Privacy</a></div>
+  <div class="sub">© 2025 mautours • <a href="#">Terms</a> • <a href="#">Privacy</a></div>
 </footer>
+
+<!-- Page data + renderer -->
+<script>
+  // Your tours data
+  window.TOURS = [
+    {
+      id: "vallee-couleurs",
+      title: "La Vallée Des Couleurs Nature Park",
+      types: ["land","sharing"],
+      price: 2800,
+      summary: "Vibrant landscapes with the 23-coloured earth, waterfalls, quad biking, zip-lining & hiking trails.",
+      img: "assets/placeholder.png"
+    },
+    {
+      id: "la-vanille",
+      title: "La Vanille Nature Park",
+      types: ["land","sharing"],
+      price: 2500,
+      summary: "Lush vegetation, Aldabra tortoises (largest captive group), crocodiles, monkeys, butterflies and more.",
+      img: "assets/placeholder.png"
+    },
+    {
+      id: "dolphins",
+      title: "Swimming with Dolphins",
+      types: ["sea","private"],
+      price: 4900,
+      summary: "Respectful dolphin viewing + snorkelling near Crystal Rock. Morning speedboat, gear included.",
+      img: "assets/placeholder.png"
+    },
+    {
+      id: "ile-aux-cerfs",
+      title: "Île aux Cerfs Catamaran",
+      types: ["sea","sharing"],
+      price: 3400,
+      summary: "Full-day lagoon cruise with BBQ lunch on board, snorkelling stops & beach time.",
+      img: "assets/placeholder.png"
+    }
+  ];
+
+  // Render alternating layout
+  (function(){
+    const listEl = document.getElementById('excList');
+    const q = document.getElementById('q');
+    const sel = document.getElementById('filterType');
+
+    function filtered(){
+      const query = (q?.value || '').toLowerCase();
+      const type = sel?.value || 'all';
+      return window.TOURS.filter(t=>{
+        const matchesQuery = !query || t.title.toLowerCase().includes(query) || t.summary.toLowerCase().includes(query);
+        const matchesType = type === 'all' || (t.types && t.types.includes(type));
+        return matchesQuery && matchesType;
+      });
+    }
+
+    function render(){
+      const data = filtered();
+      listEl.innerHTML = data.map((t, i) => {
+        const reversed = i % 2 === 1 ? " reversed" : "";
+        const price = t.price ? `Rs ${t.price.toLocaleString()}` : "";
+        return `
+          <section id="${t.id}" class="exc-item${reversed}">
+            <div class="exc-img">
+              <img src="${t.img}" alt="${t.title}">
+            </div>
+            <div class="exc-panel">
+              <h2 class="exc-title">${t.title}</h2>
+              <p class="exc-desc">${t.summary}</p>
+              <div class="row between center">
+                <div class="exc-meta">
+                  ${price ? `<span class="price">${price}</span>` : ""}
+                </div>
+                <div class="exc-cta">
+                  <a class="btn primary" href="contact.html?tour=${encodeURIComponent(t.title)}">Book Now</a>
+                </div>
+              </div>
+            </div>
+          </section>
+        `;
+      }).join('');
+    }
+
+    q?.addEventListener('input', render);
+    sel?.addEventListener('change', render);
+    render();
+  })();
+</script>
 </body>
 </html>
