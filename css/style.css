@@ -89,3 +89,31 @@ a{color:var(--brand);text-decoration:none}
   .exc-item.reversed{direction:ltr}
 }
 
+/* Contact & Footer Social */
+.contact-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.contact-card {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  color: #fff;
+  font-size: 1.1rem;
+  transition: transform .2s;
+}
+.contact-card i { font-size: 1.5rem; }
+.contact-card:hover { transform: translateY(-3px); }
+.contact-card.whatsapp { background:#25D366; }
+.contact-card.insta { background: linear-gradient(45deg,#f9ce34,#ee2a7b,#6228d7); }
+.contact-card.fb { background:#1877F2; }
+
+.social-icons { display:flex; gap:1rem; }
+.social-icons a { font-size:1.5rem; color:#fff; transition:color .2s; }
+.social-icons a:hover { color: var(--brand-2); }
