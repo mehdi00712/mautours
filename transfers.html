@@ -3,55 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Transfers – IslandVista Tours</title>
-  <meta name="description" content="Premium Mauritius tours, transfers, and experiences with instant booking.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>Transfers – mautours</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script defer src="js/script.js"></script>
-  <script type="application/ld+json">
-  {"@context": "https://schema.org", "@type": "TouristInformationCenter", "name": "IslandVista Tours", "image": "assets/placeholder.png", "address": {"@type": "PostalAddress", "addressCountry": "MU"}, "areaServed": "Mauritius", "sameAs": ["https://www.instagram.com/", "https://www.facebook.com/"], "telephone": "+230 000 0000", "url": "https://example.com"}
-  </script>
 </head>
 <body>
 <header class="topbar">
   <div class="container row between center">
-    <a class="brand" href="index.html"><span class="brand-mark">IslandVista</span> Tours</a>
+    <a class="brand" href="index.html"><span class="brand-mark">mau</span>tours</a>
     <nav class="nav" id="nav">
-      <a href="excursions.html" data-i18n="nav_excursions">Excursions</a>
-      <a href="transfers.html" data-i18n="nav_transfers">Transfers</a>
-      <a href="about.html" data-i18n="nav_about">About</a>
-      <a href="contact.html" class="btn primary" data-i18n="nav_contact">Contact</a>
-      <button class="btn ghost small" id="langToggle" aria-label="Change language">FR</button>
+      <a href="excursions.html">Excursions</a>
+      <a href="transfers.html" class="active">Transfers</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="btn primary">Contact</a>
+      <button class="btn ghost small" id="langToggle">FR</button>
     </nav>
-    <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+    <button class="hamburger" id="hamburger">☰</button>
   </div>
 </header>
 
 <main class="container section">
-  <h1 data-i18n="tr_title">Airport & Hotel Transfers</h1>
-  <p class="lead" data-i18n="tr_intro">Private vehicles, fixed prices, child seats on request.</p>
+  <h1>Airport & Hotel Transfers</h1>
+  <p class="lead">Private vehicles, fixed prices, child seats on request. Ask for a quick quote below:</p>
+
   <div class="grid-2">
+    <!-- Form -->
     <form id="transferForm" class="panel">
-      <label data-i18n="tr_from">From</label>
-      <input name="from" placeholder="MRU Airport">
-      <label data-i18n="tr_to">To</label>
-      <input name="to" placeholder="Flic‑en‑Flac">
-      <label data-i18n="tr_date">Date</label>
-      <input type="date" name="date">
-      <label data-i18n="tr_pax">Passengers</label>
-      <input type="number" name="pax" min="1" value="2">
-      <button class="btn primary" type="submit" data-i18n="btn_getquote">Get quote</button>
-      <p id="transferStatus" class="status"></p>
+      <label>From</label>
+      <input name="from" placeholder="MRU Airport" required>
+      <label>To</label>
+      <input name="to" placeholder="Flic-en-Flac" required>
+      <label>Date</label>
+      <input type="date" name="date" required>
+      <label>Passengers</label>
+      <input type="number" name="pax" min="1" value="2" required>
+      <button class="btn primary" type="submit">Get Quote</button>
     </form>
+
+    <!-- Fleet info -->
     <div>
-      <h3 data-i18n="tr_fleet">Our fleet</h3>
+      <h3>Our fleet</h3>
       <ul class="tick">
-        <li>Sedan – 1‑3 pax</li>
-        <li>Minivan – 1‑6 pax</li>
-        <li>Minibus – 1‑12 pax</li>
+        <li>Sedan – 1-3 pax</li>
+        <li>Minivan – 1-6 pax</li>
+        <li>Minibus – 1-12 pax</li>
       </ul>
+      <p>All vehicles include A/C, bottled water, and professional drivers.</p>
     </div>
   </div>
 </main>
@@ -59,24 +57,43 @@
 <footer class="footer">
   <div class="container grid-3">
     <div>
-      <div class="brand ft"><span class="brand-mark">IslandVista</span> Tours</div>
-      <p data-i18n="ft_tag">Authentic Mauritius. Seamless booking.</p>
+      <div class="brand ft"><span class="brand-mark">mau</span>tours</div>
+      <p>Authentic Mauritius. Seamless booking.</p>
     </div>
     <div>
-      <h4 data-i18n="ft_links">Links</h4>
+      <h4>Links</h4>
       <ul>
-        <li><a href="excursions.html" data-i18n="nav_excursions">Excursions</a></li>
-        <li><a href="transfers.html" data-i18n="nav_transfers">Transfers</a></li>
-        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+        <li><a href="excursions.html">Excursions</a></li>
+        <li><a href="transfers.html">Transfers</a></li>
+        <li><a href="about.html">About</a></li>
       </ul>
     </div>
     <div>
-      <h4 data-i18n="ft_contact">Contact</h4>
-      <p>Email: hello@example.com<br>Phone: +230 000 0000</p>
-      <a class="btn ghost" href="https://wa.me/2300000000" target="_blank" rel="noopener" data-i18n="ft_whatsapp">Chat on WhatsApp</a>
+      <h4>Social</h4>
+      <a href="https://wa.me/23057750662" target="_blank">WhatsApp</a><br>
+      <a href="https://www.instagram.com/yourhandle" target="_blank">Instagram</a><br>
+      <a href="https://www.facebook.com/yourpage" target="_blank">Facebook</a>
     </div>
   </div>
-  <div class="sub">© 2025 IslandVista Tours • <a href="#" data-i18n="ft_terms">Terms</a> • <a href="#" data-i18n="ft_privacy">Privacy</a></div>
+  <div class="sub">© 2025 mautours • <a href="#">Terms</a> • <a href="#">Privacy</a></div>
 </footer>
+
+<script>
+// Transfers form → WhatsApp
+document.getElementById('transferForm')?.addEventListener('submit', function(e){
+  e.preventDefault();
+  const from = this.from.value;
+  const to = this.to.value;
+  const date = this.date.value;
+  const pax = this.pax.value;
+
+  // WhatsApp number (no + sign, just country code + number)
+  const phone = "23057750662";
+  const msg = `Hello, I would like a transfer quotation:%0AFrom: ${from}%0ATo: ${to}%0ADate: ${date}%0APassengers: ${pax}`;
+  const url = `https://wa.me/${phone}?text=${msg}`;
+
+  window.open(url, "_blank");
+});
+</script>
 </body>
 </html>
