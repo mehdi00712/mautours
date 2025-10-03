@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payment Successful – mautours</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module">
+    import { db } from "./js/firebase-config.js";
+    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get("bookingId");
+    const el = document.getElementById("status");
+
+    if(id){
+      onSnapshot(doc(db,"bookings",id),(snap)=>{
+        const d = snap.data();
+        if(!d){ el.textContent="Booking not found."; return; }
+        el.textContent = d.status === "paid"
+          ? "Payment received. Your booking is confirmed! 🎉"
+          : "We’re processing your payment… this may take a minute.";
+      });
+    } else {
+      el.textContent = "Missing booking ID.";
+    }
+  </script>
+</head>
+<body>
+  <main class="container section">
+    <h1>Thank you!</h1>
+    <p id="status" class="lead">Checking payment status…</p>
+    <a class="btn" href="excursions.html">Back to Excursions</a>
+  </main>
+</body>
+</html>
