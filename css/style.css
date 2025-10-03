@@ -59,3 +59,33 @@ a{color:var(--brand);text-decoration:none}
   .nav{display:none}
   .hamburger{display:block}
 }
+
+/* ===== Excursions alternating layout ===== */
+.page-title{font-size:clamp(1.8rem,3.6vw,2.4rem);letter-spacing:-.01em;margin-bottom:.25rem}
+.exc-list{display:grid;gap:2.5rem}
+.exc-item{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;align-items:stretch}
+.exc-item.reversed{direction:rtl}       /* flip columns */
+.exc-item.reversed > *{direction:ltr}   /* keep inner text normal */
+
+.exc-img img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+
+.exc-panel{
+  background:#d9d9d9; /* light grey panel to match the ref look */
+  color:#1d1f22;      /* darker text on light panel */
+  border-radius:8px;
+  padding:1.25rem 1.5rem;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.exc-title{font-weight:700;font-size:clamp(1.2rem,2.2vw,1.6rem);margin:0 0 .5rem}
+.exc-desc{line-height:1.7;margin:0 0 1rem;font-weight:500}
+.exc-meta .price{font-weight:700}
+
+.exc-cta .btn{background:#2b2b2b;border-color:#2b2b2b;color:#fff}
+.exc-cta .btn.primary{background:#2b2b2b}
+
+/* Responsive stacking */
+@media (max-width:900px){
+  .exc-item{grid-template-columns:1fr}
+  .exc-item.reversed{direction:ltr}
+}
+
