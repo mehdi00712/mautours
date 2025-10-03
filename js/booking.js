@@ -1,65 +1,69 @@
 // js/booking.js
-(function(){
-  const list = document.getElementById('excList');
-  const modal = document.getElementById('bookingModal');
-  const closeBtn = document.getElementById('closeModal');
-  const form = document.getElementById('bookingForm');
-  const statusEl = document.getElementById('bkStatus');
-  const titleEl = document.getElementById('bkTitle');
+import { db } from "./firebase-config.js";
+import {
+  collection, addDoc, serverTimestamp, doc, onSnapshot, updateDoc
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-  function renderList(){
-    if(!list || !window.EXCURSIONS) return;
-    list.innerHTML = window.EXCURSIONS.map((t,i)=>`
-      <section class="exc-item ${i%2===1 ? "reversed":""}">
-        <div class="exc-img"><img src="${t.img}" alt="${t.title}"></div>
-        <div class="exc-panel">
-          <h2 class="exc-title">${t.title}</h2>
-          <p class="exc-desc">${t.summary}</p>
-          <button class="btn primary" data-book="${t.id}">Book now</button>
-        </div>
-      </section>
-    `).join('');
-    list.querySelectorAll('[data-book]').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const exc = window.EXCURSIONS.find(x=>x.id===btn.dataset.book);
-        if(!exc) return;
-        document.getElementById('bkExcursionId').value = exc.id;
-        titleEl.textContent = `Book: ${exc.title}`;
-        openModal();
-      });
+// Set your Cloud Function endpoint here:
+const CREATE_ABSA_SESSION_URL = "https://YOUR_REGION-YOUR_PROJECT.cloudfunctions.net/createAbsaPaymentSession";
+// After ABSA returns, you’ll redirect to success/cancel pages below:
+const SUCCESS_URL = location.origin + "/payment-success.html";
+const CANCEL_URL  = location.origin + "/payment-cancel.html";
+
+// Wire all booking forms
+document.addEventListener("submit", async (e)=>{
+  const form = e.target.closest(".book-form");
+  if(!form) return;
+  e.preventDefault();
+
+  const status = form.querySelector(".status");
+  const tourId = form.dataset.tour;
+  const title  = form.dataset.title;
+  const price  = parseInt(form.dataset.price,10);
+  const date   = form.date.value;
+  const pax    = parseInt(form.pax.value,10);
+
+  if(!date || pax<1){ status.textContent="Please select a date and passengers."; return; }
+
+  status.textContent = "Creating booking…";
+
+  try{
+    // 1) Create booking doc
+    const ref = await addDoc(collection(db, "bookings"), {
+      tourId, title, date, pax, price,
+      currency: "MUR",
+      status: "pending_payment",
+      createdAt: serverTimestamp()
     });
-  }
 
-  function openModal(){ if(modal){ modal.setAttribute('aria-hidden','false'); modal.classList.add('open'); } }
-  function closeModal(){ if(modal){ modal.setAttribute('aria-hidden','true'); modal.classList.remove('open'); statusEl.textContent=''; } }
-  closeBtn?.addEventListener('click', closeModal);
-  modal?.addEventListener('click', (e)=>{ if(e.target===modal) closeModal(); });
+    // 2) Ask server to create ABSA payment session
+    const res = await fetch(CREATE_ABSA_SESSION_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        bookingId: ref.id,
+        amount: price * pax, // adjust if child pricing etc.
+        currency: "MUR",
+        successUrl: `${SUCCESS_URL}?bookingId=${encodeURIComponent(ref.id)}`,
+        cancelUrl:  `${CANCEL_URL}?bookingId=${encodeURIComponent(ref.id)}`
+      })
+    });
 
-  form?.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    statusEl.textContent = 'Preparing secure checkout...';
-    const data = {
-      excursionId: document.getElementById('bkExcursionId').value,
-      date: document.getElementById('bkDate').value,
-      timeSlot: document.getElementById('bkTime').value,
-      adults: Number(document.getElementById('bkAdults').value || 0),
-      children: Number(document.getElementById('bkChildren').value || 0),
-      email: document.getElementById('bkEmail').value
-    };
-    try{
-      const res = await fetch('/.netlify/functions/create-checkout-session', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(data)
-      });
-      if(!res.ok){ throw new Error('Failed to start checkout'); }
-      const { url } = await res.json();
-      window.location.href = url;
-    }catch(err){
-      console.error(err);
-      statusEl.textContent = 'Could not start checkout. Please try again.';
+    if(!res.ok){
+      status.textContent = "Could not start payment. Please try again or contact us.";
+      return;
     }
-  });
+    const { paymentUrl } = await res.json();
+    if(!paymentUrl){
+      status.textContent = "Payment session error. Please contact us on WhatsApp.";
+      return;
+    }
 
-  renderList();
-})();
+    // 3) Redirect to ABSA hosted checkout
+    window.location.href = paymentUrl;
+
+  }catch(err){
+    console.error(err);
+    status.textContent = "Unexpected error. Please try again.";
+  }
+});
