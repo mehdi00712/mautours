@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Excursions – mautours</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="css/style.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <script defer src="js/booking.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script defer type="module" src="js/firebase-config.js"></script>
+  <script defer type="module" src="js/booking.js"></script>
 </head>
 <body>
 <header class="topbar">
@@ -25,7 +26,7 @@
 
 <main class="container section">
   <h1 class="page-title">Excursions</h1>
-  <p class="lead">Choose your date, secure your spot, and pay online instantly.</p>
+  <p class="lead">Pick a date & passengers, then pay securely. You’ll get instant confirmation.</p>
 
   <div id="excList" class="exc-list"></div>
 </main>
@@ -56,46 +57,46 @@
   <div class="sub">© 2025 mautours • <a href="#">Terms</a> • <a href="#">Privacy</a></div>
 </footer>
 
-<!-- Booking Modal -->
-<div id="bookingModal" class="modal" aria-hidden="true">
-  <div class="modal-content">
-    <button class="modal-close" id="closeModal" aria-label="Close">×</button>
-    <h2 id="bkTitle">Book Excursion</h2>
-    <form id="bookingForm">
-      <input type="hidden" name="excursionId" id="bkExcursionId">
-      <label>Date</label>
-      <input type="date" name="date" id="bkDate" required>
-      <label>Time</label>
-      <select name="timeSlot" id="bkTime" required>
-        <option value="08:00">08:00</option>
-        <option value="09:00">09:00</option>
-        <option value="13:00">13:00</option>
-      </select>
-      <div class="row" style="gap:1rem">
-        <div style="flex:1">
-          <label>Adults</label>
-          <input type="number" name="adults" id="bkAdults" min="1" value="2" required>
-        </div>
-        <div style="flex:1">
-          <label>Children</label>
-          <input type="number" name="children" id="bkChildren" min="0" value="0" required>
-        </div>
-      </div>
-      <label>Email (for receipt)</label>
-      <input type="email" name="email" id="bkEmail" placeholder="you@example.com" required>
-      <button class="btn primary" type="submit" id="payNowBtn">Pay now</button>
-      <p id="bkStatus" class="status"></p>
-    </form>
-  </div>
-</div>
-
 <script>
-const EXCURSIONS = [
-  { id:"ile-aux-cerfs", title:"Île aux Cerfs Catamaran", priceId:"price_ILEAUXCERFS_PLACEHOLDER", img:"assets/placeholder.png", summary:"Full-day lagoon cruise with BBQ lunch & snorkelling."},
-  { id:"dolphins", title:"Swimming with Dolphins", priceId:"price_DOLPHINS_PLACEHOLDER", img:"assets/placeholder.png", summary:"Respectful dolphin viewing + snorkelling near Crystal Rock."},
-  { id:"vallee", title:"La Vallée Des Couleurs Nature Park", priceId:"price_VALLEE_PLACEHOLDER", img:"assets/placeholder.png", summary:"23-coloured earth, waterfalls, quads & zip-lining."},
-  { id:"vanille", title:"La Vanille Nature Park", priceId:"price_VANILLE_PLACEHOLDER", img:"assets/placeholder.png", summary:"Aldabra tortoises, crocodiles, monkeys & butterflies."}
+// Example tours with price in MUR (adapt as needed)
+const tours = [
+  {id:"ile-aux-cerfs", title:"Île aux Cerfs Catamaran", summary:"Full-day cruise, BBQ lunch, snorkelling.", img:"assets/placeholder.png", price:3400},
+  {id:"dolphins", title:"Swimming with Dolphins", summary:"Speedboat, snorkelling, Crystal Rock.", img:"assets/placeholder.png", price:4900},
+  {id:"vallee", title:"La Vallée Des Couleurs Nature Park", summary:"23-coloured earth, waterfalls, zip-lining.", img:"assets/placeholder.png", price:2800},
+  {id:"vanille", title:"La Vanille Nature Park", summary:"Aldabra tortoises, crocodiles, butterflies.", img:"assets/placeholder.png", price:2500}
 ];
+
+function renderExcursions(){
+  const list = document.getElementById("excList");
+  list.innerHTML = tours.map((t,i)=>`
+    <section class="exc-item ${i%2===1 ? "reversed":""}">
+      <div class="exc-img"><img src="${t.img}" alt="${t.title}"></div>
+      <div class="exc-panel">
+        <h2>${t.title}</h2>
+        <p>${t.summary}</p>
+
+        <form class="book-form" data-tour="${t.id}" data-title="${t.title}" data-price="${t.price}">
+          <div class="row wrap gap">
+            <div>
+              <label>Date</label>
+              <input type="date" name="date" required>
+            </div>
+            <div>
+              <label>Passengers</label>
+              <input type="number" name="pax" min="1" value="2" required>
+            </div>
+          </div>
+          <div class="row between center" style="margin-top:.75rem">
+            <span class="price">Rs ${t.price.toLocaleString()}</span>
+            <button class="btn primary" type="submit">Book & Pay</button>
+          </div>
+          <p class="status"></p>
+        </form>
+      </div>
+    </section>
+  `).join("");
+}
+renderExcursions();
 </script>
 </body>
 </html>
