@@ -117,3 +117,12 @@ a{color:var(--brand);text-decoration:none}
 .social-icons { display:flex; gap:1rem; }
 .social-icons a { font-size:1.5rem; color:#fff; transition:color .2s; }
 .social-icons a:hover { color: var(--brand-2); }
+
+/* Booking modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:1rem;z-index:100}
+.modal.open{display:flex}
+.modal-content{background:#fff;color:#1b1b1b;border-radius:12px;max-width:560px;width:100%;padding:1.25rem}
+.modal-close{position:absolute;right:1rem;top:1rem;border:none;background:transparent;font-size:1.6rem;cursor:pointer}
+.modal-content label{display:block;margin:.5rem 0 .25rem}
+.modal-content input, .modal-content select{width:100%;padding:.6rem .8rem;border:1px solid #cfd7e6;border-radius:8px}
+
