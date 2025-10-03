@@ -6,20 +6,19 @@
   <title>Excursions – mautours</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/script.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 <header class="topbar">
   <div class="container row between center">
     <a class="brand" href="index.html"><span class="brand-mark">mau</span>tours</a>
     <nav class="nav" id="nav">
-      <a href="excursions.html" class="active" data-i18n="nav_excursions">Excursions</a>
-      <a href="transfers.html" data-i18n="nav_transfers">Transfers</a>
-      <a href="about.html" data-i18n="nav_about">About</a>
-      <a href="contact.html" class="btn primary" data-i18n="nav_contact">Contact</a>
-      <button class="btn ghost small" id="langToggle" aria-label="Change language">FR</button>
+      <a href="excursions.html" class="active">Excursions</a>
+      <a href="transfers.html">Transfers</a>
+      <a href="about.html">About</a>
+      <a href="contact.html" class="btn primary">Contact</a>
     </nav>
-    <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+    <button class="hamburger" id="hamburger">☰</button>
   </div>
 </header>
 
@@ -27,19 +26,6 @@
   <h1 class="page-title">Excursions</h1>
   <p class="lead">Hand-picked tours across Mauritius. Book instantly or message us to customise.</p>
 
-  <!-- Filters (optional—kept in case you want search later) -->
-  <div class="filters row wrap gap" style="margin-bottom:1.25rem">
-    <input id="q" placeholder="Search tours…" aria-label="Search">
-    <select id="filterType">
-      <option value="all">All</option>
-      <option value="sea">Sea</option>
-      <option value="land">Land</option>
-      <option value="private">Private</option>
-      <option value="sharing">Sharing</option>
-    </select>
-  </div>
-
-  <!-- Alternating image/text list -->
   <div id="excList" class="exc-list"></div>
 </main>
 
@@ -58,99 +44,40 @@
       </ul>
     </div>
     <div>
-      <h4>Contact</h4>
-      <p>Email: hello@example.com<br>Phone: +230 000 0000</p>
-      <a class="btn ghost" href="https://wa.me/2300000000" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      <h4>Social</h4>
+      <div class="social-icons">
+        <a href="https://wa.me/23057750662" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.instagram.com/yourhandle" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://www.facebook.com/yourpage" target="_blank"><i class="fab fa-facebook"></i></a>
+      </div>
     </div>
   </div>
   <div class="sub">© 2025 mautours • <a href="#">Terms</a> • <a href="#">Privacy</a></div>
 </footer>
 
-<!-- Page data + renderer -->
 <script>
-  // Your tours data
-  window.TOURS = [
-    {
-      id: "vallee-couleurs",
-      title: "La Vallée Des Couleurs Nature Park",
-      types: ["land","sharing"],
-      price: 2800,
-      summary: "Vibrant landscapes with the 23-coloured earth, waterfalls, quad biking, zip-lining & hiking trails.",
-      img: "assets/placeholder.png"
-    },
-    {
-      id: "la-vanille",
-      title: "La Vanille Nature Park",
-      types: ["land","sharing"],
-      price: 2500,
-      summary: "Lush vegetation, Aldabra tortoises (largest captive group), crocodiles, monkeys, butterflies and more.",
-      img: "assets/placeholder.png"
-    },
-    {
-      id: "dolphins",
-      title: "Swimming with Dolphins",
-      types: ["sea","private"],
-      price: 4900,
-      summary: "Respectful dolphin viewing + snorkelling near Crystal Rock. Morning speedboat, gear included.",
-      img: "assets/placeholder.png"
-    },
-    {
-      id: "ile-aux-cerfs",
-      title: "Île aux Cerfs Catamaran",
-      types: ["sea","sharing"],
-      price: 3400,
-      summary: "Full-day lagoon cruise with BBQ lunch on board, snorkelling stops & beach time.",
-      img: "assets/placeholder.png"
-    }
-  ];
+const phone = "23057750662";
+const tours = [
+  {id:"vallee", title:"La Vallée Des Couleurs Nature Park", summary:"23-coloured earth, waterfalls, quad biking, zip-lining.", img:"assets/placeholder.png"},
+  {id:"vanille", title:"La Vanille Nature Park", summary:"Aldabra tortoises, crocodiles, monkeys & butterflies.", img:"assets/placeholder.png"},
+  {id:"dolphins", title:"Swimming with Dolphins", summary:"Speedboat, snorkelling, Crystal Rock.", img:"assets/placeholder.png"},
+  {id:"ile-aux-cerfs", title:"Île aux Cerfs Catamaran", summary:"Full-day cruise, BBQ lunch, snorkelling.", img:"assets/placeholder.png"}
+];
 
-  // Render alternating layout
-  (function(){
-    const listEl = document.getElementById('excList');
-    const q = document.getElementById('q');
-    const sel = document.getElementById('filterType');
-
-    function filtered(){
-      const query = (q?.value || '').toLowerCase();
-      const type = sel?.value || 'all';
-      return window.TOURS.filter(t=>{
-        const matchesQuery = !query || t.title.toLowerCase().includes(query) || t.summary.toLowerCase().includes(query);
-        const matchesType = type === 'all' || (t.types && t.types.includes(type));
-        return matchesQuery && matchesType;
-      });
-    }
-
-    function render(){
-      const data = filtered();
-      listEl.innerHTML = data.map((t, i) => {
-        const reversed = i % 2 === 1 ? " reversed" : "";
-        const price = t.price ? `Rs ${t.price.toLocaleString()}` : "";
-        return `
-          <section id="${t.id}" class="exc-item${reversed}">
-            <div class="exc-img">
-              <img src="${t.img}" alt="${t.title}">
-            </div>
-            <div class="exc-panel">
-              <h2 class="exc-title">${t.title}</h2>
-              <p class="exc-desc">${t.summary}</p>
-              <div class="row between center">
-                <div class="exc-meta">
-                  ${price ? `<span class="price">${price}</span>` : ""}
-                </div>
-                <div class="exc-cta">
-                  <a class="btn primary" href="contact.html?tour=${encodeURIComponent(t.title)}">Book Now</a>
-                </div>
-              </div>
-            </div>
-          </section>
-        `;
-      }).join('');
-    }
-
-    q?.addEventListener('input', render);
-    sel?.addEventListener('change', render);
-    render();
-  })();
+function renderExcursions(){
+  const list = document.getElementById("excList");
+  list.innerHTML = tours.map((t,i)=>`
+    <section class="exc-item ${i%2===1 ? "reversed":""}">
+      <div class="exc-img"><img src="${t.img}" alt="${t.title}"></div>
+      <div class="exc-panel">
+        <h2>${t.title}</h2>
+        <p>${t.summary}</p>
+        <a class="btn primary" href="https://wa.me/${phone}?text=Hello, I would like to book the excursion: ${encodeURIComponent(t.title)}" target="_blank">Book Now</a>
+      </div>
+    </section>
+  `).join("");
+}
+renderExcursions();
 </script>
 </body>
 </html>
