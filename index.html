@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IslandVista Tours – Mauritius Excursions & Transfers</title>
+  <meta name="description" content="Premium Mauritius tours, transfers, and experiences with instant booking.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/script.js"></script>
+  <script type="application/ld+json">
+  {"@context": "https://schema.org", "@type": "TouristInformationCenter", "name": "IslandVista Tours", "image": "assets/placeholder.png", "address": {"@type": "PostalAddress", "addressCountry": "MU"}, "areaServed": "Mauritius", "sameAs": ["https://www.instagram.com/", "https://www.facebook.com/"], "telephone": "+230 000 0000", "url": "https://example.com"}
+  </script>
+</head>
+<body>
+<header class="topbar">
+  <div class="container row between center">
+    <a class="brand" href="index.html"><span class="brand-mark">IslandVista</span> Tours</a>
+    <nav class="nav" id="nav">
+      <a href="excursions.html" data-i18n="nav_excursions">Excursions</a>
+      <a href="transfers.html" data-i18n="nav_transfers">Transfers</a>
+      <a href="about.html" data-i18n="nav_about">About</a>
+      <a href="contact.html" class="btn primary" data-i18n="nav_contact">Contact</a>
+      <button class="btn ghost small" id="langToggle" aria-label="Change language">FR</button>
+    </nav>
+    <button class="hamburger" id="hamburger" aria-label="Open menu">☰</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-inner">
+    <h1 data-i18n="hero_title">Mauritius tours that feel tailor‑made.</h1>
+    <p class="lead" data-i18n="hero_sub">Real‑time availability, transparent pricing, instant confirmation.</p>
+    <div class="cta">
+      <a href="excursions.html" class="btn primary" data-i18n="cta_explore">Explore excursions</a>
+      <a href="transfers.html" class="btn" data-i18n="cta_transfers">Book transfers</a>
+    </div>
+    <div class="trust row center">
+      <span>★ ★ ★ ★ ★ 4.9/5</span>
+      <span data-i18n="trust_text">Trusted by 10k+ travellers</span>
+    </div>
+  </div>
+</section>
+
+<section class="container section">
+  <h2 data-i18n="sec_featured">Featured experiences</h2>
+  <div class="cards">
+    <article class="card">
+      <img src="assets/placeholder.png" alt="Île aux Cerfs catamaran">
+      <div class="card-body">
+        <h3>Île aux Cerfs Catamaran</h3>
+        <p data-i18n="card_ile">Full‑day cruise with BBQ lunch & snorkelling.</p>
+        <div class="row between center">
+          <span class="price">Rs 3,400</span>
+          <a href="excursions.html#ile-aux-cerfs" class="btn small" data-i18n="btn_details">Details</a>
+        </div>
+      </div>
+    </article>
+    <article class="card">
+      <img src="assets/placeholder.png" alt="Wild South tour">
+      <div class="card-body">
+        <h3>Wild South Discovery</h3>
+        <p data-i18n="card_south">Grand Bassin, Chamarel, 7 Coloured Earth & more.</p>
+        <div class="row between center">
+          <span class="price">Rs 6,300</span>
+          <a href="excursions.html#wild-south" class="btn small" data-i18n="btn_details">Details</a>
+        </div>
+      </div>
+    </article>
+    <article class="card">
+      <img src="assets/placeholder.png" alt="Airport transfer">
+      <div class="card-body">
+        <h3 data-i18n="card_transfer_title">Airport Transfer</h3>
+        <p data-i18n="card_transfer">Private, child seats on request, meet & greet.</p>
+        <div class="row between center">
+          <span class="price">from Rs 1,300</span>
+          <a href="transfers.html" class="btn small" data-i18n="btn_book">Book</a>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="section alt">
+  <div class="container grid-2">
+    <div>
+      <h2 data-i18n="sec_why">Why choose us</h2>
+      <ul class="tick">
+        <li data-i18n="why1">Instant confirmations with calendar availability</li>
+        <li data-i18n="why2">Free 24h cancellation on most tours</li>
+        <li data-i18n="why3">WhatsApp support from real local guides</li>
+        <li data-i18n="why4">Transparent VAT‑inclusive prices</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3 data-i18n="sec_quick">Quick enquiry</h3>
+      <form id="enquiryForm">
+        <label data-i18n="label_name">Name</label>
+        <input required name="name" placeholder="Jane Doe">
+        <label>Email</label>
+        <input required type="email" name="email" placeholder="jane@example.com">
+        <label data-i18n="label_message">What would you like to do?</label>
+        <textarea name="message" rows="4" placeholder="Catamaran on Saturday, 2 adults + 1 child"></textarea>
+        <button class="btn primary" type="submit" data-i18n="btn_send">Send</button>
+        <p id="enquiryStatus" class="status"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container grid-3">
+    <div>
+      <div class="brand ft"><span class="brand-mark">IslandVista</span> Tours</div>
+      <p data-i18n="ft_tag">Authentic Mauritius. Seamless booking.</p>
+    </div>
+    <div>
+      <h4 data-i18n="ft_links">Links</h4>
+      <ul>
+        <li><a href="excursions.html" data-i18n="nav_excursions">Excursions</a></li>
+        <li><a href="transfers.html" data-i18n="nav_transfers">Transfers</a></li>
+        <li><a href="about.html" data-i18n="nav_about">About</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 data-i18n="ft_contact">Contact</h4>
+      <p>Email: hello@example.com<br>Phone: +230 000 0000</p>
+      <a class="btn ghost" href="https://wa.me/2300000000" target="_blank" rel="noopener" data-i18n="ft_whatsapp">Chat on WhatsApp</a>
+    </div>
+  </div>
+  <div class="sub">© 2025 IslandVista Tours • <a href="#" data-i18n="ft_terms">Terms</a> • <a href="#" data-i18n="ft_privacy">Privacy</a></div>
+</footer>
+</body>
+</html>
