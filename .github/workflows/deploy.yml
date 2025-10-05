@@ -1,0 +1,62 @@
+name: Deploy Firebase Hosting + Functions
+
+on:
+  push:
+    branches: [ "main" ]              # change if your default branch is different
+    paths:
+      - "**/*.html"
+      - "css/**"
+      - "assets/**"
+      - "js/**"
+      - "firebase.json"
+      - ".github/workflows/deploy.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🧾 Checkout repo
+        uses: actions/checkout@v4
+
+      - name: 🔐 Google auth (service account JSON)
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_MAUTOURS_60318 }}
+
+      - name: 🟦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 📦 Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      # OPTIONAL: keep functions:config in sync from secrets (skip if you already set via CLI once)
+      - name: ⚙️ Set Functions Config (ABSA)
+        if: ${{ secrets.ABSA_URL != '' }}
+        run: |
+          firebase functions:config:set \
+            absa.url="${{ secrets.ABSA_URL }}" \
+            absa.merchant_id="${{ secrets.ABSA_MERCHANT_ID }}" \
+            absa.secret="${{ secrets.ABSA_SECRET }}" \
+            absa.amount_mode="${{ secrets.ABSA_AMOUNT_MODE }}" \
+            absa.mock="${{ secrets.ABSA_MOCK }}" \
+            --project ${{ secrets.FIREBASE_PROJECT_ID }}
+
+      - name: 📁 Install Functions deps
+        working-directory: js/functions
+        run: npm ci
+
+      - name: 🚀 Deploy Functions
+        run: firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
+
+      - name: 🌐 Deploy Hosting
+        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
