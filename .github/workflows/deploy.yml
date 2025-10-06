@@ -2,7 +2,7 @@ name: Deploy Firebase Hosting + Functions
 
 on:
   push:
-    branches: [ "main" ]              # change if your default branch is different
+    branches: [ "main" ]
     paths:
       - "**/*.html"
       - "css/**"
@@ -22,6 +22,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    # ✅ Expose secrets as env so we can safely use them in `if:` checks
+    env:
+      FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+      ABSA_URL:            ${{ secrets.ABSA_URL }}
+      ABSA_MERCHANT_ID:    ${{ secrets.ABSA_MERCHANT_ID }}
+      ABSA_SECRET:         ${{ secrets.ABSA_SECRET }}
+      ABSA_AMOUNT_MODE:    ${{ secrets.ABSA_AMOUNT_MODE }}
+      ABSA_MOCK:           ${{ secrets.ABSA_MOCK }}
+
     steps:
       - name: 🧾 Checkout repo
         uses: actions/checkout@v4
@@ -39,24 +48,24 @@ jobs:
       - name: 📦 Install Firebase CLI
         run: npm i -g firebase-tools
 
-      # OPTIONAL: keep functions:config in sync from secrets (skip if you already set via CLI once)
+      # ✅ Only run if ABSA_URL env is present (works even if secret is missing)
       - name: ⚙️ Set Functions Config (ABSA)
-        if: ${{ secrets.ABSA_URL != '' }}
+        if: ${{ env.ABSA_URL != '' }}
         run: |
           firebase functions:config:set \
-            absa.url="${{ secrets.ABSA_URL }}" \
-            absa.merchant_id="${{ secrets.ABSA_MERCHANT_ID }}" \
-            absa.secret="${{ secrets.ABSA_SECRET }}" \
-            absa.amount_mode="${{ secrets.ABSA_AMOUNT_MODE }}" \
-            absa.mock="${{ secrets.ABSA_MOCK }}" \
-            --project ${{ secrets.FIREBASE_PROJECT_ID }}
+            absa.url="${ABSA_URL}" \
+            absa.merchant_id="${ABSA_MERCHANT_ID}" \
+            absa.secret="${ABSA_SECRET}" \
+            absa.amount_mode="${ABSA_AMOUNT_MODE}" \
+            absa.mock="${ABSA_MOCK}" \
+            --project "${FIREBASE_PROJECT_ID}"
 
       - name: 📁 Install Functions deps
         working-directory: js/functions
         run: npm ci
 
       - name: 🚀 Deploy Functions
-        run: firebase deploy --only functions --project ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: firebase deploy --only functions --project "${FIREBASE_PROJECT_ID}"
 
       - name: 🌐 Deploy Hosting
-        run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: firebase deploy --only hosting --project "${FIREBASE_PROJECT_ID}"
