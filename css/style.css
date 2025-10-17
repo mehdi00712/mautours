@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #faf9f7;
+  color: #333;
+}
+
+.container {
+  width: 90%;
+  max-width: 1000px;
+  margin: auto;
+  padding: 1rem 0;
+}
+
+.site-header {
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-weight: 700;
+  color: #005fa3;
+}
+
+.nav a {
+  margin: 0 10px;
+  color: #444;
+}
+
+.hero {
+  background: #fdfcfb;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  text-align: center;
+  padding: 1rem;
+}
+
+.card img { width: 100%; border-radius: 12px; }
+
+.btn, .btn-outline {
+  display: inline-block;
+  margin-top: .5rem;
+  padding: .6rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn { background: #005fa3; color: white; }
+.btn:hover { background: #004a82; }
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #005fa3;
+  color: #005fa3;
+}
+
+.footer {
+  text-align: center;
+  padding: 1rem 0;
+  font-size: .9rem;
+  background: #fff;
+  margin-top: 2rem;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+}
+
+.form-section form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+label { display: block; margin-bottom: 1rem; }
+input, select {
+  width: 100%;
+  padding: .6rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+th, td {
+  padding: .75rem;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+tr:hover { background: #f5f5f5; }
+
+.whatsapp-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #25D366;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 50px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
