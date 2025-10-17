@@ -1,118 +1,304 @@
-body {
+:root {
+  --brand: #007bff;
+  --brand-light: #eaf4ff;
+  --text: #333;
+  --bg: #ffffff;
+  --muted: #777;
+  --border: #e0e0e0;
+  --accent: #f5f5f5;
+  --radius: 10px;
+}
+
+/* Reset & global styles */
+* {
+  box-sizing: border-box;
   margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #faf9f7;
-  color: #333;
+  padding: 0;
+  font-family: "Poppins", system-ui, sans-serif;
 }
 
+body {
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+  border-radius: var(--radius);
+}
+
+a {
+  text-decoration: none;
+  color: var(--brand);
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #0056b3;
+}
+
+/* Container */
 .container {
-  width: 90%;
-  max-width: 1000px;
-  margin: auto;
-  padding: 1rem 0;
+  width: min(1100px, 90%);
+  margin: 0 auto;
 }
 
+.center {
+  text-align: center;
+}
+
+.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Header */
 .site-header {
   background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  padding: 0.75rem 0;
 }
 
 .logo {
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #005fa3;
+  color: var(--brand);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  gap: 1.2rem;
 }
 
 .nav a {
-  margin: 0 10px;
-  color: #444;
+  color: var(--text);
+  font-weight: 500;
+  padding: 0.5rem;
+  transition: 0.3s;
 }
 
+.nav a:hover,
+.nav a.active {
+  color: var(--brand);
+  border-bottom: 2px solid var(--brand);
+}
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(7px);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-7px);
+}
+
+/* Hero section */
 .hero {
-  background: #fdfcfb;
+  background: linear-gradient(180deg, var(--brand-light) 0%, #fff 100%);
+  padding: 4rem 1rem;
   text-align: center;
-  padding: 3rem 1rem;
 }
 
+.hero h2 {
+  font-size: 2rem;
+  color: var(--brand);
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: var(--muted);
+}
+
+/* Excursion cards */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  text-align: center;
+  background: var(--accent);
+  border-radius: var(--radius);
   padding: 1rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
 }
 
-.card img { width: 100%; border-radius: 12px; }
+.card:hover {
+  transform: translateY(-3px);
+}
 
-.btn, .btn-outline {
-  display: inline-block;
-  margin-top: .5rem;
-  padding: .6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
+.card h3 {
+  color: var(--brand);
+  margin-top: 0.75rem;
+}
+
+.card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.btn {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
   cursor: pointer;
-  text-decoration: none;
+  transition: background 0.3s;
 }
-
-.btn { background: #005fa3; color: white; }
-.btn:hover { background: #004a82; }
+.btn:hover {
+  background: #0056b3;
+}
 
 .btn-outline {
+  border: 2px solid var(--brand);
   background: transparent;
-  border: 2px solid #005fa3;
-  color: #005fa3;
+  color: var(--brand);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.btn-outline:hover {
+  background: var(--brand);
+  color: #fff;
 }
 
-.footer {
-  text-align: center;
-  padding: 1rem 0;
-  font-size: .9rem;
-  background: #fff;
-  margin-top: 2rem;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
-}
-
-.form-section form {
-  background: #fff;
+/* Forms */
+.form-section {
+  margin: 3rem auto;
+  background: var(--accent);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: var(--radius);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
 }
 
-label { display: block; margin-bottom: 1rem; }
-input, select {
-  width: 100%;
-  padding: .6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
+label {
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  margin-top: 0.25rem;
+}
+
+/* Table (Admin) */
 table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
+  margin-top: 1.5rem;
 }
-th, td {
-  padding: .75rem;
-  border-bottom: 1px solid #eee;
-  text-align: left;
-}
-tr:hover { background: #f5f5f5; }
 
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  text-align: center;
+}
+
+th {
+  background: var(--brand-light);
+  color: var(--brand);
+}
+
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1.2rem;
+  background: #f9f9f9;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+  color: var(--muted);
+}
+
+/* WhatsApp Floating Button */
 .whatsapp-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: #25D366;
+  background: #25d366;
   color: white;
-  padding: 12px 16px;
-  border-radius: 50px;
-  font-weight: bold;
-  text-decoration: none;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  font-size: 1.5rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  z-index: 999;
+}
+.whatsapp-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .nav {
+    position: absolute;
+    top: 60px;
+    right: 15px;
+    background: white;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 220px;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: none;
+  }
+
+  .nav.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: flex;
+  }
 }
