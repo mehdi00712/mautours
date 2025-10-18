@@ -7,10 +7,9 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-
   <!-- ===== Header ===== -->
   <header class="site-header">
-    <div class="container nav-container">
+    <div class="nav-container">
       <h1 class="logo">Mautours</h1>
       <nav class="nav" id="nav">
         <a href="index.html" class="active">Home</a>
@@ -24,73 +23,72 @@
     </div>
   </header>
 
-  <!-- ===== Hero ===== -->
+  <!-- ===== Hero Section ===== -->
   <section class="hero">
-    <div class="hero-content fade-in">
-      <h2>Discover Paradise with Mautours</h2>
-      <p>Unforgettable island adventures, crafted with care in Mauritius.</p>
-      <a href="booking.html" class="btn">Start Your Journey</a>
+    <div class="hero-content">
+      <h2>Discover the Magic of Mauritius</h2>
+      <p>From serene beaches to lush forests — your adventure begins here.</p>
+      <a href="booking.html" class="btn">Book Your Tour</a>
     </div>
   </section>
 
-  <!-- ===== About ===== -->
-  <section class="about fade-in">
-    <div class="container">
+  <!-- ===== Our Most Loved Experiences ===== -->
+  <section class="loved-section fade-in">
+    <h2>Our Most Loved Experiences</h2>
+    <div class="loved-carousel">
+      <div class="loved-cards" id="lovedCards">
+        <!-- Card 1 -->
+        <div class="loved-card">
+          <img src="assets/ile.jpg" alt="Ile aux Cerfs" />
+          <h3>Île aux Cerfs Adventure</h3>
+          <p>Golden beaches, turquoise waters, and a day of pure relaxation.</p>
+        </div>
+        <!-- Card 2 -->
+        <div class="loved-card">
+          <img src="assets/south.jpg" alt="South Tour" />
+          <h3>Southern Wonders Tour</h3>
+          <p>Discover Chamarel, the Seven Coloured Earth, and majestic waterfalls.</p>
+        </div>
+        <!-- Card 3 -->
+        <div class="loved-card">
+          <img src="assets/transfer.jpg" alt="Transfers" />
+          <h3>Private Island Transfers</h3>
+          <p>Seamless, comfortable rides to your dream destinations in style.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== About Us ===== -->
+  <section class="about-section fade-in">
+    <div class="container center">
       <h2>About Us</h2>
       <p>
-        At <b>Mautours</b>, we believe every traveller deserves a unique experience.
-        From serene catamaran cruises to breathtaking mountain drives, we craft each
-        journey to showcase the heart and soul of Mauritius.
+        At <strong>Mautours</strong>, we curate unforgettable experiences across Mauritius.
+        Whether it’s exploring the south or relaxing on Île aux Cerfs, we make your journey
+        effortless and memorable.
       </p>
     </div>
   </section>
 
-  <!-- ===== Experiences ===== -->
-  <section class="packages fade-in">
-    <div class="container">
-      <h2>Our Most Loved Experiences</h2>
-      <div class="cards">
-        <div class="card">
-          <img src="assets/ile.jpg" alt="Île aux Cerfs" />
-          <h3>Île aux Cerfs Catamaran</h3>
-          <p>Glide across turquoise lagoons, enjoy a BBQ lunch and relax on paradise beaches.</p>
-        </div>
-        <div class="card">
-          <img src="assets/south.jpg" alt="Wild South" />
-          <h3>Wild South Discovery</h3>
-          <p>Witness waterfalls, sacred lakes, and volcanic landscapes on this scenic tour.</p>
-        </div>
-        <div class="card">
-          <img src="assets/transfer.jpg" alt="Transfer" />
-          <h3>Airport Transfers</h3>
-          <p>Travel comfortably to and from the airport with our premium transfer service.</p>
-        </div>
-      </div>
-      <div class="center" style="margin-top: 2rem;">
-        <a href="booking.html" class="btn-outline">View All Packages</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== Contact ===== -->
-  <section class="contact fade-in">
-    <div class="container">
+  <!-- ===== Contact Us ===== -->
+  <section class="contact-section fade-in">
+    <div class="container center">
       <h2>Contact Us</h2>
-      <p>Have questions or special requests? We’d love to hear from you.</p>
-      <div class="contact-details">
-        <p>📍 Mauritius | 📞 +230 5254 2792 | ✉️ info@mautours.mu</p>
-      </div>
+      <p>
+        Have questions or custom requests?<br />
+        Reach us at <a href="mailto:info@mautours.com">info@mautours.com</a><br />
+        or call <strong>+230 5254 2792</strong>
+      </p>
     </div>
   </section>
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
-    <p>© 2025 Mautours. Crafted with ❤️ in Mauritius.</p>
+    <p>&copy; 2025 Mautours. All Rights Reserved.</p>
   </footer>
 
-  <a href="https://wa.me/23052542792" class="whatsapp-btn">💬 Chat on WhatsApp</a>
-
-  <!-- Keep defer so DOM loads before JS -->
-  <script defer src="js/main.js"></script>
+  <!-- ===== Scripts ===== -->
+  <script src="js/main.js"></script>
 </body>
 </html>
