@@ -1,31 +1,29 @@
-// Hamburger menu
+// ===== Safe Navbar Toggle =====
 const hamburger = document.getElementById("hamburger");
-const navMenu = document.getElementById("navMenu");
+const nav = document.getElementById("nav");
 
-hamburger?.addEventListener("click", () => {
-  navMenu.classList.toggle("open");
-  hamburger.classList.toggle("active");
-});
+if (hamburger && nav) {
+  hamburger.addEventListener("click", () => {
+    hamburger.classList.toggle("active");
+    nav.classList.toggle("open");
+  });
+}
 
-// Scroll fade animation
+// ===== Scroll Fade-in Animations =====
 const faders = document.querySelectorAll(".fade-in");
 
-const appear = new IntersectionObserver(
-  (entries, observer) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.2 }
-);
+if (faders.length > 0) {
+  const appear = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.2 }
+  );
 
-faders.forEach((el) => appear.observe(el));
-
-// Contact form (mock)
-document.getElementById("contactForm")?.addEventListener("submit", (e) => {
-  e.preventDefault();
-  alert("Thank you! We'll get back to you soon.");
-});
+  faders.forEach((el) => appear.observe(el));
+}
