@@ -19,7 +19,7 @@ document.getElementById("bookingForm").addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value;
   const phone = document.getElementById("phone").value;
   const date = document.getElementById("date").value;
-  const people = document.getElementById("people").value;
+  const people = document.getElementById("people").value; 
 
   try {
     await addDoc(collection(db, "bookings"), {
