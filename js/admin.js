@@ -18,6 +18,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
+// Check authentication
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Please log in first!");
@@ -31,39 +32,53 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+// Load bookings
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
-  const snapshot = await getDocs(collection(db, "bookings"));
-  tableBody.innerHTML = "";
+  tableBody.innerHTML = `<tr><td colspan="7">Loading bookings...</td></tr>`;
 
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${data.name}</td>
-      <td>${data.phone || "-"}</td>
-      <td>${data.email}</td>
-      <td>${data.package}</td>
-      <td>${data.date}</td>
-      <td>${data.people}</td>
-      <td><button class="delete-btn" data-id="${docSnap.id}">Delete</button></td>
-    `;
-    tableBody.appendChild(row);
-  });
+  try {
+    const snapshot = await getDocs(collection(db, "bookings"));
+    tableBody.innerHTML = "";
 
-  document.querySelectorAll(".delete-btn").forEach((btn) =>
-    btn.addEventListener("click", async () => {
-      await deleteDoc(doc(db, "bookings", btn.dataset.id));
-      loadBookings();
-    })
-  );
+    if (snapshot.empty) {
+      tableBody.innerHTML = `<tr><td colspan="7">No bookings found.</td></tr>`;
+      return;
+    }
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${data.name}</td>
+        <td>${data.phone || "-"}</td>
+        <td>${data.email}</td>
+        <td>${data.package}</td>
+        <td>${data.date}</td>
+        <td>${data.people}</td>
+        <td>
+          <button class="delete-btn" data-id="${docSnap.id}">Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    document.querySelectorAll(".delete-btn").forEach((btn) =>
+      btn.addEventListener("click", async () => {
+        if (confirm("Are you sure you want to delete this booking?")) {
+          await deleteDoc(doc(db, "bookings", btn.dataset.id));
+          loadBookings();
+        }
+      })
+    );
+  } catch (error) {
+    tableBody.innerHTML = `<tr><td colspan="7" style="color:red;">Error loading bookings: ${error.message}</td></tr>`;
+  }
 }
 
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    await signOut(auth);
-    alert("Logged out successfully!");
-    window.location.href = "index.html";
-  });
-}
+// Logout
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  await signOut(auth);
+  alert("Logged out successfully!");
+  window.location.href = "index.html";
+});
