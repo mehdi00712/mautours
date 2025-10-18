@@ -215,109 +215,7 @@ p {
   text-align: center;
 }
 
-/* ===== FIXED 3D CAROUSEL SECTION (corrected) ===== */
-.loved-section {
-  background: var(--lightblue);
-  padding: 5rem 1rem;
-  text-align: center;
-}
-
-.loved-section h2 {
-  color: var(--darkblue);
-  margin-bottom: 2rem;
-  font-size: 2rem;
-}
-
-.carousel-container {
-  position: relative;
-  width: 100%;
-  height: 420px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  perspective: 1200px;
-  overflow: hidden;
-}
-
-.carousel {
-  position: relative;
-  width: 100%;
-  max-width: 900px;
-  height: 360px;
-  transform-style: preserve-3d;
-  transform-origin: center center;
-  transition: transform 1s ease;
-}
-
-.carousel-item {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform-style: preserve-3d;
-  width: 260px;
-  height: 320px;
-  background: var(--white);
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-  text-align: center;
-  overflow: hidden;
-  transform-origin: center center;
-  backface-visibility: hidden;
-  transition: transform 1s ease, opacity 0.8s ease;
-}
-
-.carousel-item img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-bottom: 3px solid var(--blue);
-}
-
-.carousel-item h3 {
-  color: var(--darkblue);
-  margin-top: 0.8rem;
-  font-size: 1.1rem;
-}
-
-.carousel-item p {
-  color: var(--muted);
-  padding: 0.5rem 1rem;
-  font-size: 0.9rem;
-}
-
-/* Proper circular layout, always facing front */
-.carousel-item:nth-child(1) { transform: rotateY(0deg) translateZ(380px); }
-.carousel-item:nth-child(2) { transform: rotateY(72deg) translateZ(380px); }
-.carousel-item:nth-child(3) { transform: rotateY(144deg) translateZ(380px); }
-.carousel-item:nth-child(4) { transform: rotateY(216deg) translateZ(380px); }
-.carousel-item:nth-child(5) { transform: rotateY(288deg) translateZ(380px); }
-
-/* Carousel Buttons */
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--darkblue);
-  border: none;
-  font-size: 2rem;
-  padding: 0.3rem 0.8rem;
-  border-radius: 50%;
-  cursor: pointer;
-  z-index: 10;
-  transition: background 0.3s ease, transform 0.2s;
-}
-
-.carousel-btn:hover {
-  background: var(--blue);
-  color: var(--white);
-  transform: translateY(-50%) scale(1.1);
-}
-
-.carousel-btn.prev { left: 6%; }
-.carousel-btn.next { right: 6%; }
-
-/* ===== Booking Page Cards ===== */
+/* ===== Package Cards ===== */
 .package-list {
   display: flex;
   flex-direction: column;
@@ -347,12 +245,27 @@ p {
   transition: transform 0.3s ease;
 }
 
+.package-card:hover img {
+  transform: scale(1.05);
+}
+
 .package-info {
   flex: 1;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.package-info h3 {
+  font-size: 1.3rem;
+  color: var(--darkblue);
+  margin-bottom: 0.5rem;
+}
+
+.package-info p {
+  color: var(--muted);
+  margin-bottom: 1rem;
 }
 
 .package-footer {
@@ -364,6 +277,16 @@ p {
 .package-footer .price {
   color: var(--blue);
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .package-card {
+    flex-direction: column;
+  }
+
+  .package-info {
+    padding: 1.5rem;
+  }
 }
 
 /* ===== Booking Modal ===== */
@@ -390,7 +313,7 @@ p {
   border-radius: 16px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   width: 90%;
-  max-width: 460px;
+  max-width: 420px;
   padding: 2rem;
   position: relative;
   animation: slideUp 0.4s ease;
@@ -400,28 +323,46 @@ p {
   color: var(--darkblue);
   margin-bottom: 1rem;
   text-align: center;
-  font-size: 1.4rem;
-  font-weight: 600;
 }
 
 .modal-content form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.modal-content form input,
-.modal-content form select {
+.modal-content input {
   padding: 0.8rem;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 1rem;
+}
+
+.modal-content button {
   width: 100%;
 }
 
-.modal-content form button {
-  grid-column: span 2;
-  margin-top: 0.8rem;
+.close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.5rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close:hover {
+  color: var(--darkblue);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ===== Login Page ===== */
@@ -436,46 +377,30 @@ p {
 
 .login-box {
   background: var(--white);
-  padding: 2.5rem 3rem;
+  padding: 2rem 2.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  max-width: 420px;
+  width: 100%;
+  max-width: 400px;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+}
+
+.login-box h2 {
+  color: var(--darkblue);
+  margin-bottom: 1.5rem;
 }
 
 .login-box input {
   width: 100%;
-  padding: 0.9rem;
+  padding: 0.8rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 1rem;
-  outline: none;
-  transition: 0.3s;
-}
-
-.login-box input:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 6px rgba(0, 115, 255, 0.2);
 }
 
 .login-box button {
-  background: var(--blue);
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 0.8rem 2rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.login-box button:hover {
-  background: var(--darkblue);
-  transform: translateY(-2px);
+  width: 100%;
 }
 
 /* ===== Dashboard ===== */
@@ -488,29 +413,20 @@ p {
   box-shadow: var(--shadow);
 }
 
-.dashboard-container h3 {
-  font-size: 1.5rem;
-  color: var(--darkblue);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
 .table-wrapper {
   overflow-x: auto;
   margin-top: 1.5rem;
-  border-radius: 12px;
 }
 
 #bookingsTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.95rem;
-  background: var(--white);
 }
 
 #bookingsTable th,
 #bookingsTable td {
-  padding: 1rem;
+  padding: 0.8rem;
   border-bottom: 1px solid #eee;
   text-align: center;
 }
@@ -518,54 +434,71 @@ p {
 #bookingsTable th {
   background: var(--blue);
   color: var(--white);
-  text-transform: uppercase;
-  font-weight: 600;
 }
 
 #bookingsTable tr:nth-child(even) {
-  background: #f9fbff;
+  background: var(--lightblue);
 }
 
+.delete-btn {
+  background: #e63946;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.delete-btn:hover {
+  background: #b71c1c;
+}
+
+/* ===== Revenue Summary ===== */
 .summary-box {
-  margin: 2rem auto;
-  background: var(--lightblue);
-  padding: 1.2rem 2.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  margin: 1.5rem auto;
   text-align: center;
-  max-width: 500px;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  background: var(--lightblue);
+  box-shadow: var(--shadow);
+  width: fit-content;
 }
 
 .summary-box h3 {
   color: var(--darkblue);
-  font-weight: 600;
   font-size: 1.3rem;
 }
 
 #totalRevenue {
   color: var(--blue);
   font-weight: 700;
-  font-size: 1.3rem;
 }
 
-.logout-btn {
-  background: var(--blue);
-  color: #fff;
-  border: none;
-  padding: 0.7rem 2rem;
-  border-radius: 50px;
+/* ===== Revenue Progress Bar ===== */
+.revenue-bar {
+  width: 100%;
+  max-width: 500px;
+  height: 18px;
+  background: #e6efff;
+  border-radius: 12px;
+  margin: 0.8rem auto 0.5rem auto;
+  overflow: hidden;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+#revenueFill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--blue), var(--darkblue));
+  border-radius: 12px;
+  transition: width 1s ease-in-out, background 0.6s ease;
+}
+
+#revenueValue {
+  color: var(--darkblue);
   font-weight: 600;
-  cursor: pointer;
-  margin-top: 1.5rem;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  transition: 0.3s;
-}
-
-.logout-btn:hover {
-  background: var(--darkblue);
-  transform: translateY(-2px);
+  font-size: 1.2rem;
 }
 
 /* ===== Footer ===== */
