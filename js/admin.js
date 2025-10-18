@@ -1,6 +1,5 @@
-// admin.js - Mautours Dashboard
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -17,71 +16,39 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const tableBody = document.querySelector("#bookingsTable tbody");
-const totalRevenueEl = document.getElementById("totalRevenue");
+const bookingsTable = document.querySelector("#bookingsTable tbody");
 
-async function loadBookings() {
-  tableBody.innerHTML = "";
+// Live updates from Firestore
+onSnapshot(collection(db, "bookings"), (snapshot) => {
+  bookingsTable.innerHTML = "";
   let totalRevenue = 0;
 
-  try {
-    const querySnapshot = await getDocs(collection(db, "bookings"));
+  snapshot.forEach((doc) => {
+    const data = doc.data();
+    const price = parseFloat(data.price || 0);
+    totalRevenue += price;
 
-    querySnapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      const tr = document.createElement("tr");
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${data.name}</td>
+      <td>${data.email}</td>
+      <td>${data.excursion}</td>
+      <td>${data.price}</td>
+      <td>${data.date}</td>
+      <td>${data.people}</td>
+      <td>${data.status}</td>
+    `;
+    bookingsTable.appendChild(tr);
+  });
 
-      const isPaid = data.status === "paid";
-      if (isPaid) totalRevenue += parseFloat(data.price) || 0;
-
-      tr.innerHTML = `
-        <td>${data.name}</td>
-        <td>${data.email}</td>
-        <td>${data.excursion}</td>
-        <td>${data.date}</td>
-        <td>${data.people}</td>
-        <td>${data.price}</td>
-        <td><span class="${isPaid ? "status-paid" : "status-pending"}">${data.status}</span></td>
-        <td>
-          <button class="btn-small mark-paid" data-id="${docSnap.id}">Mark Paid</button>
-          <button class="btn-small delete" data-id="${docSnap.id}">Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(tr);
-    });
-
-    totalRevenueEl.textContent = `MUR ${totalRevenue}`;
-  } catch (err) {
-    console.error("Error loading bookings:", err);
-  }
-}
-
-// Handle mark as paid & delete
-tableBody.addEventListener("click", async (e) => {
-  const id = e.target.dataset.id;
-  if (!id) return;
-
-  if (e.target.classList.contains("mark-paid")) {
-    try {
-      await updateDoc(doc(db, "bookings", id), { status: "paid" });
-      alert("Booking marked as paid ✅");
-      loadBookings();
-    } catch (err) {
-      console.error("Error marking as paid:", err);
-    }
-  }
-
-  if (e.target.classList.contains("delete")) {
-    if (confirm("Are you sure you want to delete this booking?")) {
-      try {
-        await deleteDoc(doc(db, "bookings", id));
-        alert("Booking deleted 🗑️");
-        loadBookings();
-      } catch (err) {
-        console.error("Error deleting booking:", err);
-      }
-    }
-  }
+  // Show total revenue
+  const tfoot = document.createElement("tfoot");
+  tfoot.innerHTML = `
+    <tr>
+      <th colspan="3">Total Revenue</th>
+      <th>MUR ${totalRevenue.toFixed(2)}</th>
+      <th colspan="3"></th>
+    </tr>
+  `;
+  bookingsTable.appendChild(tfoot);
 });
-
-loadBookings();
