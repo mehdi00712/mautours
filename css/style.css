@@ -195,7 +195,7 @@ body {
   color: var(--white);
 }
 
-/* ===== Sections ===== */
+/* ===== General Sections ===== */
 section {
   padding: 4rem 0;
 }
@@ -215,7 +215,98 @@ p {
   text-align: center;
 }
 
-/* ===== Package Cards ===== */
+/* ===== Loved Experiences (Carousel) ===== */
+.loved-section {
+  background: var(--lightblue);
+  padding: 4rem 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.loved-section h2 {
+  text-align: center;
+  color: var(--darkblue);
+  margin-bottom: 2rem;
+  font-size: 2rem;
+}
+
+.loved-carousel {
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.loved-cards {
+  display: flex;
+  transition: transform 1s ease-in-out;
+  width: 300%;
+  gap: 2rem;
+}
+
+.loved-card {
+  min-width: 300px;
+  max-width: 350px;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  padding: 1.5rem;
+  flex-shrink: 0;
+  transform: scale(0.96);
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
+}
+
+.loved-card:hover {
+  transform: scale(1);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.loved-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.loved-card h3 {
+  color: var(--darkblue);
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.loved-card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .loved-cards {
+    gap: 1rem;
+  }
+  .loved-card {
+    min-width: 260px;
+  }
+}
+
+/* ===== About & Contact ===== */
+.about-section,
+.contact-section {
+  background: var(--white);
+  padding: 4rem 1.5rem;
+}
+
+.about-section p,
+.contact-section p {
+  text-align: center;
+  color: var(--muted);
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ===== Booking Cards ===== */
 .package-list {
   display: flex;
   flex-direction: column;
@@ -286,82 +377,6 @@ p {
 
   .package-info {
     padding: 1.5rem;
-  }
-}
-
-/* ===== Booking Modal ===== */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 3000;
-}
-
-.modal.show {
-  display: flex;
-  animation: fadeIn 0.3s ease forwards;
-}
-
-.modal-content {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-  width: 90%;
-  max-width: 420px;
-  padding: 2rem;
-  position: relative;
-  animation: slideUp 0.4s ease;
-}
-
-.modal-content h3 {
-  color: var(--darkblue);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.modal-content form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.modal-content input {
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.modal-content button {
-  width: 100%;
-}
-
-.close {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  font-size: 1.5rem;
-  color: var(--muted);
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.close:hover {
-  color: var(--darkblue);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
@@ -454,53 +469,6 @@ p {
   background: #b71c1c;
 }
 
-/* ===== Revenue Summary ===== */
-.summary-box {
-  margin: 1.5rem auto;
-  text-align: center;
-  padding: 1rem 2rem;
-  border-radius: var(--radius);
-  background: var(--lightblue);
-  box-shadow: var(--shadow);
-  width: fit-content;
-}
-
-.summary-box h3 {
-  color: var(--darkblue);
-  font-size: 1.3rem;
-}
-
-#totalRevenue {
-  color: var(--blue);
-  font-weight: 700;
-}
-
-/* ===== Revenue Progress Bar ===== */
-.revenue-bar {
-  width: 100%;
-  max-width: 500px;
-  height: 18px;
-  background: #e6efff;
-  border-radius: 12px;
-  margin: 0.8rem auto 0.5rem auto;
-  overflow: hidden;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
-}
-
-#revenueFill {
-  height: 100%;
-  width: 0;
-  background: linear-gradient(90deg, var(--blue), var(--darkblue));
-  border-radius: 12px;
-  transition: width 1s ease-in-out, background 0.6s ease;
-}
-
-#revenueValue {
-  color: var(--darkblue);
-  font-weight: 600;
-  font-size: 1.2rem;
-}
-
 /* ===== Footer ===== */
 .footer {
   background: var(--darkblue);
@@ -516,7 +484,6 @@ p {
   transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
-
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
