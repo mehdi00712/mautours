@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book Now | Mautours</title>
+  <title>Book an Excursion | Mautours</title>
   <link rel="stylesheet" href="css/style.css" />
   <script type="module" src="js/booking.js" defer></script>
 </head>
@@ -21,30 +21,41 @@
   </header>
 
   <section class="container">
-    <h2>Available Packages</h2>
-    <div class="cards" id="packages">
-      <div class="card">
+    <h2 class="center">Our Exclusive Packages</h2>
+    <p class="center muted">Choose your adventure and book in just a few clicks</p>
+
+    <div class="package-list">
+      <!-- Package 1 -->
+      <div class="package-card">
         <img src="assets/ile.jpg" alt="Île aux Cerfs" />
-        <h3>Île aux Cerfs Catamaran</h3>
-        <p>Full-day cruise | BBQ lunch | Snorkeling.</p>
-        <p class="price">Rs 3 400</p>
-        <button class="btn" onclick="selectPackage('Île aux Cerfs Catamaran',3400)">Book Now</button>
+        <div class="package-info">
+          <h3>Île aux Cerfs Catamaran</h3>
+          <p>Full-day luxury catamaran cruise with BBQ lunch and snorkeling stop at Île aux Cerfs Lagoon.</p>
+          <span class="price">Rs 3,400</span>
+          <button class="btn-outline" onclick="selectPackage('Île aux Cerfs Catamaran', 3400)">Book Now</button>
+        </div>
       </div>
 
-      <div class="card">
+      <!-- Package 2 -->
+      <div class="package-card">
         <img src="assets/wildsouth.jpg" alt="Wild South" />
-        <h3>Wild South Discovery</h3>
-        <p>Grand Bassin | Chamarel | 7 Coloured Earth.</p>
-        <p class="price">Rs 6 300</p>
-        <button class="btn" onclick="selectPackage('Wild South Discovery',6300)">Book Now</button>
+        <div class="package-info">
+          <h3>Wild South Discovery</h3>
+          <p>Explore Grand Bassin, Chamarel, Black River Gorges, and the iconic Seven Coloured Earth.</p>
+          <span class="price">Rs 6,300</span>
+          <button class="btn-outline" onclick="selectPackage('Wild South Discovery', 6300)">Book Now</button>
+        </div>
       </div>
 
-      <div class="card">
+      <!-- Package 3 -->
+      <div class="package-card">
         <img src="assets/transfer.jpg" alt="Airport Transfer" />
-        <h3>Airport Transfer</h3>
-        <p>Private transfer anywhere in Mauritius.</p>
-        <p class="price">Rs 1 300</p>
-        <button class="btn" onclick="selectPackage('Airport Transfer',1300)">Book Now</button>
+        <div class="package-info">
+          <h3>Airport Transfer</h3>
+          <p>Private, air-conditioned transfer anywhere on the island. Reliable and professional service.</p>
+          <span class="price">Rs 1,300</span>
+          <button class="btn-outline" onclick="selectPackage('Airport Transfer', 1300)">Book Now</button>
+        </div>
       </div>
     </div>
   </section>
