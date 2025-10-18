@@ -11,8 +11,9 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
-// Login form
 const loginForm = document.getElementById("loginForm");
+const message = document.getElementById("loginMessage");
+
 if (loginForm) {
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -22,19 +23,23 @@ if (loginForm) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
+        message.textContent = "Login successful! Redirecting...";
+        message.style.color = "green";
+
         if (user.uid === adminUID) {
-          window.location.href = "admin.html";
+          setTimeout(() => (window.location.href = "admin.html"), 800);
         } else {
-          window.location.href = "index.html";
+          setTimeout(() => (window.location.href = "index.html"), 800);
         }
       })
       .catch((error) => {
-        alert("Login failed: " + error.message);
+        message.textContent = "Login failed: " + error.message;
+        message.style.color = "red";
       });
   });
 }
 
-// Logout button
+// Logout handler
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
