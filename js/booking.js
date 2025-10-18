@@ -1,86 +1,75 @@
+// js/booking.js
+import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getFirestore,
   collection,
   addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.addEventListener("DOMContentLoaded", () => {
-  const bookButtons = document.querySelectorAll(".book-btn");
-  const modal = document.getElementById("bookingModal");
-  const closeBtn = document.querySelector(".modal .close");
-  const modalTitle = document.getElementById("modalTitle");
-  const form = document.getElementById("bookingForm");
+// Handle Book Now buttons
+const bookButtons = document.querySelectorAll(".book-btn");
 
-  let selectedPackage = null;
-  let selectedPrice = null;
-
-  // Open modal
-  bookButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      selectedPackage = btn.dataset.package;
-      selectedPrice = btn.dataset.price;
-      modalTitle.textContent = `Book: ${selectedPackage}`;
-      modal.classList.add("show");
-      document.body.style.overflow = "hidden";
-    });
+bookButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const packageName = btn.dataset.package;
+    openBookingModal(packageName);
   });
+});
 
-  // Close modal
-  closeBtn.addEventListener("click", () => {
+// Modal logic
+const modal = document.getElementById("bookingModal");
+const closeModal = document.getElementById("closeModal");
+const bookingForm = document.getElementById("bookingForm");
+const checkoutBtn = document.getElementById("checkoutBtn");
+let selectedPackage = "";
+
+function openBookingModal(packageName) {
+  selectedPackage = packageName;
+  modal.classList.add("show");
+  document.getElementById("selectedPackage").value = packageName;
+}
+
+if (closeModal) {
+  closeModal.addEventListener("click", () => {
     modal.classList.remove("show");
-    document.body.style.overflow = "auto";
   });
+}
 
-  // Submit form
-  form.addEventListener("submit", async (e) => {
+// Handle Booking Submission
+if (bookingForm) {
+  bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const phone = form.phone.value.trim();
-    const date = form.date.value;
-    const people = form.people.value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const people = document.getElementById("people").value.trim();
+    const date = document.getElementById("date").value.trim();
 
     try {
       await addDoc(collection(db, "bookings"), {
-        package: selectedPackage,
-        price: selectedPrice,
         name,
         email,
         phone,
-        date,
         people,
-        createdAt: new Date(),
+        date,
+        package: selectedPackage,
+        createdAt: serverTimestamp()
       });
 
-      // Temporary animation before ABSA redirect
-      modal.innerHTML = `
-        <div style="text-align:center;padding:2rem;">
-          <h3>Redirecting to Payment Portal...</h3>
-          <p>Please wait while we connect you to ABSA Secure Payment.</p>
-          <div class="spinner"></div>
-        </div>
-      `;
-
-      // TODO: replace this with your real ABSA link
-      const absaURL = "https://secureacceptance.cybersource.com/pay";
-      setTimeout(() => {
-        window.location.href = absaURL;
-      }, 2000);
-    } catch (err) {
-      alert("Error saving booking: " + err.message);
-    }
-  });
-
-  // Click outside closes modal
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) {
       modal.classList.remove("show");
-      document.body.style.overflow = "auto";
+      alert("✅ Booking saved! Redirecting to payment...");
+
+      // TODO: replace with ABSA live redirect link when you receive it
+      setTimeout(() => {
+        window.location.href = "https://secureacceptance.cybersource.com/pay";
+      }, 1500);
+    } catch (error) {
+      alert("❌ Error saving booking: " + error.message);
     }
   });
-});
+}
