@@ -1,24 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard | Mautours</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/main.js"></script>
+  <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/admin.js" defer></script>
 </head>
 <body>
   <header class="site-header">
-    <div class="container between">
-      <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="navMenu">
-        <a href="index.html">Home</a>
-        <a href="booking.html">Book</a>
-        <a href="login.html">Login</a>
-        <a href="admin.html" class="active">Dashboard</a>
-      </nav>
-      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    <div class="container">
+      <h1 class="logo">Mautours Dashboard</h1>
     </div>
   </header>
 
@@ -27,23 +19,11 @@
     <table id="bookingsTable">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Excursion</th>
-          <th>Price (MUR)</th>
-          <th>Date</th>
-          <th>People</th>
-          <th>Status</th>
+          <th>Name</th><th>Email</th><th>Excursion</th><th>Date</th><th>People</th><th>Status</th><th>Action</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </section>
-
-  <footer class="footer">
-    <p>© 2025 Mautours</p>
-  </footer>
-
-  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬</a>
 </body>
 </html>
