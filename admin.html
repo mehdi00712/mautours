@@ -27,11 +27,15 @@
   <main style="padding-top: 100px;">
     <section class="dashboard-container">
       <h2 class="center">Admin Dashboard</h2>
-      <p class="center" style="color: var(--muted);">Manage all your bookings below.</p>
+      <p class="center" style="color: var(--muted);">Manage all your bookings and view total revenue.</p>
 
       <!-- ===== Revenue Summary ===== -->
       <div id="revenueSummary" class="summary-box fade-in">
-        <h3>Total Revenue: <span id="totalRevenue">Rs 0</span></h3>
+        <h3>Total Revenue</h3>
+        <div class="revenue-bar">
+          <div id="revenueFill"></div>
+        </div>
+        <p id="revenueValue">Rs 0</p>
       </div>
 
       <!-- ===== Bookings Table ===== -->
