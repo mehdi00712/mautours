@@ -25,7 +25,13 @@
   </header>
 
   <section class="container">
-    <h2>All Bookings</h2>
+    <h2>Admin Dashboard</h2>
+    <p>Manage bookings and view total revenue</p>
+
+    <div class="stats-box">
+      <h3>Total Revenue: <span id="totalRevenue">MUR 0</span></h3>
+    </div>
+
     <table id="bookingsTable">
       <thead>
         <tr>
@@ -34,6 +40,7 @@
           <th>Excursion</th>
           <th>Date</th>
           <th>People</th>
+          <th>Price (MUR)</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
@@ -41,6 +48,10 @@
       <tbody></tbody>
     </table>
   </section>
+
+  <footer class="footer">
+    <p>© 2025 Mautours</p>
+  </footer>
 
   <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬</a>
 </body>
