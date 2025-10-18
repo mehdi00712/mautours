@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours – Dashboard</title>
+  <title>Mautours Admin Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -22,32 +22,35 @@
     </div>
   </header>
 
-  <main class="container center" style="margin-top: 120px;">
+  <main style="padding-top: 100px; text-align: center;">
     <h2>Admin Dashboard</h2>
     <p>Manage bookings below:</p>
 
-    <table id="bookingsTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Package</th>
-          <th>Email</th>
-          <th>Date</th>
-          <th>People</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="dashboard-container">
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Package</th>
+            <th>Date</th>
+            <th>People</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-    <button id="logoutBtn" class="btn" style="margin-top: 1.5rem;">Logout</button>
+      <button id="logoutBtn" class="btn" style="margin-top: 2rem;">Logout</button>
+    </div>
   </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
-  <script src="js/firebase-config.js"></script>
-  <script src="js/admin.js"></script>
+  <footer class="footer">
+    <p>&copy; 2025 Mautours. All Rights Reserved.</p>
+  </footer>
+
+  <script type="module" src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
