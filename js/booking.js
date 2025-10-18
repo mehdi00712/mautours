@@ -5,34 +5,16 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Toggle “View Details”
-window.toggleDetails = function (btn) {
-  const details = btn.closest(".package-info").querySelector(".details");
-  const isHidden = details.classList.contains("hidden");
-  details.classList.toggle("hidden");
-
-  if (isHidden) {
-    btn.textContent = "Hide Details";
-    details.style.maxHeight = details.scrollHeight + "px";
-  } else {
-    btn.textContent = "View Details";
-    details.style.maxHeight = null;
-  }
-};
-
 // Select package
 window.selectPackage = function (name, price) {
+  const section = document.getElementById("checkoutSection");
   document.getElementById("excursion").value = name;
   document.getElementById("total").value = price;
-  document.getElementById("checkoutSection").classList.remove("hidden");
-
-  window.scrollTo({
-    top: document.getElementById("checkoutSection").offsetTop - 50,
-    behavior: "smooth",
-  });
+  section.classList.remove("hidden");
+  section.scrollIntoView({ behavior: "smooth" });
 };
 
-// Submit booking
+// Booking submission
 const form = document.getElementById("bookingForm");
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -47,7 +29,7 @@ if (form) {
     const total = document.getElementById("total").value;
 
     if (!name || !email || !phone || !date || !people) {
-      alert("Please fill in all fields before proceeding.");
+      alert("Please fill all fields.");
       return;
     }
 
@@ -64,6 +46,7 @@ if (form) {
         created_at: serverTimestamp(),
       });
 
+      // ABSA Hosted Payment Redirect
       const merchantID = "bbm_coraplexltd_1232735_mur";
       const returnUrl = encodeURIComponent(
         "https://mehdi00712.github.io/mautours/success.html"
@@ -74,8 +57,8 @@ if (form) {
 
       window.location.href = absaUrl;
     } catch (err) {
-      console.error("Error saving booking:", err);
-      alert("Something went wrong. Please try again later.");
+      console.error(err);
+      alert("Error saving booking. Please try again later.");
     }
   });
 }
