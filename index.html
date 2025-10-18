@@ -32,30 +32,37 @@
     </div>
   </section>
 
-  <!-- ===== Our Most Loved Experiences ===== -->
+  <!-- ===== Our Most Loved Experiences (3D Carousel) ===== -->
   <section class="loved-section fade-in">
     <h2>Our Most Loved Experiences</h2>
-    <div class="loved-carousel">
-      <div class="loved-cards" id="lovedCards">
-        <!-- Card 1 -->
-        <div class="loved-card">
-          <img src="assets/ile.jpg" alt="Ile aux Cerfs" />
+
+    <div class="carousel-container">
+      <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
+
+      <div class="carousel" id="carousel">
+        <div class="carousel-item">
+          <img src="assets/ile.jpg" alt="Île aux Cerfs" />
           <h3>Île aux Cerfs Adventure</h3>
           <p>Golden beaches, turquoise waters, and a day of pure relaxation.</p>
         </div>
-        <!-- Card 2 -->
-        <div class="loved-card">
+        <div class="carousel-item">
           <img src="assets/south.jpg" alt="South Tour" />
           <h3>Southern Wonders Tour</h3>
           <p>Discover Chamarel, the Seven Coloured Earth, and majestic waterfalls.</p>
         </div>
-        <!-- Card 3 -->
-        <div class="loved-card">
+        <div class="carousel-item">
           <img src="assets/transfer.jpg" alt="Transfers" />
           <h3>Private Island Transfers</h3>
           <p>Seamless, comfortable rides to your dream destinations in style.</p>
         </div>
+        <div class="carousel-item">
+          <img src="assets/north.jpg" alt="Northern Discovery" />
+          <h3>Northern Discovery</h3>
+          <p>Explore Port Louis, Grand Baie, and the charm of the northern coast.</p>
+        </div>
       </div>
+
+      <button class="carousel-btn next" id="nextBtn">&#10095;</button>
     </div>
   </section>
 
