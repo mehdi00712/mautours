@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | Mautours</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script type="module" src="js/auth.js"></script>
-  <script defer src="js/main.js"></script>
-
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
   <header class="site-header">
-    <div class="container between">
+    <div class="container">
       <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="navMenu">
+      <nav class="nav" id="nav">
         <a href="index.html">Home</a>
         <a href="booking.html">Book</a>
         <a href="login.html" class="active">Login</a>
@@ -25,17 +23,22 @@
     </div>
   </header>
 
-  <section class="container fade-in">
-    <h2 class="center">Login to Mautours</h2>
+  <section class="form-section fade-in">
+    <h2 class="center">Login or Register</h2>
     <form id="loginForm">
-      <label>Email <input type="email" id="email" required /></label>
-      <label>Password <input type="password" id="password" required /></label>
-      <button type="submit" class="btn">Login</button>
+      <label>Email</label>
+      <input type="email" id="email" required>
+      <label>Password</label>
+      <input type="password" id="password" required>
+      <button type="submit" class="btn">Login / Register</button>
     </form>
   </section>
 
   <footer class="footer">
-    <p>© 2025 Mautours | Discover Mauritius</p>
+    <p>© 2025 Mautours. Secure access for travelers.</p>
   </footer>
+
+  <script type="module" src="js/auth.js"></script>
+  <script defer src="js/main.js"></script>
 </body>
 </html>
