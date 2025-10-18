@@ -302,3 +302,48 @@ tr:nth-child(even) {
     display: flex;
   }
 }
+
+/* Admin dashboard */
+.stats-box {
+  background: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.btn-small {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  margin: 0.1rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-small.delete {
+  background: #dc3545;
+}
+.btn-small.delete:hover {
+  background: #a52834;
+}
+.btn-small.mark-paid {
+  background: #198754;
+}
+.btn-small.mark-paid:hover {
+  background: #146c43;
+}
+
+.status-paid {
+  color: #198754;
+  font-weight: 600;
+}
+
+.status-pending {
+  color: #dc3545;
+  font-weight: 600;
+}
