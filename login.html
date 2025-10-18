@@ -5,8 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login | Mautours</title>
   <link rel="stylesheet" href="css/style.css" />
+  <script type="module" src="js/auth.js" defer></script>
 </head>
 <body>
+  <header class="site-header">
+    <div class="container between">
+      <h1 class="logo">Mautours</h1>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="booking.html">Book</a>
+        <a href="login.html" class="active">Login</a>
+        <a href="admin.html">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
   <section class="container form-section">
     <h2>Login or Sign Up</h2>
     <form id="authForm">
@@ -18,10 +31,9 @@
   </section>
 
   <footer class="footer">
-    <p>© 2025 Mautours</p>
+    <p>© 2025 Mautours | <a href="index.html">Home</a> | <a href="booking.html">Book</a></p>
   </footer>
 
   <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬 Chat on WhatsApp</a>
-  <script type="module" src="js/auth.js" defer></script>
 </body>
 </html>
