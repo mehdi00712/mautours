@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Book an Excursion | Mautours</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script type="module" src="js/booking.js"></script>
-  <script defer src="js/main.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Your Adventure | Mautours</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
   <header class="site-header">
-    <div class="container between">
+    <div class="container">
       <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="navMenu">
+      <nav class="nav" id="nav">
         <a href="index.html">Home</a>
         <a href="booking.html" class="active">Book</a>
         <a href="login.html">Login</a>
@@ -26,63 +25,40 @@
 
   <section class="container fade-in">
     <h2 class="center">Our Exclusive Packages</h2>
-    <p class="center muted">Choose your adventure and book in just a few clicks</p>
+    <p class="center">Choose your adventure and book instantly.</p>
 
     <div class="package-list">
-      <div class="package-card fade-in">
-        <img src="assets/ile.jpg" alt="Île aux Cerfs" />
+      <div class="package-card">
+        <img src="assets/ile.jpg" alt="Ile aux Cerfs">
         <div class="package-info">
           <h3>Île aux Cerfs Catamaran</h3>
           <p>Full-day luxury catamaran cruise with BBQ lunch and snorkeling in turquoise lagoons.</p>
           <div class="package-footer">
             <span class="price">Rs 3,400</span>
-            <button class="btn" onclick="selectPackage('Île aux Cerfs Catamaran', 3400)">Book Now</button>
+            <button class="btn" onclick="bookNow('Ile aux Cerfs Catamaran', 3400)">Book Now</button>
           </div>
         </div>
       </div>
 
-      <div class="package-card fade-in">
-        <img src="assets/wildsouth.jpg" alt="Wild South Discovery" />
+      <div class="package-card">
+        <img src="assets/south.jpg" alt="Wild South Discovery">
         <div class="package-info">
           <h3>Wild South Discovery</h3>
           <p>Explore Grand Bassin, Chamarel, Black River Gorges, and the Seven Coloured Earth.</p>
           <div class="package-footer">
             <span class="price">Rs 6,300</span>
-            <button class="btn" onclick="selectPackage('Wild South Discovery', 6300)">Book Now</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="package-card fade-in">
-        <img src="assets/transfer.jpg" alt="Airport Transfer" />
-        <div class="package-info">
-          <h3>Airport Transfer</h3>
-          <p>Comfortable and private transfers to any destination in Mauritius — stress-free travel.</p>
-          <div class="package-footer">
-            <span class="price">Rs 1,300</span>
-            <button class="btn" onclick="selectPackage('Airport Transfer', 1300)">Book Now</button>
+            <button class="btn" onclick="bookNow('Wild South Discovery', 6300)">Book Now</button>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="container form-section hidden fade-in" id="checkoutSection">
-    <h2>Checkout</h2>
-    <form id="bookingForm">
-      <label>Full Name <input type="text" id="name" required /></label>
-      <label>Email <input type="email" id="email" required /></label>
-      <label>Phone <input type="text" id="phone" required /></label>
-      <label>Excursion <input type="text" id="excursion" readonly /></label>
-      <label>Date <input type="date" id="date" required /></label>
-      <label>Number of People <input type="number" id="people" min="1" required /></label>
-      <label>Total (MUR) <input type="text" id="total" readonly /></label>
-      <button type="submit" class="btn">Proceed to Payment</button>
-    </form>
-  </section>
-
   <footer class="footer">
-    <p>© 2025 Mautours | <a href="index.html">Home</a></p>
+    <p>© 2025 Mautours. Explore paradise your way.</p>
   </footer>
+
+  <script type="module" src="js/booking.js"></script>
+  <script defer src="js/main.js"></script>
 </body>
 </html>
