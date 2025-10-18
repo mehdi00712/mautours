@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours – Mauritius Excursions & Transfers</title>
+  <title>Mautours | Discover Mauritius</title>
   <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/main.js"></script>
 </head>
@@ -11,30 +11,71 @@
   <header class="site-header">
     <div class="container between">
       <h1 class="logo">Mautours</h1>
-      <nav class="nav">
+      <nav class="nav" id="navMenu">
         <a href="index.html" class="active">Home</a>
         <a href="booking.html">Book</a>
         <a href="login.html">Login</a>
         <a href="admin.html">Dashboard</a>
       </nav>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container center">
-      <h2>Discover Mauritius with Mautours</h2>
-      <p>Excursions • Airport Transfers • Private Tours</p>
-      <a href="booking.html" class="btn">View Packages</a>
+  <section class="hero fade-in">
+    <div class="hero-content">
+      <h2>Explore Paradise with Mautours</h2>
+      <p>Book unforgettable excursions and island experiences in Mauritius.</p>
+      <a href="booking.html" class="btn">Start Your Journey</a>
     </div>
   </section>
 
-  <section class="container">
-    <h2>Why Choose Us?</h2>
-    <p class="center">Experienced drivers, local guides, and safe travel around paradise.</p>
+  <section class="container about fade-in">
+    <h2>About Us</h2>
+    <p>Mautours is your trusted local travel partner for exploring the wonders of Mauritius.
+       From pristine beaches to lush forests, we craft personalized adventures to make your stay unforgettable.</p>
+  </section>
+
+  <section class="container highlights fade-in">
+    <h2>Popular Experiences</h2>
+    <div class="cards">
+      <div class="card">
+        <img src="assets/ile.jpg" alt="Île aux Cerfs" />
+        <h3>Île aux Cerfs Catamaran</h3>
+        <p>Crystal lagoons, BBQ lunch and sun-filled adventure.</p>
+      </div>
+      <div class="card">
+        <img src="assets/wildsouth.jpg" alt="Wild South" />
+        <h3>Wild South Discovery</h3>
+        <p>Chamarel, Black River Gorges & Seven Coloured Earth.</p>
+      </div>
+      <div class="card">
+        <img src="assets/transfer.jpg" alt="Transfer" />
+        <h3>Airport Transfer</h3>
+        <p>Reliable and comfortable transfers anywhere on the island.</p>
+      </div>
+    </div>
+    <div class="center">
+      <a href="booking.html" class="btn-outline">See All Packages</a>
+    </div>
+  </section>
+
+  <section class="contact fade-in">
+    <div class="container">
+      <h2>Contact Us</h2>
+      <p>Ready to plan your next adventure? We’d love to hear from you!</p>
+      <form id="contactForm">
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+        <textarea placeholder="Your Message" rows="4" required></textarea>
+        <button class="btn">Send Message</button>
+      </form>
+    </div>
   </section>
 
   <footer class="footer">
-    <p>© 2025 Mautours | <a href="about.html">About Us</a> | <a href="booking.html">Book</a> | <a href="login.html">Login</a></p>
+    <p>© 2025 Mautours | <a href="index.html">Home</a> | <a href="booking.html">Book</a></p>
   </footer>
 
   <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬 Chat on WhatsApp</a>
