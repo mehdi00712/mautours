@@ -1,4 +1,3 @@
-// main.js — controls navigation and UI
 document.addEventListener("DOMContentLoaded", () => {
   const hamburger = document.getElementById("hamburger");
   const navMenu = document.getElementById("navMenu");
@@ -10,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Highlight current page in navbar
   const currentPage = window.location.pathname.split("/").pop();
   document.querySelectorAll(".nav a").forEach((link) => {
     if (link.getAttribute("href") === currentPage) {
