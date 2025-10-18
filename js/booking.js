@@ -1,23 +1,9 @@
-// booking.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { app } from "./firebase-config.js";
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyC2jf5v9p8kVXP3weiPvHm8piHDbP6XaRw",
-  authDomain: "mautours-60318.firebaseapp.com",
-  projectId: "mautours-60318",
-  storageBucket: "mautours-60318.firebasestorage.app",
-  messagingSenderId: "1009871171111",
-  appId: "1:1009871171111:web:d4369386c1a958aa18a802",
-  measurementId: "G-882H9VPLJT",
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Fill in excursion and price from URL
+// Get excursion & price from URL
 const urlParams = new URLSearchParams(window.location.search);
 const excursion = urlParams.get("excursion") || "";
 const price = urlParams.get("price") || "0";
@@ -25,7 +11,7 @@ const price = urlParams.get("price") || "0";
 document.getElementById("excursion").value = excursion;
 document.getElementById("price").value = price;
 
-// Handle booking form
+// Submit booking
 document.getElementById("bookingForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -36,7 +22,6 @@ document.getElementById("bookingForm").addEventListener("submit", async (e) => {
   const people = document.getElementById("people").value;
 
   try {
-    // Save booking to Firestore
     await addDoc(collection(db, "bookings"), {
       name,
       email,
@@ -46,17 +31,15 @@ document.getElementById("bookingForm").addEventListener("submit", async (e) => {
       date,
       people,
       status: "pending",
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
-    // Redirect to ABSA payment gateway
     const merchantID = "bbm_coraplexltd_1232735_mur";
     const redirectUrl = encodeURIComponent("https://mehdi00712.github.io/mautours/success.html");
     const absaUrl = `https://secureacceptance.cybersource.com/pay?merchant=${merchantID}&amount=${price}&reference=${encodeURIComponent(excursion)}&return_url=${redirectUrl}`;
-
     window.location.href = absaUrl;
-  } catch (error) {
-    console.error("Error saving booking:", error);
-    alert("There was a problem saving your booking. Please try again.");
+  } catch (err) {
+    console.error("Booking error:", err);
+    alert("Error saving booking. Try again.");
   }
 });
