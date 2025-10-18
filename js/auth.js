@@ -1,3 +1,4 @@
+// auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getAuth,
@@ -12,39 +13,47 @@ const auth = getAuth(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
 const loginForm = document.getElementById("loginForm");
-const message = document.getElementById("loginMessage");
-
-if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        message.textContent = "Login successful! Redirecting...";
-        message.style.color = "green";
-
-        if (user.uid === adminUID) {
-          setTimeout(() => (window.location.href = "admin.html"), 800);
-        } else {
-          setTimeout(() => (window.location.href = "index.html"), 800);
-        }
-      })
-      .catch((error) => {
-        message.textContent = "Login failed: " + error.message;
-        message.style.color = "red";
-      });
-  });
-}
-
-// Logout handler
+const loginMessage = document.getElementById("loginMessage");
 const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    signOut(auth).then(() => {
-      window.location.href = "index.html";
-    });
+
+// ===== Login Form =====
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      loginMessage.textContent = "✅ Login successful. Redirecting...";
+      loginMessage.style.color = "green";
+
+      setTimeout(() => {
+        if (user.uid === adminUID) {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "index.html";
+        }
+      }, 1000);
+    } catch (error) {
+      loginMessage.textContent = "❌ " + error.message;
+      loginMessage.style.color = "red";
+    }
   });
 }
+
+// ===== Logout Button =====
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    alert("You have been logged out.");
+    window.location.href = "index.html";
+  });
+}
+
+// ===== Auto-state check =====
+onAuthStateChanged(auth, (user) => {
+  console.log("Auth state changed:", user ? user.email : "No user");
+});
