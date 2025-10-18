@@ -1,54 +1,67 @@
-// ===== Firebase Auth Handling =====
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { app } from "./firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { firebaseConfig } from "./firebase-config.js";
 
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// ===== LOGIN PAGE =====
+const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
+
 const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful!");
-      window.location.href = "index.html";
-    } catch (error) {
-      alert("Login failed. Please check your credentials.");
-      console.error(error);
-    }
-  });
-}
-
-// ===== LOGOUT =====
+const logoutSection = document.getElementById("logoutSection");
+const userEmailDisplay = document.getElementById("userEmail");
 const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      alert("You have been logged out.");
-      window.location.href = "login.html";
-    } catch (error) {
-      console.error("Logout error:", error);
-    }
+
+if (loginForm) {
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+
+        if (user.uid === adminUID) {
+          alert("Welcome Admin! Redirecting to Dashboard...");
+          window.location.href = "admin.html";
+        } else {
+          alert("Login successful! Redirecting...");
+          window.location.href = "index.html";
+        }
+      })
+      .catch((error) => {
+        alert("Login failed: " + error.message);
+      });
   });
 }
 
-// ===== ADMIN PROTECTION =====
-const ADMIN_UID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
-const adminPage = window.location.pathname.includes("admin.html");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () => {
+    signOut(auth)
+      .then(() => {
+        alert("Logged out successfully!");
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        console.error("Logout error:", error);
+      });
+  });
+}
 
+// Show/hide logout section dynamically
 onAuthStateChanged(auth, (user) => {
-  if (adminPage) {
-    if (!user) {
-      alert("Access denied. Please log in as admin.");
-      window.location.href = "login.html";
-    } else if (user.uid !== ADMIN_UID) {
-      alert("Unauthorized. Only admin can access this page.");
-      window.location.href = "index.html";
+  if (user) {
+    if (logoutSection) {
+      logoutSection.style.display = "block";
+      userEmailDisplay.textContent = user.email;
     }
+  } else {
+    if (logoutSection) logoutSection.style.display = "none";
   }
 });
