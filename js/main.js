@@ -18,15 +18,33 @@ window.addEventListener("scroll", () => {
   });
 });
 
-// ===== Auto Sliding Loved Experiences =====
-let currentSlide = 0;
-const lovedCards = document.getElementById("lovedCards");
-if (lovedCards) {
-  const totalSlides = lovedCards.children.length;
-  function showNextSlide() {
-    currentSlide = (currentSlide + 1) % totalSlides;
-    const offset = -currentSlide * 100;
-    lovedCards.style.transform = `translateX(${offset}%)`;
-  }
-  setInterval(showNextSlide, 10000); // every 10 s
+// ===== 3D Carousel Manual + Auto Rotation =====
+const carousel = document.getElementById("carousel");
+const nextBtn = document.getElementById("nextBtn");
+const prevBtn = document.getElementById("prevBtn");
+let angle = 0;
+let autoRotate;
+
+// Rotate carousel manually
+function rotateCarousel(deg) {
+  angle += deg;
+  carousel.style.transform = `rotateY(${angle}deg)`;
 }
+
+// Button listeners
+nextBtn.addEventListener("click", () => rotateCarousel(-90));
+prevBtn.addEventListener("click", () => rotateCarousel(90));
+
+// Auto rotation every 6s
+function startAutoRotate() {
+  autoRotate = setInterval(() => rotateCarousel(-90), 6000);
+}
+function stopAutoRotate() {
+  clearInterval(autoRotate);
+}
+
+// Pause on hover
+carousel.parentElement.addEventListener("mouseenter", stopAutoRotate);
+carousel.parentElement.addEventListener("mouseleave", startAutoRotate);
+
+startAutoRotate();
