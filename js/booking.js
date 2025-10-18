@@ -1,45 +1,53 @@
-import { app } from "./firebase-config.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db } from "./firebase-config.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-const db = getFirestore(app);
+const form = document.getElementById("bookingForm");
+const excursionInput = document.getElementById("excursion");
 
-// Get excursion & price from URL
+// Autofill excursion name from URL (e.g. ?excursion=Ile+aux+Cerfs)
 const urlParams = new URLSearchParams(window.location.search);
-const excursion = urlParams.get("excursion") || "";
-const price = urlParams.get("price") || "0";
+const excursionName = urlParams.get("excursion");
+if (excursionName) excursionInput.value = decodeURIComponent(excursionName);
 
-document.getElementById("excursion").value = excursion;
-document.getElementById("price").value = price;
-
-// Submit booking
-document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const phone = document.getElementById("phone").value;
+  const excursion = document.getElementById("excursion").value;
   const date = document.getElementById("date").value;
-  const people = document.getElementById("people").value; 
+  const people = document.getElementById("people").value;
 
   try {
+    // Save booking in Firestore
     await addDoc(collection(db, "bookings"), {
       name,
       email,
       phone,
       excursion,
-      price,
       date,
       people,
-      status: "pending",
-      createdAt: new Date(),
+      payment_status: "pending",
+      created_at: serverTimestamp(),
     });
 
+    // Redirect to ABSA Hosted Payment Page
+    const redirectUrl = encodeURIComponent(window.location.origin + "/success.html");
     const merchantID = "bbm_coraplexltd_1232735_mur";
-    const redirectUrl = encodeURIComponent("https://mehdi00712.github.io/mautours/success.html");
-    const absaUrl = `https://secureacceptance.cybersource.com/pay?merchant=${merchantID}&amount=${price}&reference=${encodeURIComponent(excursion)}&return_url=${redirectUrl}`;
+
+    // Example ABSA URL (replace if your live URL differs)
+    const absaUrl = `https://www.hostedpayments.com/pay?merchant=${merchantID}&amount=1000&reference=${encodeURIComponent(
+      excursion
+    )}&return_url=${redirectUrl}`;
+
     window.location.href = absaUrl;
-  } catch (err) {
-    console.error("Booking error:", err);
-    alert("Error saving booking. Try again.");
+  } catch (error) {
+    alert("Error while booking. Please try again.");
+    console.error(error);
   }
 });
