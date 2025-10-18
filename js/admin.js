@@ -1,24 +1,25 @@
+// js/admin.js
+import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
-  signOut,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
   getFirestore,
   collection,
   getDocs,
   deleteDoc,
-  doc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
-// Check authentication
+// Auth protection
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Please log in first!");
@@ -32,17 +33,17 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Load bookings
+// Load Bookings
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
-  tableBody.innerHTML = `<tr><td colspan="7">Loading bookings...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
 
   try {
     const snapshot = await getDocs(collection(db, "bookings"));
     tableBody.innerHTML = "";
 
     if (snapshot.empty) {
-      tableBody.innerHTML = `<tr><td colspan="7">No bookings found.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="7">No bookings yet.</td></tr>`;
       return;
     }
 
@@ -56,9 +57,7 @@ async function loadBookings() {
         <td>${data.package}</td>
         <td>${data.date}</td>
         <td>${data.people}</td>
-        <td>
-          <button class="delete-btn" data-id="${docSnap.id}">Delete</button>
-        </td>
+        <td><button class="delete-btn" data-id="${docSnap.id}">Delete</button></td>
       `;
       tableBody.appendChild(row);
     });
@@ -72,7 +71,7 @@ async function loadBookings() {
       })
     );
   } catch (error) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="color:red;">Error loading bookings: ${error.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="7" style="color:red;">Error: ${error.message}</td></tr>`;
   }
 }
 
