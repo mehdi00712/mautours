@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book Your Excursion | Mautours</title>
-  <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/main.js"></script>
+  <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/booking.js" defer></script>
 </head>
 <body>
   <header class="site-header">
-    <div class="container between">
+    <div class="container">
       <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="navMenu">
-        <a href="index.html">Home</a>
-        <a href="booking.html" class="active">Book</a>
-        <a href="login.html">Login</a>
-        <a href="admin.html">Dashboard</a>
-      </nav>
-      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
     </div>
   </header>
 
   <section class="container form-section">
     <h2>Book Your Excursion</h2>
     <form id="bookingForm">
-      <label>Full Name <input type="text" id="name" required /></label>
-      <label>Email <input type="email" id="email" required /></label>
-      <label>Phone <input type="text" id="phone" required /></label>
-      <label>Excursion <input type="text" id="excursion" readonly /></label>
-      <label>Price (MUR) <input type="text" id="price" readonly /></label>
-      <label>Date <input type="date" id="date" required /></label>
-      <label>Number of People <input type="number" id="people" min="1" required /></label>
+      <label>Full Name <input type="text" id="name" required></label>
+      <label>Email <input type="email" id="email" required></label>
+      <label>Phone <input type="text" id="phone" required></label>
+      <label>Excursion
+        <input type="text" id="excursion" readonly>
+      </label>
+      <label>Date <input type="date" id="date" required></label>
+      <label>Number of People <input type="number" id="people" min="1" required></label>
       <button type="submit" class="btn">Proceed to Payment</button>
     </form>
   </section>
@@ -40,6 +33,6 @@
     <p>© 2025 Mautours</p>
   </footer>
 
-  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬</a>
+  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬 Chat on WhatsApp</a>
 </body>
 </html>
