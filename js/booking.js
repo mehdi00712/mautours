@@ -5,7 +5,7 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Toggle Details visibility
+// Toggle “View Details”
 window.toggleDetails = function (btn) {
   const details = btn.closest(".package-info").querySelector(".details");
   const isHidden = details.classList.contains("hidden");
@@ -20,7 +20,7 @@ window.toggleDetails = function (btn) {
   }
 };
 
-// Show checkout form when a package is selected
+// Select package
 window.selectPackage = function (name, price) {
   document.getElementById("excursion").value = name;
   document.getElementById("total").value = price;
@@ -32,7 +32,7 @@ window.selectPackage = function (name, price) {
   });
 };
 
-// Handle form submission
+// Submit booking
 const form = document.getElementById("bookingForm");
 if (form) {
   form.addEventListener("submit", async (e) => {
