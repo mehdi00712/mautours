@@ -1,4 +1,5 @@
 // js/admin.js
+
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
@@ -19,7 +20,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
-// Auth protection
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Please log in first!");
@@ -33,23 +33,27 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// Load Bookings
+// ===== Load Bookings =====
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
-  tableBody.innerHTML = `<tr><td colspan="7">Loading...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="9">Loading...</td></tr>`;
 
   try {
     const snapshot = await getDocs(collection(db, "bookings"));
     tableBody.innerHTML = "";
 
     if (snapshot.empty) {
-      tableBody.innerHTML = `<tr><td colspan="7">No bookings yet.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="9">No bookings found.</td></tr>`;
       return;
     }
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const row = document.createElement("tr");
+
+      const price = data.pricePerPerson || 0;
+      const total = data.totalPrice || price * (data.people || 1);
+
       row.innerHTML = `
         <td>${data.name}</td>
         <td>${data.phone || "-"}</td>
@@ -57,6 +61,8 @@ async function loadBookings() {
         <td>${data.package}</td>
         <td>${data.date}</td>
         <td>${data.people}</td>
+        <td>Rs ${price.toLocaleString()}</td>
+        <td><strong>Rs ${total.toLocaleString()}</strong></td>
         <td><button class="delete-btn" data-id="${docSnap.id}">Delete</button></td>
       `;
       tableBody.appendChild(row);
@@ -64,18 +70,18 @@ async function loadBookings() {
 
     document.querySelectorAll(".delete-btn").forEach((btn) =>
       btn.addEventListener("click", async () => {
-        if (confirm("Are you sure you want to delete this booking?")) {
+        if (confirm("Delete this booking?")) {
           await deleteDoc(doc(db, "bookings", btn.dataset.id));
           loadBookings();
         }
       })
     );
   } catch (error) {
-    tableBody.innerHTML = `<tr><td colspan="7" style="color:red;">Error: ${error.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="9" style="color:red;">Error: ${error.message}</td></tr>`;
   }
 }
 
-// Logout
+// ===== Logout =====
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
   alert("Logged out successfully!");
