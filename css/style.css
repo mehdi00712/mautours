@@ -195,7 +195,7 @@ body {
   color: var(--white);
 }
 
-/* ===== General Sections ===== */
+/* ===== Sections ===== */
 section {
   padding: 4rem 0;
 }
@@ -215,12 +215,10 @@ p {
   text-align: center;
 }
 
-/* ===== Loved Experiences (Carousel) ===== */
+/* ===== 3D Circular Loved Experiences Carousel ===== */
 .loved-section {
   background: var(--lightblue);
   padding: 4rem 1rem;
-  position: relative;
-  overflow: hidden;
 }
 
 .loved-section h2 {
@@ -230,67 +228,127 @@ p {
   font-size: 2rem;
 }
 
-.loved-carousel {
+.carousel-container {
+  position: relative;
   width: 100%;
-  overflow: hidden;
+  height: 400px;
   display: flex;
   justify-content: center;
+  align-items: center;
+  perspective: 1000px;
+  margin-top: 3rem;
 }
 
-.loved-cards {
-  display: flex;
-  transition: transform 1s ease-in-out;
-  width: 300%;
-  gap: 2rem;
+.carousel {
+  width: 100%;
+  max-width: 800px;
+  height: 350px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1s ease;
 }
 
-.loved-card {
-  min-width: 300px;
-  max-width: 350px;
+.carousel-item {
+  position: absolute;
+  width: 260px;
+  height: 320px;
   background: var(--white);
   border-radius: 16px;
   box-shadow: var(--shadow);
   text-align: center;
-  padding: 1.5rem;
-  flex-shrink: 0;
-  transform: scale(0.96);
-  transition: transform 0.5s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  transform-origin: center center;
+  transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
-.loved-card:hover {
-  transform: scale(1);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-}
-
-.loved-card img {
+.carousel-item img {
   width: 100%;
-  height: 200px;
+  height: 180px;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1rem;
+  border-bottom: 3px solid var(--blue);
 }
 
-.loved-card h3 {
+.carousel-item h3 {
+  margin-top: 0.8rem;
   color: var(--darkblue);
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
 }
 
-.loved-card p {
+.carousel-item p {
   color: var(--muted);
-  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
 }
 
+/* Circular depth illusion */
+.carousel-item:nth-child(1) {
+  transform: rotateY(0deg) translateZ(380px);
+}
+.carousel-item:nth-child(2) {
+  transform: rotateY(90deg) translateZ(380px);
+}
+.carousel-item:nth-child(3) {
+  transform: rotateY(180deg) translateZ(380px);
+}
+.carousel-item:nth-child(4) {
+  transform: rotateY(270deg) translateZ(380px);
+}
+
+/* Buttons for control */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--darkblue);
+  border: none;
+  font-size: 2rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.carousel-btn:hover {
+  background: var(--blue);
+  color: var(--white);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-btn.prev {
+  left: 8%;
+}
+.carousel-btn.next {
+  right: 8%;
+}
+
+/* Pause on hover */
+.carousel-container:hover .carousel {
+  animation-play-state: paused;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .loved-cards {
-    gap: 1rem;
+  .carousel-container {
+    height: 320px;
   }
-  .loved-card {
-    min-width: 260px;
+  .carousel-item {
+    width: 220px;
+    height: 280px;
+  }
+  .carousel-item img {
+    height: 150px;
+  }
+  .carousel-btn.prev {
+    left: 4%;
+  }
+  .carousel-btn.next {
+    right: 4%;
   }
 }
 
-/* ===== About & Contact ===== */
+/* ===== About / Contact Sections ===== */
 .about-section,
 .contact-section {
   background: var(--white);
@@ -304,169 +362,6 @@ p {
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.7;
-}
-
-/* ===== Booking Cards ===== */
-.package-list {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-
-.package-card {
-  display: flex;
-  flex-wrap: wrap;
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: var(--transition);
-}
-
-.package-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-}
-
-.package-card img {
-  width: 100%;
-  max-width: 420px;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.package-card:hover img {
-  transform: scale(1.05);
-}
-
-.package-info {
-  flex: 1;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.package-info h3 {
-  font-size: 1.3rem;
-  color: var(--darkblue);
-  margin-bottom: 0.5rem;
-}
-
-.package-info p {
-  color: var(--muted);
-  margin-bottom: 1rem;
-}
-
-.package-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.package-footer .price {
-  color: var(--blue);
-  font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  .package-card {
-    flex-direction: column;
-  }
-
-  .package-info {
-    padding: 1.5rem;
-  }
-}
-
-/* ===== Login Page ===== */
-.login-page {
-  min-height: 90vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: var(--lightblue);
-  padding-top: 80px;
-}
-
-.login-box {
-  background: var(--white);
-  padding: 2rem 2.5rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.login-box h2 {
-  color: var(--darkblue);
-  margin-bottom: 1.5rem;
-}
-
-.login-box input {
-  width: 100%;
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.login-box button {
-  width: 100%;
-}
-
-/* ===== Dashboard ===== */
-.dashboard-container {
-  width: min(1000px, 92%);
-  margin: 2rem auto;
-  background: var(--white);
-  padding: 2rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-
-.table-wrapper {
-  overflow-x: auto;
-  margin-top: 1.5rem;
-}
-
-#bookingsTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
-}
-
-#bookingsTable th,
-#bookingsTable td {
-  padding: 0.8rem;
-  border-bottom: 1px solid #eee;
-  text-align: center;
-}
-
-#bookingsTable th {
-  background: var(--blue);
-  color: var(--white);
-}
-
-#bookingsTable tr:nth-child(even) {
-  background: var(--lightblue);
-}
-
-.delete-btn {
-  background: #e63946;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.delete-btn:hover {
-  background: #b71c1c;
 }
 
 /* ===== Footer ===== */
