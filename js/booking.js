@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebas
 import {
   getFirestore,
   collection,
-  addDoc
+  addDoc,
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import { firebaseConfig } from "./firebase-config.js";
 
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedPackage = null;
   let selectedPrice = null;
 
-  // Open booking modal
+  // Open modal
   bookButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       selectedPackage = btn.dataset.package;
@@ -36,12 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "auto";
   });
 
-  // Submit booking form
+  // Submit form
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const name = form.name.value;
-    const email = form.email.value;
-    const phone = form.phone.value;
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
     const date = form.date.value;
     const people = form.people.value;
 
@@ -57,16 +57,26 @@ document.addEventListener("DOMContentLoaded", () => {
         createdAt: new Date(),
       });
 
-      // Redirect to ABSA hosted payment link
-      const mid = "bbm_coraplexltd_1232735_mur";
-      const paymentUrl = `https://secureacceptance.cybersource.com/pay?mid=${mid}&amount=${selectedPrice}&reference=${encodeURIComponent(selectedPackage)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`;
-      window.location.href = paymentUrl;
+      // Temporary animation before ABSA redirect
+      modal.innerHTML = `
+        <div style="text-align:center;padding:2rem;">
+          <h3>Redirecting to Payment Portal...</h3>
+          <p>Please wait while we connect you to ABSA Secure Payment.</p>
+          <div class="spinner"></div>
+        </div>
+      `;
 
-    } catch (error) {
-      alert("Error saving booking: " + error.message);
+      // TODO: replace this with your real ABSA link
+      const absaURL = "https://secureacceptance.cybersource.com/pay";
+      setTimeout(() => {
+        window.location.href = absaURL;
+      }, 2000);
+    } catch (err) {
+      alert("Error saving booking: " + err.message);
     }
   });
 
+  // Click outside closes modal
   window.addEventListener("click", (e) => {
     if (e.target === modal) {
       modal.classList.remove("show");
