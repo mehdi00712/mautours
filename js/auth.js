@@ -1,22 +1,22 @@
-// auth.js
+// js/auth.js
+import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
 const loginForm = document.getElementById("loginForm");
-const loginMessage = document.getElementById("loginMessage");
 const logoutBtn = document.getElementById("logoutBtn");
+const loginMessage = document.getElementById("loginMessage");
 
-// ===== Login Form =====
+// ===== Login Function =====
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -44,7 +44,7 @@ if (loginForm) {
   });
 }
 
-// ===== Logout Button =====
+// ===== Logout Function =====
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
@@ -53,7 +53,7 @@ if (logoutBtn) {
   });
 }
 
-// ===== Auto-state check =====
+// ===== Auto-auth state monitor =====
 onAuthStateChanged(auth, (user) => {
-  console.log("Auth state changed:", user ? user.email : "No user");
+  console.log("Auth state:", user ? `Logged in as ${user.email}` : "Logged out");
 });
