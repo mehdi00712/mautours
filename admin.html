@@ -11,36 +11,34 @@
   <header class="site-header">
     <div class="container between">
       <h1 class="logo">Mautours Dashboard</h1>
-      <nav class="nav">
+      <nav class="nav" id="navMenu">
         <a href="index.html">Home</a>
         <a href="booking.html">Book</a>
-        <a href="login.html">Logout</a>
+        <a href="login.html">Login</a>
+        <a href="admin.html" class="active">Dashboard</a>
       </nav>
     </div>
   </header>
 
-  <section class="container">
+  <section class="container fade-in">
     <h2>All Bookings</h2>
-    <table id="bookingsTable">
+    <table>
       <thead>
         <tr>
           <th>Name</th>
-          <th>Email</th>
           <th>Excursion</th>
           <th>Date</th>
           <th>People</th>
+          <th>Total</th>
           <th>Status</th>
-          <th>Action</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody id="bookingTable"></tbody>
     </table>
   </section>
 
   <footer class="footer">
-    <p>© 2025 Mautours | <a href="index.html">Home</a></p>
+    <p>© 2025 Mautours | Admin View</p>
   </footer>
-
-  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬 Chat on WhatsApp</a>
 </body>
 </html>
