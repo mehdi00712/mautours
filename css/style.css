@@ -501,6 +501,66 @@ p {
   font-size: 1.2rem;
 }
 
+/* ===== Loved Experiences Section ===== */
+.loved-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.loved-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.loved-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.loved-card:hover img {
+  transform: scale(1.08);
+}
+
+.loved-info {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.loved-info h3 {
+  color: var(--darkblue);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.loved-info p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .loved-card img {
+    height: 200px;
+  }
+}
+
+/* ===== Contact Section ===== */
+.contact-info p {
+  margin: 0.4rem 0;
+  color: var(--muted);
+}
+
+.contact-info strong {
+  color: var(--darkblue);
+}
+
 /* ===== Footer ===== */
 .footer {
   background: var(--darkblue);
