@@ -1,50 +1,61 @@
-// ===== Responsive Navbar =====
-const hamburger = document.getElementById("hamburger");
-const nav = document.getElementById("nav");
+/* ===== Navbar Toggle ===== */
+const hamburger = document.querySelector('.hamburger');
+const nav = document.querySelector('.nav');
 
-if (hamburger) {
-  hamburger.addEventListener("click", () => {
-    hamburger.classList.toggle("active");
-    nav.classList.toggle("open");
-  });
-}
-
-// ===== Fade-in Animation =====
-const fadeElements = document.querySelectorAll(".fade-in");
-window.addEventListener("scroll", () => {
-  fadeElements.forEach((el) => {
-    const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight - 100) el.classList.add("visible");
-  });
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  nav.classList.toggle('open');
 });
 
-// ===== 3D Carousel Manual + Auto Rotation =====
-const carousel = document.getElementById("carousel");
-const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");
+/* ===== Fade-in Animation on Scroll ===== */
+const fadeElements = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+});
+fadeElements.forEach(el => observer.observe(el));
+
+/* ===== 3D Carousel Control ===== */
+const carousel = document.querySelector('.carousel');
+const prevBtn = document.querySelector('.carousel-btn.prev');
+const nextBtn = document.querySelector('.carousel-btn.next');
+
 let angle = 0;
+const totalItems = document.querySelectorAll('.carousel-item').length;
+const rotationPerItem = 360 / totalItems;
 let autoRotate;
 
-// Rotate carousel manually
-function rotateCarousel(deg) {
-  angle += deg;
+/* Rotate Carousel Function */
+function rotateCarousel(direction) {
+  angle += rotationPerItem * direction;
   carousel.style.transform = `rotateY(${angle}deg)`;
 }
 
-// Button listeners
-nextBtn.addEventListener("click", () => rotateCarousel(-90));
-prevBtn.addEventListener("click", () => rotateCarousel(90));
-
-// Auto rotation every 6s
+/* Auto Rotation */
 function startAutoRotate() {
-  autoRotate = setInterval(() => rotateCarousel(-90), 6000);
+  autoRotate = setInterval(() => rotateCarousel(-1), 4000);
 }
 function stopAutoRotate() {
   clearInterval(autoRotate);
 }
 
-// Pause on hover
-carousel.parentElement.addEventListener("mouseenter", stopAutoRotate);
-carousel.parentElement.addEventListener("mouseleave", startAutoRotate);
+/* Buttons */
+prevBtn.addEventListener('click', () => {
+  stopAutoRotate();
+  rotateCarousel(1);
+  setTimeout(startAutoRotate, 5000);
+});
 
+nextBtn.addEventListener('click', () => {
+  stopAutoRotate();
+  rotateCarousel(-1);
+  setTimeout(startAutoRotate, 5000);
+});
+
+/* Pause rotation on hover */
+carousel.parentElement.addEventListener('mouseenter', stopAutoRotate);
+carousel.parentElement.addEventListener('mouseleave', startAutoRotate);
+
+/* Start automatically */
 startAutoRotate();
