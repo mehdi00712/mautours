@@ -1,6 +1,5 @@
 // js/booking.js
 
-// Import Firebase modules
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
@@ -10,20 +9,23 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ===== Modal Elements =====
+// ===== Package Prices =====
+const packagePrices = {
+  "Southern Wonders Tour": 2500,
+  "Île aux Cerfs Experience": 3000,
+  "Airport Transfers": 1200
+};
+
+// ===== Modal & Buttons =====
 const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
 const bookingForm = document.getElementById("bookingForm");
-const checkoutBtn = document.getElementById("checkoutBtn");
 let selectedPackage = "";
 
-// ===== Open Modal when clicking "Book Now" =====
 const bookButtons = document.querySelectorAll(".book-btn");
-
 bookButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     selectedPackage = btn.dataset.package;
@@ -39,7 +41,6 @@ function openBookingModal(packageName) {
   }
 }
 
-// ===== Close Modal =====
 if (closeModal) {
   closeModal.addEventListener("click", () => {
     modal.classList.remove("show");
@@ -54,16 +55,18 @@ if (bookingForm) {
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
-    const people = document.getElementById("people").value.trim();
+    const people = parseInt(document.getElementById("people").value.trim());
     const date = document.getElementById("date").value.trim();
 
     if (!name || !email || !phone || !people || !date) {
-      alert("⚠️ Please fill in all fields before submitting.");
+      alert("⚠️ Please fill in all fields.");
       return;
     }
 
+    const basePrice = packagePrices[selectedPackage] || 0;
+    const totalPrice = basePrice * people;
+
     try {
-      // Save booking to Firestore
       await addDoc(collection(db, "bookings"), {
         name,
         email,
@@ -71,15 +74,15 @@ if (bookingForm) {
         people,
         date,
         package: selectedPackage,
+        pricePerPerson: basePrice,
+        totalPrice,
         createdAt: serverTimestamp()
       });
 
-      // Close modal & show success
       modal.classList.remove("show");
-      alert("✅ Booking saved successfully! Redirecting to payment...");
+      alert(`✅ Booking saved! Total: Rs ${totalPrice}\nRedirecting to payment...`);
 
-      // Simulate checkout redirect
-      // ⚠️ Replace this placeholder with your real ABSA hosted payment URL once ready
+      // TODO: Replace with real ABSA payment portal
       setTimeout(() => {
         window.location.href = "https://secureacceptance.cybersource.com/pay";
       }, 1500);
@@ -90,7 +93,7 @@ if (bookingForm) {
   });
 }
 
-// ===== Optional: ESC Key closes modal =====
+// ===== ESC Key to Close =====
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && modal && modal.classList.contains("show")) {
     modal.classList.remove("show");
