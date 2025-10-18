@@ -18,13 +18,14 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
-// Only admin can access
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    alert("Please log in first!");
     window.location.href = "login.html";
   } else if (user.uid !== adminUID) {
     alert("Access Denied – Admin Only");
-    signOut(auth).then(() => (window.location.href = "index.html"));
+    await signOut(auth);
+    window.location.href = "index.html";
   } else {
     loadBookings();
   }
@@ -32,15 +33,15 @@ onAuthStateChanged(auth, (user) => {
 
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
+  const snapshot = await getDocs(collection(db, "bookings"));
   tableBody.innerHTML = "";
 
-  const snapshot = await getDocs(collection(db, "bookings"));
   snapshot.forEach((docSnap) => {
     const data = docSnap.data();
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${data.name}</td>
-      <td>${data.phone}</td>
+      <td>${data.phone || "-"}</td>
       <td>${data.email}</td>
       <td>${data.package}</td>
       <td>${data.date}</td>
@@ -58,7 +59,11 @@ async function loadBookings() {
   );
 }
 
-// Logout
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  signOut(auth).then(() => (window.location.href = "index.html"));
-});
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    alert("Logged out successfully!");
+    window.location.href = "index.html";
+  });
+}
