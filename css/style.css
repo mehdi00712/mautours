@@ -215,7 +215,7 @@ p {
   text-align: center;
 }
 
-/* ===== FIXED 3D Carousel Section ===== */
+/* ===== FIXED 3D CAROUSEL SECTION (corrected) ===== */
 .loved-section {
   background: var(--lightblue);
   padding: 5rem 1rem;
@@ -252,7 +252,8 @@ p {
 .carousel-item {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 50%;
+  transform-style: preserve-3d;
   width: 260px;
   height: 320px;
   background: var(--white);
@@ -261,7 +262,8 @@ p {
   text-align: center;
   overflow: hidden;
   transform-origin: center center;
-  transition: transform 0.8s ease, opacity 0.8s ease;
+  backface-visibility: hidden;
+  transition: transform 1s ease, opacity 0.8s ease;
 }
 
 .carousel-item img {
@@ -283,14 +285,14 @@ p {
   font-size: 0.9rem;
 }
 
-/* Perfect circular layout for 5 items */
+/* Proper circular layout, always facing front */
 .carousel-item:nth-child(1) { transform: rotateY(0deg) translateZ(380px); }
 .carousel-item:nth-child(2) { transform: rotateY(72deg) translateZ(380px); }
 .carousel-item:nth-child(3) { transform: rotateY(144deg) translateZ(380px); }
 .carousel-item:nth-child(4) { transform: rotateY(216deg) translateZ(380px); }
 .carousel-item:nth-child(5) { transform: rotateY(288deg) translateZ(380px); }
 
-/* carousel buttons */
+/* Carousel Buttons */
 .carousel-btn {
   position: absolute;
   top: 50%;
