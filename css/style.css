@@ -9,7 +9,7 @@
   --radius: 10px;
 }
 
-/* Reset & global styles */
+/* Global */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -21,25 +21,8 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  overflow-x: hidden;
 }
 
-img {
-  max-width: 100%;
-  display: block;
-  border-radius: var(--radius);
-}
-
-a {
-  text-decoration: none;
-  color: var(--brand);
-  transition: color 0.3s ease;
-}
-a:hover {
-  color: #0056b3;
-}
-
-/* Container */
 .container {
   width: min(1100px, 90%);
   margin: 0 auto;
@@ -71,7 +54,7 @@ a:hover {
   color: var(--brand);
 }
 
-/* Navigation */
+/* Navbar */
 .nav {
   display: flex;
   gap: 1.2rem;
@@ -109,16 +92,14 @@ a:hover {
 .hamburger.open span:nth-child(1) {
   transform: rotate(45deg) translateY(7px);
 }
-
 .hamburger.open span:nth-child(2) {
   opacity: 0;
 }
-
 .hamburger.open span:nth-child(3) {
   transform: rotate(-45deg) translateY(-7px);
 }
 
-/* Hero section */
+/* Hero */
 .hero {
   background: linear-gradient(180deg, var(--brand-light) 0%, #fff 100%);
   padding: 4rem 1rem;
@@ -136,7 +117,7 @@ a:hover {
   color: var(--muted);
 }
 
-/* Excursion cards */
+/* Cards */
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -223,7 +204,7 @@ input {
   margin-top: 0.25rem;
 }
 
-/* Table (Admin) */
+/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -278,7 +259,7 @@ tr:nth-child(even) {
   transform: scale(1.1);
 }
 
-/* Responsive Navbar */
+/* Responsive */
 @media (max-width: 768px) {
   .nav {
     position: absolute;
@@ -301,49 +282,4 @@ tr:nth-child(even) {
   .hamburger {
     display: flex;
   }
-}
-
-/* Admin dashboard */
-.stats-box {
-  background: var(--accent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1rem;
-  margin: 1.5rem 0;
-  text-align: center;
-  font-size: 1.1rem;
-}
-
-.btn-small {
-  background: var(--brand);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 0.8rem;
-  margin: 0.1rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
-
-.btn-small.delete {
-  background: #dc3545;
-}
-.btn-small.delete:hover {
-  background: #a52834;
-}
-.btn-small.mark-paid {
-  background: #198754;
-}
-.btn-small.mark-paid:hover {
-  background: #146c43;
-}
-
-.status-paid {
-  color: #198754;
-  font-weight: 600;
-}
-
-.status-pending {
-  color: #dc3545;
-  font-weight: 600;
 }
