@@ -1,67 +1,70 @@
-import { auth, db } from "./firebase-config.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
-  collection,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
-import {
+  getAuth,
   onAuthStateChanged,
   signOut,
-} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
 
-const bookingTable = document.getElementById("bookingTable").querySelector("tbody");
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
-// ===== Protect Page =====
+// ===== Access Control =====
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    alert("Access denied. Please login as admin.");
+    alert("You must log in first!");
     window.location.href = "login.html";
-    return;
-  }
-  if (user.email !== "mbhoyroo246@gmail.com") {
-    alert("Only the admin can access this page.");
-    signOut(auth);
+  } else if (user.uid !== adminUID) {
+    alert("Access denied. Admin only.");
     window.location.href = "index.html";
-    return;
+  } else {
+    loadBookings();
   }
-
-  loadBookings();
 });
 
 // ===== Load Bookings =====
-function loadBookings() {
-  const q = query(collection(db, "bookings"), orderBy("created_at", "desc"));
+async function loadBookings() {
+  const tableBody = document.querySelector("#bookingsTable tbody");
+  tableBody.innerHTML = "";
 
-  onSnapshot(q, (snapshot) => {
-    bookingTable.innerHTML = "";
-    snapshot.forEach((docSnap) => {
-      const b = docSnap.data();
-      const tr = document.createElement("tr");
+  const querySnapshot = await getDocs(collection(db, "bookings"));
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${data.name}</td>
+      <td>${data.package}</td>
+      <td>${data.email}</td>
+      <td>${data.date}</td>
+      <td>${data.people}</td>
+      <td><button class="delete-btn" data-id="${docSnap.id}">Delete</button></td>
+    `;
+    tableBody.appendChild(row);
+  });
 
-      tr.innerHTML = `
-        <td>${b.excursion}</td>
-        <td>${b.name} <br><small>${b.email}</small></td>
-        <td>Rs ${b.total}</td>
-        <td>
-          <button class="delete-btn" data-id="${docSnap.id}">Delete</button>
-        </td>
-      `;
-      bookingTable.appendChild(tr);
-    });
-
-    // Attach delete listeners
-    const deleteBtns = document.querySelectorAll(".delete-btn");
-    deleteBtns.forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        const id = btn.getAttribute("data-id");
-        if (confirm("Are you sure you want to delete this booking?")) {
-          await deleteDoc(doc(db, "bookings", id));
-          alert("Booking deleted.");
-        }
-      });
+  // Add delete button event
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await deleteDoc(doc(db, "bookings", btn.dataset.id));
+      loadBookings();
     });
   });
 }
+
+// ===== Logout =====
+const logoutBtn = document.getElementById("logoutBtn");
+logoutBtn.addEventListener("click", () => {
+  signOut(auth).then(() => {
+    alert("Logged out successfully.");
+    window.location.href = "index.html";
+  });
+});
