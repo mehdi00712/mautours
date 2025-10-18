@@ -5,7 +5,22 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Display checkout when a package is selected
+// Toggle Details visibility
+window.toggleDetails = function (btn) {
+  const details = btn.closest(".package-info").querySelector(".details");
+  const isHidden = details.classList.contains("hidden");
+  details.classList.toggle("hidden");
+
+  if (isHidden) {
+    btn.textContent = "Hide Details";
+    details.style.maxHeight = details.scrollHeight + "px";
+  } else {
+    btn.textContent = "View Details";
+    details.style.maxHeight = null;
+  }
+};
+
+// Show checkout form when a package is selected
 window.selectPackage = function (name, price) {
   document.getElementById("excursion").value = name;
   document.getElementById("total").value = price;
@@ -17,7 +32,7 @@ window.selectPackage = function (name, price) {
   });
 };
 
-// Handle booking form submission
+// Handle form submission
 const form = document.getElementById("bookingForm");
 if (form) {
   form.addEventListener("submit", async (e) => {
