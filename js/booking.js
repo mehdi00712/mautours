@@ -5,60 +5,45 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-// Select package
-window.selectPackage = function (name, price) {
-  const section = document.getElementById("checkoutSection");
-  document.getElementById("excursion").value = name;
-  document.getElementById("total").value = price;
-  section.classList.remove("hidden");
-  section.scrollIntoView({ behavior: "smooth" });
+window.bookNow = async function (excursion, price) {
+  const name = prompt("Enter your full name:");
+  const email = prompt("Enter your email:");
+  const phone = prompt("Enter your phone number:");
+  const date = prompt("Enter your travel date (YYYY-MM-DD):");
+  const people = prompt("Number of people:");
+
+  if (!name || !email || !phone || !date || !people) {
+    alert("Please fill all fields before booking.");
+    return;
+  }
+
+  const total = price * parseInt(people);
+
+  try {
+    await addDoc(collection(db, "bookings"), {
+      name,
+      email,
+      phone,
+      excursion,
+      date,
+      people,
+      total,
+      payment_status: "pending",
+      created_at: serverTimestamp(),
+    });
+
+    // Redirect to ABSA Hosted Payments
+    const merchantID = "bbm_coraplexltd_1232735_mur";
+    const returnUrl = encodeURIComponent(
+      "https://mehdi00712.github.io/mautours/success.html"
+    );
+    const absaUrl = `https://www.hostedpayments.com/pay?merchant=${merchantID}&amount=${total}&reference=${encodeURIComponent(
+      excursion
+    )}&return_url=${returnUrl}`;
+
+    window.location.href = absaUrl;
+  } catch (err) {
+    console.error("Booking Error:", err);
+    alert("Something went wrong. Please try again later.");
+  }
 };
-
-// Booking submission
-const form = document.getElementById("bookingForm");
-if (form) {
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const excursion = document.getElementById("excursion").value;
-    const date = document.getElementById("date").value;
-    const people = document.getElementById("people").value;
-    const total = document.getElementById("total").value;
-
-    if (!name || !email || !phone || !date || !people) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    try {
-      await addDoc(collection(db, "bookings"), {
-        name,
-        email,
-        phone,
-        excursion,
-        date,
-        people,
-        total,
-        payment_status: "pending",
-        created_at: serverTimestamp(),
-      });
-
-      // ABSA Hosted Payment Redirect
-      const merchantID = "bbm_coraplexltd_1232735_mur";
-      const returnUrl = encodeURIComponent(
-        "https://mehdi00712.github.io/mautours/success.html"
-      );
-      const absaUrl = `https://www.hostedpayments.com/pay?merchant=${merchantID}&amount=${total}&reference=${encodeURIComponent(
-        excursion
-      )}&return_url=${returnUrl}`;
-
-      window.location.href = absaUrl;
-    } catch (err) {
-      console.error(err);
-      alert("Error saving booking. Please try again later.");
-    }
-  });
-}
