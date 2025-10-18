@@ -23,16 +23,20 @@ body {
   background: var(--white);
   color: var(--text);
   overflow-x: hidden;
+  scroll-behavior: smooth;
 }
 
 /* ===== Header ===== */
 .site-header {
   background: var(--white);
   box-shadow: var(--shadow);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  width: 100%;
+  z-index: 2000;
 }
+
 .container {
   width: min(1100px, 92%);
   margin: 0 auto;
@@ -41,37 +45,45 @@ body {
   align-items: center;
   padding: 1rem 0;
 }
+
 .logo {
   font-size: 1.7rem;
   font-weight: 700;
   color: var(--darkblue);
 }
+
 .nav {
   display: flex;
   gap: 1.5rem;
 }
+
 .nav a {
   text-decoration: none;
   color: var(--text);
   font-weight: 500;
   transition: color 0.3s ease;
 }
+
 .nav a:hover,
 .nav a.active {
   color: var(--blue);
 }
+
 .hamburger {
   display: none;
   flex-direction: column;
   cursor: pointer;
   gap: 4px;
+  z-index: 3000;
 }
+
 .hamburger span {
   width: 25px;
   height: 3px;
   background: var(--darkblue);
   transition: var(--transition);
 }
+
 .hamburger.active span:nth-child(1) {
   transform: rotate(45deg) translateY(8px);
 }
@@ -86,7 +98,7 @@ body {
 @media (max-width: 768px) {
   .nav {
     position: fixed;
-    top: 60px;
+    top: 70px;
     right: -100%;
     flex-direction: column;
     background: var(--white);
@@ -94,10 +106,13 @@ body {
     padding: 1rem;
     box-shadow: var(--shadow);
     transition: right 0.3s ease;
+    z-index: 2500;
   }
+
   .nav.open {
     right: 0;
   }
+
   .hamburger {
     display: flex;
   }
@@ -109,7 +124,7 @@ body {
   background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.4),
-      rgba(0, 0, 0, 0.5)
+      rgba(0, 0, 0, 0.6)
     ),
     url("../assets/ile.jpg") center/cover no-repeat;
   display: flex;
@@ -117,12 +132,15 @@ body {
   align-items: center;
   text-align: center;
   color: var(--white);
-  position: relative;
+  margin-top: 80px;
   overflow: hidden;
+  position: relative;
 }
+
 .hero-content {
   animation: slideUp 1.2s ease forwards;
 }
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -133,10 +151,12 @@ body {
     transform: translateY(0);
   }
 }
+
 .hero h2 {
-  font-size: 2.4rem;
+  font-size: 2.6rem;
   margin-bottom: 0.8rem;
 }
+
 .hero p {
   font-size: 1.1rem;
   margin-bottom: 1.5rem;
@@ -146,25 +166,29 @@ body {
 .btn,
 .btn-outline {
   display: inline-block;
-  padding: 0.8rem 1.7rem;
+  padding: 0.9rem 1.7rem;
   border-radius: 50px;
   text-decoration: none;
   font-weight: 600;
   transition: var(--transition);
 }
+
 .btn {
   background: var(--blue);
   color: var(--white);
   border: none;
 }
+
 .btn:hover {
   background: var(--darkblue);
   transform: translateY(-3px);
 }
+
 .btn-outline {
   color: var(--darkblue);
   border: 2px solid var(--darkblue);
 }
+
 .btn-outline:hover {
   background: var(--darkblue);
   color: var(--white);
@@ -174,15 +198,18 @@ body {
 section {
   padding: 4rem 0;
 }
+
 h2 {
   text-align: center;
   color: var(--darkblue);
   margin-bottom: 1rem;
 }
+
 p {
   line-height: 1.6;
   color: var(--muted);
 }
+
 .center {
   text-align: center;
 }
@@ -195,6 +222,7 @@ p {
   box-shadow: var(--shadow);
   margin-top: 2rem;
 }
+
 .about p {
   max-width: 800px;
   margin: auto;
@@ -204,10 +232,11 @@ p {
 /* ===== Cards ===== */
 .cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
 }
+
 .card {
   background: var(--white);
   border-radius: var(--radius);
@@ -215,19 +244,23 @@ p {
   box-shadow: var(--shadow);
   transition: var(--transition);
 }
+
 .card:hover {
   transform: translateY(-5px);
 }
+
 .card img {
   width: 100%;
-  height: 180px;
+  height: 190px;
   object-fit: cover;
 }
+
 .card h3 {
   margin: 0.8rem 0 0.3rem;
   color: var(--darkblue);
   text-align: center;
 }
+
 .card p {
   text-align: center;
   padding: 0 1rem 1rem;
@@ -240,6 +273,7 @@ p {
   gap: 2rem;
   margin-top: 2rem;
 }
+
 .package-card {
   display: flex;
   flex-wrap: wrap;
@@ -249,15 +283,18 @@ p {
   overflow: hidden;
   transition: var(--transition);
 }
+
 .package-card:hover {
   transform: translateY(-4px);
 }
+
 .package-card img {
   width: 100%;
   max-width: 420px;
-  object-fit: cover;
   height: auto;
+  object-fit: cover;
 }
+
 .package-info {
   flex: 1;
   padding: 2rem;
@@ -265,34 +302,40 @@ p {
   flex-direction: column;
   justify-content: space-between;
 }
+
 .package-info h3 {
   font-size: 1.3rem;
   color: var(--darkblue);
   margin-bottom: 0.5rem;
 }
+
 .package-info p {
   color: var(--muted);
   margin-bottom: 1rem;
 }
+
 .package-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .package-footer .price {
   color: var(--blue);
   font-weight: 600;
 }
+
 @media (max-width: 768px) {
   .package-card {
     flex-direction: column;
   }
+
   .package-info {
     padding: 1.5rem;
   }
 }
 
-/* ===== Form Section ===== */
+/* ===== Forms ===== */
 .form-section {
   background: var(--lightblue);
   border-radius: var(--radius);
@@ -300,16 +343,19 @@ p {
   padding: 2.5rem;
   margin-top: 3rem;
 }
+
 form {
   display: grid;
   gap: 1.2rem;
   max-width: 450px;
   margin: auto;
 }
+
 label {
   font-weight: 500;
   color: var(--darkblue);
 }
+
 input,
 textarea {
   width: 100%;
@@ -319,6 +365,7 @@ textarea {
   transition: border-color 0.3s ease;
   font-size: 1rem;
 }
+
 input:focus,
 textarea:focus {
   border-color: var(--blue);
@@ -334,19 +381,23 @@ table {
   overflow: hidden;
   box-shadow: var(--shadow);
 }
+
 th,
 td {
   padding: 0.8rem;
   text-align: center;
   border-bottom: 1px solid #eee;
 }
+
 th {
   background: var(--darkblue);
   color: var(--white);
 }
+
 tr:nth-child(even) {
   background: var(--lightblue);
 }
+
 .delete-btn {
   background: crimson;
   color: var(--white);
@@ -356,6 +407,7 @@ tr:nth-child(even) {
   cursor: pointer;
   transition: var(--transition);
 }
+
 .delete-btn:hover {
   background: #b00020;
 }
@@ -368,6 +420,7 @@ tr:nth-child(even) {
   box-shadow: var(--shadow);
   padding: 2rem;
 }
+
 .contact-details {
   margin-top: 1rem;
   color: var(--muted);
@@ -381,10 +434,12 @@ tr:nth-child(even) {
   padding: 1.3rem;
   font-size: 0.9rem;
 }
+
 .footer a {
   color: #d8e8ff;
   text-decoration: none;
 }
+
 .footer a:hover {
   text-decoration: underline;
 }
@@ -403,6 +458,7 @@ tr:nth-child(even) {
   box-shadow: var(--shadow);
   transition: var(--transition);
 }
+
 .whatsapp-btn:hover {
   transform: translateY(-3px);
 }
@@ -413,6 +469,7 @@ tr:nth-child(even) {
   transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
+
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
