@@ -215,7 +215,7 @@ p {
   text-align: center;
 }
 
-/* ===== 3D Circular Loved Experiences Carousel ===== */
+/* ===== Loved Experiences (3D Carousel) ===== */
 .loved-section {
   background: var(--lightblue);
   padding: 4rem 1rem;
@@ -280,7 +280,7 @@ p {
   font-size: 0.9rem;
 }
 
-/* Circular depth illusion */
+/* Circle position */
 .carousel-item:nth-child(1) {
   transform: rotateY(0deg) translateZ(380px);
 }
@@ -294,7 +294,7 @@ p {
   transform: rotateY(270deg) translateZ(380px);
 }
 
-/* Buttons for control */
+/* Buttons */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -323,45 +323,240 @@ p {
   right: 8%;
 }
 
-/* Pause on hover */
-.carousel-container:hover .carousel {
-  animation-play-state: paused;
+/* ===== Booking Page ===== */
+.package-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 2rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .carousel-container {
-    height: 320px;
-  }
-  .carousel-item {
-    width: 220px;
-    height: 280px;
-  }
-  .carousel-item img {
-    height: 150px;
-  }
-  .carousel-btn.prev {
-    left: 4%;
-  }
-  .carousel-btn.next {
-    right: 4%;
-  }
-}
-
-/* ===== About / Contact Sections ===== */
-.about-section,
-.contact-section {
+.package-card {
+  display: flex;
+  flex-wrap: wrap;
   background: var(--white);
-  padding: 4rem 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
 }
 
-.about-section p,
-.contact-section p {
+.package-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.package-card img {
+  width: 100%;
+  max-width: 420px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.package-info {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.package-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.package-footer .price {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .package-card {
+    flex-direction: column;
+  }
+
+  .package-info {
+    padding: 1.5rem;
+  }
+}
+
+/* ===== Booking Modal ===== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.modal.show {
+  display: flex;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 420px;
+  padding: 2rem;
+  position: relative;
+  animation: slideUp 0.4s ease;
+}
+
+.modal-content h3 {
+  color: var(--darkblue);
+  margin-bottom: 1rem;
   text-align: center;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.modal-content button {
+  width: 100%;
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.5rem;
   color: var(--muted);
-  max-width: 700px;
-  margin: 0 auto;
-  line-height: 1.7;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.close:hover {
+  color: var(--darkblue);
+}
+
+/* ===== Login Page ===== */
+.login-page {
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--lightblue);
+  padding-top: 80px;
+}
+
+.login-box {
+  background: var(--white);
+  padding: 2rem 2.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-box h2 {
+  color: var(--darkblue);
+  margin-bottom: 1.5rem;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.login-box button {
+  width: 100%;
+}
+
+/* ===== Dashboard ===== */
+.dashboard-container {
+  width: min(1000px, 92%);
+  margin: 2rem auto;
+  background: var(--white);
+  padding: 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+}
+
+#bookingsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+#bookingsTable th,
+#bookingsTable td {
+  padding: 0.8rem;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+#bookingsTable th {
+  background: var(--blue);
+  color: var(--white);
+}
+
+#bookingsTable tr:nth-child(even) {
+  background: var(--lightblue);
+}
+
+.delete-btn {
+  background: #e63946;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.delete-btn:hover {
+  background: #b71c1c;
+}
+
+/* ===== Revenue Summary ===== */
+.summary-box {
+  margin: 1.5rem auto;
+  text-align: center;
+  padding: 1rem 2rem;
+  border-radius: var(--radius);
+  background: var(--lightblue);
+  box-shadow: var(--shadow);
+  width: fit-content;
+}
+
+.summary-box h3 {
+  color: var(--darkblue);
+  font-size: 1.3rem;
+}
+
+#totalRevenue {
+  color: var(--blue);
+  font-weight: 700;
 }
 
 /* ===== Footer ===== */
@@ -379,6 +574,7 @@ p {
   transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s ease;
 }
+
 .fade-in.visible {
   opacity: 1;
   transform: translateY(0);
