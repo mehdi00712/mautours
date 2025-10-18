@@ -31,7 +31,7 @@
         <img src="assets/ile.jpg" alt="Île aux Cerfs">
         <div class="package-info">
           <h3>Île aux Cerfs Catamaran</h3>
-          <p>Full-day luxury catamaran cruise with BBQ lunch and snorkeling in turquoise lagoons.</p>
+          <p>Full-day catamaran cruise with BBQ lunch and snorkeling.</p>
           <div class="package-footer">
             <span class="price">Rs 3,400</span>
             <button class="btn book-btn" data-package="Île aux Cerfs Catamaran" data-price="3400">Book Now</button>
@@ -40,10 +40,10 @@
       </div>
 
       <div class="package-card">
-        <img src="assets/south.jpg" alt="Wild South">
+        <img src="assets/south.jpg" alt="Wild South Discovery">
         <div class="package-info">
           <h3>Wild South Discovery</h3>
-          <p>Explore Grand Bassin, Chamarel, Black River Gorges, and the Seven Coloured Earth.</p>
+          <p>Chamarel, Black River Gorges, Grand Bassin and the Seven Coloured Earth.</p>
           <div class="package-footer">
             <span class="price">Rs 6,300</span>
             <button class="btn book-btn" data-package="Wild South Discovery" data-price="6300">Book Now</button>
@@ -53,7 +53,7 @@
     </div>
   </main>
 
-  <!-- ===== Booking Modal ===== -->
+  <!-- Booking Modal -->
   <div id="bookingModal" class="modal">
     <div class="modal-content">
       <span class="close">&times;</span>
@@ -61,6 +61,7 @@
       <form id="bookingForm">
         <input type="text" id="name" placeholder="Full Name" required />
         <input type="email" id="email" placeholder="Email" required />
+        <input type="tel" id="phone" placeholder="Phone Number" required />
         <input type="date" id="date" required />
         <input type="number" id="people" placeholder="No. of People" min="1" required />
         <button type="submit" class="btn">Proceed to Checkout</button>
@@ -68,7 +69,10 @@
     </div>
   </div>
 
-  <script defer src="js/main.js"></script>
-  <script defer src="js/booking.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/booking.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
