@@ -1,37 +1,64 @@
-import { app } from "./firebase-config.js";
-import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { db, auth } from "./firebase-config.js";
+import {
+  onAuthStateChanged,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+} from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
 
-const db = getFirestore(app);
-const bookingsTable = document.querySelector("#bookingsTable tbody");
+const tableBody = document.querySelector("#bookingsTable tbody");
 
-onSnapshot(collection(db, "bookings"), (snapshot) => {
-  bookingsTable.innerHTML = "";
-  let total = 0;
+onAuthStateChanged(auth, async (user) => {
+  if (!user || user.email !== "mbhoyroo246@gmail.com") {
+    alert("Access denied. Admins only.");
+    window.location.href = "login.html";
+    return;
+  }
 
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    total += parseFloat(data.price || 0);
+  const bookings = await getDocs(collection(db, "bookings"));
+  tableBody.innerHTML = "";
 
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+  bookings.forEach((docSnap) => {
+    const data = docSnap.data();
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
       <td>${data.name}</td>
       <td>${data.email}</td>
       <td>${data.excursion}</td>
-      <td>${data.price}</td>
       <td>${data.date}</td>
       <td>${data.people}</td>
-      <td>${data.status}</td>
+      <td>${data.payment_status}</td>
+      <td>
+        <button class="btn confirm" data-id="${docSnap.id}">Confirm</button>
+        <button class="btn-outline delete" data-id="${docSnap.id}">Delete</button>
+      </td>
     `;
-    bookingsTable.appendChild(tr);
+    tableBody.appendChild(row);
   });
 
-  const tfoot = document.createElement("tfoot");
-  tfoot.innerHTML = `
-    <tr>
-      <th colspan="3">Total Revenue</th>
-      <th>MUR ${total.toFixed(2)}</th>
-      <th colspan="3"></th>
-    </tr>
-  `;
-  bookingsTable.appendChild(tfoot);
+  // Confirm booking
+  document.querySelectorAll(".confirm").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await updateDoc(doc(db, "bookings", btn.dataset.id), {
+        payment_status: "paid",
+      });
+      alert("Booking confirmed!");
+      location.reload();
+    });
+  });
+
+  // Delete booking
+  document.querySelectorAll(".delete").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await deleteDoc(doc(db, "bookings", btn.dataset.id));
+      alert("Booking deleted.");
+      location.reload();
+    });
+  });
 });
