@@ -18,8 +18,11 @@ import {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Only admin UID can access
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
+// ===== Auth Check =====
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Please log in first!");
@@ -36,6 +39,9 @@ onAuthStateChanged(auth, async (user) => {
 // ===== Load Bookings =====
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
+  const revenueFill = document.getElementById("revenueFill");
+  const revenueValue = document.getElementById("revenueValue");
+
   tableBody.innerHTML = `<tr><td colspan="9">Loading...</td></tr>`;
 
   try {
@@ -44,8 +50,12 @@ async function loadBookings() {
 
     if (snapshot.empty) {
       tableBody.innerHTML = `<tr><td colspan="9">No bookings found.</td></tr>`;
+      revenueFill.style.width = "0%";
+      revenueValue.textContent = "Rs 0";
       return;
     }
+
+    let totalRevenue = 0;
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -53,6 +63,7 @@ async function loadBookings() {
 
       const price = data.pricePerPerson || 0;
       const total = data.totalPrice || price * (data.people || 1);
+      totalRevenue += total;
 
       row.innerHTML = `
         <td>${data.name}</td>
@@ -68,6 +79,23 @@ async function loadBookings() {
       tableBody.appendChild(row);
     });
 
+    // ===== Animate Revenue Bar =====
+    const cappedRevenue = Math.min(totalRevenue, 200000);
+    const percentage = (cappedRevenue / 200000) * 100;
+    revenueFill.style.width = `${percentage}%`;
+
+    // Change bar color based on revenue
+    if (percentage < 40) {
+      revenueFill.style.background = "linear-gradient(90deg, #0073ff, #0040a0)";
+    } else if (percentage < 80) {
+      revenueFill.style.background = "linear-gradient(90deg, #00b894, #009970)";
+    } else {
+      revenueFill.style.background = "linear-gradient(90deg, #fcb900, #f57c00)";
+    }
+
+    revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+
+    // ===== Delete Buttons =====
     document.querySelectorAll(".delete-btn").forEach((btn) =>
       btn.addEventListener("click", async () => {
         if (confirm("Delete this booking?")) {
