@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours Admin Dashboard</title>
+  <title>Mautours – Admin Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- ===== Header ===== -->
   <header class="site-header">
     <div class="nav-container">
       <h1 class="logo">Mautours</h1>
@@ -22,34 +23,52 @@
     </div>
   </header>
 
-  <main style="padding-top: 100px; text-align: center;">
-    <h2>Admin Dashboard</h2>
-    <p>Manage bookings below:</p>
+  <!-- ===== Dashboard ===== -->
+  <main style="padding-top: 100px;">
+    <section class="dashboard-container">
+      <h2 class="center">Admin Dashboard</h2>
+      <p class="center" style="color: var(--muted);">Manage all your bookings below.</p>
 
-    <div class="dashboard-container">
-      <table id="bookingsTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Package</th>
-            <th>Date</th>
-            <th>People</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <!-- ===== Revenue Summary ===== -->
+      <div id="revenueSummary" class="summary-box fade-in">
+        <h3>Total Revenue: <span id="totalRevenue">Rs 0</span></h3>
+      </div>
 
-      <button id="logoutBtn" class="btn" style="margin-top: 2rem;">Logout</button>
-    </div>
+      <!-- ===== Bookings Table ===== -->
+      <div class="table-wrapper">
+        <table id="bookingsTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Package</th>
+              <th>Date</th>
+              <th>People</th>
+              <th>Price/Person</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="9">Loading bookings...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ===== Logout Button ===== -->
+      <div class="center" style="margin-top: 2rem;">
+        <button id="logoutBtn" class="btn">Logout</button>
+      </div>
+    </section>
   </main>
 
+  <!-- ===== Footer ===== -->
   <footer class="footer">
     <p>&copy; 2025 Mautours. All Rights Reserved.</p>
   </footer>
 
+  <!-- ===== Scripts ===== -->
   <script type="module" src="js/admin.js"></script>
   <script src="js/main.js"></script>
 </body>
