@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Book Your Adventure | Mautours</title>
-  <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mautours – Book Your Experience</title>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-
   <header class="site-header">
-    <div class="container">
+    <div class="container nav-container">
       <h1 class="logo">Mautours</h1>
       <nav class="nav" id="nav">
         <a href="index.html">Home</a>
@@ -23,42 +22,53 @@
     </div>
   </header>
 
-  <section class="container fade-in">
+  <main class="container" style="margin-top: 100px;">
     <h2 class="center">Our Exclusive Packages</h2>
     <p class="center">Choose your adventure and book instantly.</p>
 
     <div class="package-list">
       <div class="package-card">
-        <img src="assets/ile.jpg" alt="Ile aux Cerfs">
+        <img src="assets/ile.jpg" alt="Île aux Cerfs">
         <div class="package-info">
           <h3>Île aux Cerfs Catamaran</h3>
           <p>Full-day luxury catamaran cruise with BBQ lunch and snorkeling in turquoise lagoons.</p>
           <div class="package-footer">
             <span class="price">Rs 3,400</span>
-            <button class="btn" onclick="bookNow('Ile aux Cerfs Catamaran', 3400)">Book Now</button>
+            <button class="btn book-btn" data-package="Île aux Cerfs Catamaran" data-price="3400">Book Now</button>
           </div>
         </div>
       </div>
 
       <div class="package-card">
-        <img src="assets/south.jpg" alt="Wild South Discovery">
+        <img src="assets/south.jpg" alt="Wild South">
         <div class="package-info">
           <h3>Wild South Discovery</h3>
           <p>Explore Grand Bassin, Chamarel, Black River Gorges, and the Seven Coloured Earth.</p>
           <div class="package-footer">
             <span class="price">Rs 6,300</span>
-            <button class="btn" onclick="bookNow('Wild South Discovery', 6300)">Book Now</button>
+            <button class="btn book-btn" data-package="Wild South Discovery" data-price="6300">Book Now</button>
           </div>
         </div>
       </div>
     </div>
-  </section>
+  </main>
 
-  <footer class="footer">
-    <p>© 2025 Mautours. Explore paradise your way.</p>
-  </footer>
+  <!-- ===== Booking Modal ===== -->
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="modalTitle">Book Package</h3>
+      <form id="bookingForm">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="date" id="date" required />
+        <input type="number" id="people" placeholder="No. of People" min="1" required />
+        <button type="submit" class="btn">Proceed to Checkout</button>
+      </form>
+    </div>
+  </div>
 
-  <script type="module" src="js/booking.js"></script>
   <script defer src="js/main.js"></script>
+  <script defer src="js/booking.js"></script>
 </body>
 </html>
