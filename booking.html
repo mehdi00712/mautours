@@ -3,63 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours – Mauritius Excursions & Transfers</title>
+  <title>Book Your Excursion | Mautours</title>
   <link rel="stylesheet" href="css/style.css" />
-  <script defer src="js/main.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
       <h1 class="logo">Mautours</h1>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="booking.html">Book</a>
-        <a href="login.html">Login</a>
-        <a href="admin.html">Dashboard</a>
-      </nav>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="container center">
-      <h2>Discover Mauritius with Mautours</h2>
-      <p>Excursions • Airport Transfers • Private Tours</p>
-    </div>
-  </section>
-
-  <section class="excursions container">
-    <h2>Popular Excursions</h2>
-    <div class="cards">
-      <div class="card">
-        <img src="assets/ile.jpg" alt="Île aux Cerfs" />
-        <h3>Île aux Cerfs Catamaran</h3>
-        <p>Full-day cruise with BBQ lunch.</p>
-        <a href="booking.html?excursion=Île aux Cerfs Catamaran" class="btn">Book Now</a>
-      </div>
-
-      <div class="card">
-        <img src="assets/wildsouth.jpg" alt="Wild South" />
-        <h3>Wild South Discovery</h3>
-        <p>Grand Bassin, Chamarel, and more.</p>
-        <a href="booking.html?excursion=Wild South Discovery" class="btn">Book Now</a>
-      </div>
-
-      <div class="card">
-        <img src="assets/transfer.jpg" alt="Airport Transfer" />
-        <h3>Airport Transfer</h3>
-        <p>Private transfers to any hotel in Mauritius.</p>
-        <a href="booking.html?excursion=Airport Transfer" class="btn">Book Now</a>
-      </div>
-    </div>
+  <section class="container form-section">
+    <h2>Book Your Excursion</h2>
+    <form id="bookingForm">
+      <label>Full Name <input type="text" id="name" required /></label>
+      <label>Email <input type="email" id="email" required /></label>
+      <label>Phone <input type="text" id="phone" required /></label>
+      <label>Excursion <input type="text" id="excursion" readonly /></label>
+      <label>Date <input type="date" id="date" required /></label>
+      <label>Number of People <input type="number" id="people" min="1" required /></label>
+      <button type="submit" class="btn">Proceed to Payment</button>
+    </form>
   </section>
 
   <footer class="footer">
-    <p>© 2025 Mautours | All rights reserved</p>
+    <p>© 2025 Mautours</p>
   </footer>
 
-  <!-- WhatsApp Floating Button -->
-  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">
-    💬 Chat on WhatsApp
-  </a>
+  <a href="https://wa.me/23052542792" target="_blank" class="whatsapp-btn">💬 Chat on WhatsApp</a>
+  <script type="module" src="js/booking.js" defer></script>
 </body>
 </html>
