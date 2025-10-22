@@ -20,10 +20,10 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ====== Admin Access List ======
+// ===== Admin Access =====
 const adminUIDs = [
-  "d6IRCgOfwhZrKyRIoP6siAM8EOf2", // Main admin
-  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"  // Secondary admin
+  "d6IRCgOfwhZrKyRIoP6siAM8EOf2", // Main Admin
+  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"  // Second Admin (full permissions)
 ];
 
 // ===== Auth Check =====
@@ -36,6 +36,7 @@ onAuthStateChanged(auth, async (user) => {
     await signOut(auth);
     window.location.href = "index.html";
   } else {
+    console.log("✅ Admin access granted:", user.email);
     loadBookings();
   }
 });
@@ -85,13 +86,12 @@ async function loadBookings() {
       tableBody.appendChild(row);
     });
 
-    // ===== Animate Revenue Bar =====
+    // ===== Revenue Bar Update =====
     const cappedRevenue = Math.min(totalRevenue, 200000);
     const percentage = (cappedRevenue / 200000) * 100;
 
     if (revenueFill) {
       revenueFill.style.width = `${percentage}%`;
-
       if (percentage < 40) {
         revenueFill.style.background = "linear-gradient(90deg, #0073ff, #0040a0)";
       } else if (percentage < 80) {
@@ -110,11 +110,13 @@ async function loadBookings() {
       btn.addEventListener("click", async () => {
         if (confirm("Delete this booking?")) {
           await deleteDoc(doc(db, "bookings", btn.dataset.id));
+          alert("Booking deleted successfully.");
           loadBookings();
         }
       })
     );
   } catch (error) {
+    console.error("Error loading bookings:", error);
     tableBody.innerHTML = `<tr><td colspan="9" style="color:red;">Error: ${error.message}</td></tr>`;
   }
 }
