@@ -15,19 +15,23 @@ import {
   doc
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Only admin UID can access
-const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
+// ====== Admin Access List ======
+const adminUIDs = [
+  "d6IRCgOfwhZrKyRIoP6siAM8EOf2", // Main admin
+  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"  // Secondary admin
+];
 
 // ===== Auth Check =====
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     alert("Please log in first!");
     window.location.href = "login.html";
-  } else if (user.uid !== adminUID) {
+  } else if (!adminUIDs.includes(user.uid)) {
     alert("Access Denied – Admin Only");
     await signOut(auth);
     window.location.href = "index.html";
@@ -42,6 +46,8 @@ async function loadBookings() {
   const revenueFill = document.getElementById("revenueFill");
   const revenueValue = document.getElementById("revenueValue");
 
+  if (!tableBody) return;
+
   tableBody.innerHTML = `<tr><td colspan="9">Loading...</td></tr>`;
 
   try {
@@ -50,8 +56,8 @@ async function loadBookings() {
 
     if (snapshot.empty) {
       tableBody.innerHTML = `<tr><td colspan="9">No bookings found.</td></tr>`;
-      revenueFill.style.width = "0%";
-      revenueValue.textContent = "Rs 0";
+      if (revenueFill) revenueFill.style.width = "0%";
+      if (revenueValue) revenueValue.textContent = "Rs 0";
       return;
     }
 
@@ -82,18 +88,22 @@ async function loadBookings() {
     // ===== Animate Revenue Bar =====
     const cappedRevenue = Math.min(totalRevenue, 200000);
     const percentage = (cappedRevenue / 200000) * 100;
-    revenueFill.style.width = `${percentage}%`;
 
-    // Change bar color based on revenue
-    if (percentage < 40) {
-      revenueFill.style.background = "linear-gradient(90deg, #0073ff, #0040a0)";
-    } else if (percentage < 80) {
-      revenueFill.style.background = "linear-gradient(90deg, #00b894, #009970)";
-    } else {
-      revenueFill.style.background = "linear-gradient(90deg, #fcb900, #f57c00)";
+    if (revenueFill) {
+      revenueFill.style.width = `${percentage}%`;
+
+      if (percentage < 40) {
+        revenueFill.style.background = "linear-gradient(90deg, #0073ff, #0040a0)";
+      } else if (percentage < 80) {
+        revenueFill.style.background = "linear-gradient(90deg, #00b894, #009970)";
+      } else {
+        revenueFill.style.background = "linear-gradient(90deg, #fcb900, #f57c00)";
+      }
     }
 
-    revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+    if (revenueValue) {
+      revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+    }
 
     // ===== Delete Buttons =====
     document.querySelectorAll(".delete-btn").forEach((btn) =>
@@ -110,8 +120,11 @@ async function loadBookings() {
 }
 
 // ===== Logout =====
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-  await signOut(auth);
-  alert("Logged out successfully!");
-  window.location.href = "index.html";
-});
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    alert("Logged out successfully!");
+    window.location.href = "index.html";
+  });
+}
