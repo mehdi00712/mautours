@@ -1,5 +1,4 @@
 // js/admin.js
-
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
@@ -20,21 +19,36 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Popup references
+const popup = document.getElementById("popup");
+const popupTitle = document.getElementById("popupTitle");
+const popupMessage = document.getElementById("popupMessage");
+const popupBtn = document.getElementById("popupBtn");
+
+function showPopup(title, message, redirect = null) {
+  popupTitle.textContent = title;
+  popupMessage.textContent = message;
+  popup.classList.add("show");
+
+  popupBtn.onclick = () => {
+    popup.classList.remove("show");
+    if (redirect) window.location.href = redirect;
+  };
+}
+
 // ===== Admin Access =====
 const adminUIDs = [
-  "d6IRCgOfwhZrKyRIoP6siAM8EOf2", // Main Admin
-  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"  // Second Admin (full permissions)
+  "d6IRCgOfwhZrKyRIoP6siAM8EOf2",
+  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"
 ];
 
 // ===== Auth Check =====
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    alert("Please log in first!");
-    window.location.href = "login.html";
+    showPopup("Login Required", "Please log in first.", "login.html");
   } else if (!adminUIDs.includes(user.uid)) {
-    alert("Access Denied – Admin Only");
     await signOut(auth);
-    window.location.href = "index.html";
+    showPopup("Access Denied", "Admin privileges required.", "index.html");
   } else {
     console.log("✅ Admin access granted:", user.email);
     loadBookings();
@@ -92,15 +106,7 @@ async function loadBookings() {
 
     if (revenueFill) {
       revenueFill.style.width = `${percentage}%`;
-      if (percentage < 40) {
-        revenueFill.style.background = "linear-gradient(90deg, #0073ff, #0040a0)";
-      } else if (percentage < 80) {
-        revenueFill.style.background = "linear-gradient(90deg, #00b894, #009970)";
-      } else {
-        revenueFill.style.background = "linear-gradient(90deg, #fcb900, #f57c00)";
-      }
     }
-
     if (revenueValue) {
       revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
     }
@@ -108,11 +114,18 @@ async function loadBookings() {
     // ===== Delete Buttons =====
     document.querySelectorAll(".delete-btn").forEach((btn) =>
       btn.addEventListener("click", async () => {
-        if (confirm("Delete this booking?")) {
+        showPopup(
+          "Confirm Deletion",
+          "Do you want to delete this booking?",
+          null
+        );
+
+        popupBtn.onclick = async () => {
           await deleteDoc(doc(db, "bookings", btn.dataset.id));
-          alert("Booking deleted successfully.");
+          popup.classList.remove("show");
+          showPopup("Booking Deleted", "The booking has been removed.", null);
           loadBookings();
-        }
+        };
       })
     );
   } catch (error) {
@@ -126,7 +139,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
-    alert("Logged out successfully!");
-    window.location.href = "index.html";
+    showPopup("Logged Out", "You have been logged out successfully.", "index.html");
   });
 }
