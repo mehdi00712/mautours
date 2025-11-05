@@ -14,7 +14,23 @@ const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
 const loginForm = document.getElementById("loginForm");
 const logoutBtn = document.getElementById("logoutBtn");
-const loginMessage = document.getElementById("loginMessage");
+
+// ===== Popup Elements =====
+const popup = document.getElementById("popup");
+const popupTitle = document.getElementById("popupTitle");
+const popupMessage = document.getElementById("popupMessage");
+const popupBtn = document.getElementById("popupBtn");
+
+function showPopup(title, message, redirect = null) {
+  popupTitle.textContent = title;
+  popupMessage.textContent = message;
+  popup.classList.add("show");
+
+  popupBtn.onclick = () => {
+    popup.classList.remove("show");
+    if (redirect) window.location.href = redirect;
+  };
+}
 
 // ===== Login Function =====
 if (loginForm) {
@@ -27,19 +43,13 @@ if (loginForm) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      loginMessage.textContent = "✅ Login successful. Redirecting...";
-      loginMessage.style.color = "green";
-
-      setTimeout(() => {
-        if (user.uid === adminUID) {
-          window.location.href = "admin.html";
-        } else {
-          window.location.href = "index.html";
-        }
-      }, 1000);
+      if (user.uid === adminUID) {
+        showPopup("Login Successful 🎉", "Welcome back, Admin!", "admin.html");
+      } else {
+        showPopup("Login Successful 🎉", "Welcome to Mautours!", "index.html");
+      }
     } catch (error) {
-      loginMessage.textContent = "❌ " + error.message;
-      loginMessage.style.color = "red";
+      showPopup("Login Failed ❌", error.message);
     }
   });
 }
@@ -48,12 +58,11 @@ if (loginForm) {
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
-    alert("You have been logged out.");
-    window.location.href = "index.html";
+    showPopup("Logged Out", "You have been logged out successfully.", "index.html");
   });
 }
 
-// ===== Auto-auth state monitor =====
+// ===== Auth Monitor =====
 onAuthStateChanged(auth, (user) => {
   console.log("Auth state:", user ? `Logged in as ${user.email}` : "Logged out");
 });
