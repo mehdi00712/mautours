@@ -23,7 +23,7 @@
     </div>
   </header>
 
-  <!-- ===== Hero Section ===== -->
+  <!-- ===== Hero Section (Video Background) ===== -->
   <section class="hero">
     <video autoplay muted loop playsinline class="hero-video">
       <source src="mauvid2.mp4" type="video/mp4">
@@ -31,7 +31,7 @@
     </video>
     <div class="hero-content">
       <h2>Book Your Perfect Adventure</h2>
-      <p>Choose from our top destinations and enjoy Mauritius like never before.</p>
+      <p>Choose from our top destinations and enjoy the beauty of Mauritius like never before.</p>
       <a href="#packages" class="btn">Explore Packages</a>
     </div>
   </section>
@@ -41,11 +41,12 @@
     <h2>Our Packages</h2>
     <div class="package-list">
       
+      <!-- Southern Wonders Tour -->
       <div class="package-card">
         <img src="assets/south.jpg" alt="South Tour">
         <div class="package-info">
           <h3>Southern Wonders Tour</h3>
-          <p>Explore the South — Chamarel, Black River Gorges and more.</p>
+          <p>Explore the stunning landscapes of the South – Chamarel, Black River Gorges, and more.</p>
           <div class="package-footer">
             <span class="price">Rs 2,500 / person</span>
             <button class="btn book-btn" data-package="Southern Wonders Tour">Book Now</button>
@@ -53,6 +54,7 @@
         </div>
       </div>
 
+      <!-- Ile aux Cerfs Experience -->
       <div class="package-card">
         <img src="assets/ile.jpg" alt="Ile aux Cerfs">
         <div class="package-info">
@@ -65,11 +67,12 @@
         </div>
       </div>
 
+      <!-- Airport Transfers -->
       <div class="package-card">
         <img src="assets/transfer.jpg" alt="Airport Transfers">
         <div class="package-info">
           <h3>Airport Transfers</h3>
-          <p>Comfortable and reliable transport to and from your hotel or airport.</p>
+          <p>Comfortable and reliable transport from and to your hotel or airport – stress-free!</p>
           <div class="package-footer">
             <span class="price">Rs 1,200 / trip</span>
             <button class="btn book-btn" data-package="Airport Transfers">Book Now</button>
@@ -87,13 +90,22 @@
       <h3>Book Your Trip</h3>
       <form id="bookingForm">
         <input type="text" id="name" placeholder="Full Name" required>
-        <input type="email" id="email" placeholder="Email" required>
+        <input type="email" id="email" placeholder="Email Address" required>
         <input type="text" id="phone" placeholder="Phone Number" required>
         <input type="number" id="people" placeholder="Number of People" required>
         <input type="date" id="date" required>
         <input type="text" id="selectedPackage" readonly>
         <button type="submit" class="btn">Proceed to Checkout</button>
       </form>
+    </div>
+  </div>
+
+  <!-- ===== Custom Popup ===== -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h3 id="popupTitle"></h3>
+      <p id="popupMessage"></p>
+      <button id="popupBtn" class="btn">OK</button>
     </div>
   </div>
 
