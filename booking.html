@@ -1,142 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mautours | Book Your Experience</title>
-    <link rel="stylesheet" href="css/style.css" />
-  </head>
-  <body>
-    <!-- ===== Header ===== -->
-    <header class="site-header">
-      <div class="nav-container">
-        <div class="logo">Mautours</div>
-        <nav class="nav">
-          <a href="index.html">Home</a>
-          <a href="booking.html" class="active">Book</a>
-          <a href="contact.html">Contact</a>
-          <a href="about.html">About</a>
-        </nav>
-        <div class="hamburger" id="hamburger">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-    </header>
-
-    <!-- ===== Hero Section ===== -->
-    <section class="hero">
-      <video autoplay muted loop playsinline class="hero-video">
-        <source src="assets/mauritius.mp4" type="video/mp4" />
-      </video>
-      <div class="hero-content">
-        <h2>Book Your Dream Experience</h2>
-        <p>
-          Choose from our top-rated tours and adventures across the paradise
-          island of Mauritius.
-        </p>
-        <a href="#packages" class="btn">Explore Packages</a>
-      </div>
-    </section>
-
-    <!-- ===== Packages Section ===== -->
-    <section id="packages">
-      <h2>Our Tour Packages</h2>
-
-      <div class="package-list">
-        <div class="package-card">
-          <img src="assets/south.jpg" alt="Southern Wonders" />
-          <div class="package-info">
-            <h3>Southern Wonders Tour</h3>
-            <p>
-              Discover Chamarel Waterfall, Seven-Coloured Earth, and Black River
-              Gorges on a full-day scenic tour.
-            </p>
-            <div class="package-footer">
-              <span class="price">Rs 2,500 / person</span>
-              <button class="btn book-btn" data-package="Southern Wonders Tour">
-                Book Now
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="package-card">
-          <img src="assets/ile.jpg" alt="Île aux Cerfs" />
-          <div class="package-info">
-            <h3>Île aux Cerfs Experience</h3>
-            <p>
-              Enjoy boat transfers, snorkelling, and BBQ lunch on Mauritius’
-              most iconic island paradise.
-            </p>
-            <div class="package-footer">
-              <span class="price">Rs 3,000 / person</span>
-              <button class="btn book-btn" data-package="Île aux Cerfs Experience">
-                Book Now
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="package-card">
-          <img src="assets/transfer.jpg" alt="Airport Transfers" />
-          <div class="package-info">
-            <h3>Airport Transfers</h3>
-            <p>
-              Hassle-free rides between SSR International Airport and your
-              accommodation — safe and reliable.
-            </p>
-            <div class="package-footer">
-              <span class="price">Rs 1,200 / person</span>
-              <button class="btn book-btn" data-package="Airport Transfers">
-                Book Now
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ===== Booking Modal ===== -->
-    <div id="bookingModal" class="modal">
-      <div class="modal-content">
-        <span id="closeModal" class="close">&times;</span>
-        <h3>Complete Your Booking</h3>
-
-        <form id="bookingForm">
-          <input type="text" id="name" placeholder="Full Name" required />
-          <input
-            type="email"
-            id="email"
-            placeholder="Email Address"
-            required
-          />
-          <input
-            type="tel"
-            id="phone"
-            placeholder="Phone Number"
-            required
-          />
-          <input
-            type="number"
-            id="people"
-            placeholder="Number of People"
-            min="1"
-            required
-          />
-          <input type="date" id="date" required />
-          <input type="text" id="selectedPackage" readonly />
-
-          <button type="submit" class="btn">Proceed to Checkout</button>
-        </form>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mautours – Book Your Experience</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <div class="nav-container">
+      <h1 class="logo">Mautours</h1>
+      <nav class="nav" id="nav">
+        <a href="index.html">Home</a>
+        <a href="booking.html" class="active">Book</a>
+        <a href="contact.html">Contact</a>
+        <a href="about.html">About</a>
+      </nav>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
       </div>
     </div>
+  </header>
 
-    <!-- ===== Footer ===== -->
-    <footer class="footer">
-      © 2025 Mautours. All Rights Reserved.
-    </footer>
+  <!-- ===== Hero Section (Video Background) ===== -->
+  <section class="hero">
+    <video autoplay muted loop playsinline class="hero-video">
+      <source src="mauvid2.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="hero-content">
+      <h2>Book Your Perfect Adventure</h2>
+      <p>Choose from our top destinations and enjoy the beauty of Mauritius like never before.</p>
+      <a href="#packages" class="btn">Explore Packages</a>
+    </div>
+  </section>
 
-    <script type="module" src="js/booking.js"></script>
-    <script src="js/main.js"></script>
-  </body>
+  <!-- ===== Packages Section ===== -->
+  <section id="packages" class="container fade-in">
+    <h2>Our Packages</h2>
+    <div class="package-list">
+      
+      <div class="package-card">
+        <img src="assets/south.jpg" alt="South Tour">
+        <div class="package-info">
+          <h3>Southern Wonders Tour</h3>
+          <p>Explore the stunning landscapes of the South – Chamarel, Black River Gorges, and more.</p>
+          <div class="package-footer">
+            <span class="price">Rs 2,500 / person</span>
+            <button class="btn book-btn" data-package="Southern Wonders Tour">Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="package-card">
+        <img src="assets/ile.jpg" alt="Ile aux Cerfs">
+        <div class="package-info">
+          <h3>Île aux Cerfs Experience</h3>
+          <p>Relax and soak in the sun on Mauritius’s most iconic island paradise.</p>
+          <div class="package-footer">
+            <span class="price">Rs 3,000 / person</span>
+            <button class="btn book-btn" data-package="Île aux Cerfs Experience">Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="package-card">
+        <img src="assets/transfer.jpg" alt="Airport Transfers">
+        <div class="package-info">
+          <h3>Airport Transfers</h3>
+          <p>Comfortable and reliable transport from and to your hotel or airport – stress-free!</p>
+          <div class="package-footer">
+            <span class="price">Rs 1,200 / trip</span>
+            <button class="btn book-btn" data-package="Airport Transfers">Book Now</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== Booking Modal ===== -->
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal" class="close">&times;</span>
+      <h3>Book Your Trip</h3>
+      <form id="bookingForm">
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="text" id="phone" placeholder="Phone Number" required>
+        <input type="number" id="people" placeholder="Number of People" min="1" required>
+        <input type="date" id="date" required>
+        <input type="text" id="selectedPackage" readonly>
+        <button type="submit" class="btn">Proceed to Checkout</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p>&copy; 2025 Mautours. All Rights Reserved.</p>
+  </footer>
+
+  <!-- ===== Scripts ===== -->
+  <script src="js/main.js"></script>
+  <script src="js/booking.js"></script>
+</body>
 </html>
