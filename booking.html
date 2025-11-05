@@ -14,8 +14,8 @@
       <nav class="nav" id="nav">
         <a href="index.html">Home</a>
         <a href="booking.html" class="active">Book</a>
-        <a href="contact.html">Contact</a>
-        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="admin.html">Dashboard</a>
       </nav>
       <div class="hamburger" id="hamburger">
         <span></span><span></span><span></span>
@@ -23,7 +23,7 @@
     </div>
   </header>
 
-  <!-- ===== Hero Section (Video Background) ===== -->
+  <!-- ===== Hero Section ===== -->
   <section class="hero">
     <video autoplay muted loop playsinline class="hero-video">
       <source src="mauvid2.mp4" type="video/mp4">
@@ -31,7 +31,7 @@
     </video>
     <div class="hero-content">
       <h2>Book Your Perfect Adventure</h2>
-      <p>Choose from our top destinations and enjoy the beauty of Mauritius like never before.</p>
+      <p>Choose from our top destinations and enjoy Mauritius like never before.</p>
       <a href="#packages" class="btn">Explore Packages</a>
     </div>
   </section>
@@ -45,7 +45,7 @@
         <img src="assets/south.jpg" alt="South Tour">
         <div class="package-info">
           <h3>Southern Wonders Tour</h3>
-          <p>Explore the stunning landscapes of the South – Chamarel, Black River Gorges, and more.</p>
+          <p>Explore the South — Chamarel, Black River Gorges and more.</p>
           <div class="package-footer">
             <span class="price">Rs 2,500 / person</span>
             <button class="btn book-btn" data-package="Southern Wonders Tour">Book Now</button>
@@ -69,7 +69,7 @@
         <img src="assets/transfer.jpg" alt="Airport Transfers">
         <div class="package-info">
           <h3>Airport Transfers</h3>
-          <p>Comfortable and reliable transport from and to your hotel or airport – stress-free!</p>
+          <p>Comfortable and reliable transport to and from your hotel or airport.</p>
           <div class="package-footer">
             <span class="price">Rs 1,200 / trip</span>
             <button class="btn book-btn" data-package="Airport Transfers">Book Now</button>
@@ -89,7 +89,7 @@
         <input type="text" id="name" placeholder="Full Name" required>
         <input type="email" id="email" placeholder="Email" required>
         <input type="text" id="phone" placeholder="Phone Number" required>
-        <input type="number" id="people" placeholder="Number of People" min="1" required>
+        <input type="number" id="people" placeholder="Number of People" required>
         <input type="date" id="date" required>
         <input type="text" id="selectedPackage" readonly>
         <button type="submit" class="btn">Proceed to Checkout</button>
@@ -104,6 +104,6 @@
 
   <!-- ===== Scripts ===== -->
   <script src="js/main.js"></script>
-  <script src="js/booking.js"></script>
+  <script type="module" src="js/booking.js"></script>
 </body>
 </html>
