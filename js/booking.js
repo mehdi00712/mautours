@@ -9,6 +9,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -41,6 +42,7 @@ function openBookingModal(packageName) {
   }
 }
 
+// ===== Close Modal =====
 if (closeModal) {
   closeModal.addEventListener("click", () => {
     modal.classList.remove("show");
@@ -58,8 +60,16 @@ if (bookingForm) {
     const people = parseInt(document.getElementById("people").value.trim());
     const date = document.getElementById("date").value.trim();
 
+    // ===== Field Validation =====
     if (!name || !email || !phone || !people || !date) {
-      alert("⚠️ Please fill in all fields.");
+      alert("⚠️ Please fill in all fields before proceeding.");
+      return;
+    }
+
+    // Simple email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("📧 Please enter a valid email address.");
       return;
     }
 
@@ -80,12 +90,15 @@ if (bookingForm) {
       });
 
       modal.classList.remove("show");
-      alert(`✅ Booking saved! Total: Rs ${totalPrice}\nRedirecting to payment...`);
+      bookingForm.reset();
 
-      // TODO: Replace with real ABSA payment portal
+      alert(`✅ Booking confirmed!\n\nPackage: ${selectedPackage}\nTotal: Rs ${totalPrice}\n\nYou’ll be redirected to payment.`);
+
+      // Redirect to ABSA payment portal (replace later with your live URL)
       setTimeout(() => {
         window.location.href = "https://secureacceptance.cybersource.com/pay";
-      }, 1500);
+      }, 2000);
+
     } catch (error) {
       console.error("Booking Error:", error);
       alert("❌ Failed to save booking: " + error.message);
