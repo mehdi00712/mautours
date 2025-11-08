@@ -10,8 +10,11 @@ import {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+
+// ===== Admin UID =====
 const adminUID = "d6IRCgOfwhZrKyRIoP6siAM8EOf2";
 
+// ===== Elements =====
 const loginForm = document.getElementById("loginForm");
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -32,10 +35,11 @@ function showPopup(title, message, redirect = null) {
   };
 }
 
-// ===== Login Function =====
+// ===== LOGIN FUNCTION =====
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const email = document.getElementById("loginEmail").value.trim();
     const password = document.getElementById("loginPassword").value.trim();
 
@@ -44,17 +48,20 @@ if (loginForm) {
       const user = userCredential.user;
 
       if (user.uid === adminUID) {
-        showPopup("Login Successful 🎉", "Welcome back, Admin!", "admin.html");
+        showPopup("Welcome Admin 🎉", "Login successful! Redirecting to Dashboard...", "admin.html");
       } else {
-        showPopup("Login Successful 🎉", "Welcome to Mautours!", "index.html");
+        await signOut(auth);
+        showPopup("Access Denied 🚫", "You are not authorized to access the dashboard.");
       }
+
     } catch (error) {
-      showPopup("Login Failed ❌", error.message);
+      showPopup("Login Failed ❌", "Invalid email or password. Please try again.");
+      console.error("Login Error:", error);
     }
   });
 }
 
-// ===== Logout Function =====
+// ===== LOGOUT FUNCTION =====
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
@@ -62,7 +69,7 @@ if (logoutBtn) {
   });
 }
 
-// ===== Auth Monitor =====
+// ===== AUTH MONITOR =====
 onAuthStateChanged(auth, (user) => {
   console.log("Auth state:", user ? `Logged in as ${user.email}` : "Logged out");
 });
