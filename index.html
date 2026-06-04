@@ -7,88 +7,202 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- ===== Header ===== -->
+
   <header class="site-header">
     <div class="nav-container">
       <h1 class="logo">Mautours</h1>
+
       <nav class="nav" id="nav">
         <a href="index.html" class="active">Home</a>
         <a href="booking.html">Book</a>
-        <a href="login.html">Login</a>
+        <a href="login.html">Sign In</a>
         <a href="admin.html">Dashboard</a>
       </nav>
+
       <div class="hamburger" id="hamburger">
-        <span></span><span></span><span></span>
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
   </header>
 
-  <!-- ===== Hero Section (Video Background) ===== -->
-  <section class="hero">
+  <section class="hero home-hero">
     <video autoplay muted loop playsinline class="hero-video">
-      <source src="mauvid1.mp4" type="video/mp4">
+      <source src="mauvid1.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
+
     <div class="hero-content">
-      <h2>Explore the Beauty of Mauritius with Mautours</h2>
-      <p>Uncover breathtaking landscapes, turquoise lagoons, and unforgettable experiences across our paradise island.</p>
-      <a href="booking.html" class="btn">Book Your Trip</a>
+      <span class="hero-badge">Mauritius Travel Experiences</span>
+      <h2>Discover Mauritius the Beautiful Way</h2>
+      <p>
+        Explore turquoise lagoons, scenic mountain routes, cultural villages,
+        private transfers, and unforgettable island adventures with Mautours.
+      </p>
+
+      <div class="hero-actions">
+        <a href="booking.html" class="btn">Book Your Trip</a>
+        <a href="#loved" class="btn-outline hero-outline">Explore Tours</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <strong>500+</strong>
+        <span>Happy Travellers</span>
+      </div>
+      <div>
+        <strong>50+</strong>
+        <span>Island Experiences</span>
+      </div>
+      <div>
+        <strong>24/7</strong>
+        <span>Travel Support</span>
+      </div>
     </div>
   </section>
 
-  <!-- ===== About Us Section ===== -->
   <section id="about" class="container fade-in">
-    <h2>About Us</h2>
-    <p class="center">
-      At Mautours, we provide exceptional guided experiences, blending comfort, adventure, and the authentic beauty of Mauritius.
-      Whether you're here for the sun, the sea, or the culture, we make sure your journey is unforgettable.
-    </p>
+    <div class="about-split">
+      <div class="about-text">
+        <span class="section-label">About Mautours</span>
+        <h2>Your Trusted Travel Partner in Mauritius</h2>
+        <p>
+          At Mautours, we create smooth, enjoyable, and memorable travel experiences
+          across Mauritius. From peaceful beach escapes to cultural discoveries and
+          comfortable transfers, we help every traveller enjoy the island with confidence.
+        </p>
+
+        <div class="about-points">
+          <div>
+            <strong>Comfort</strong>
+            <span>Reliable transport and carefully planned trips.</span>
+          </div>
+          <div>
+            <strong>Adventure</strong>
+            <span>Unique tours designed around Mauritius' best locations.</span>
+          </div>
+          <div>
+            <strong>Local Touch</strong>
+            <span>Friendly service with authentic island knowledge.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <img src="assets/ile.jpg" alt="Beautiful Mauritius lagoon" />
+        <div class="floating-card">
+          <strong>Plan your perfect escape</strong>
+          <span>Easy bookings, trusted service, unforgettable views.</span>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <!-- ===== Our Most Loved Experiences ===== -->
+  <section id="why" class="why-section fade-in">
+    <div class="container">
+      <span class="section-label center-label">Why Choose Us</span>
+      <h2>Travel Made Simple, Beautiful and Secure</h2>
+
+      <div class="why-grid">
+        <div class="why-card">
+          <span>🌴</span>
+          <h3>Handpicked Experiences</h3>
+          <p>Enjoy carefully selected tours that show the best beaches, nature, culture and hidden gems of Mauritius.</p>
+        </div>
+
+        <div class="why-card">
+          <span>🚐</span>
+          <h3>Comfortable Transfers</h3>
+          <p>Travel stress-free with reliable transport, friendly support and smooth pickup arrangements.</p>
+        </div>
+
+        <div class="why-card">
+          <span>🔒</span>
+          <h3>Secure Bookings</h3>
+          <p>Signed-in users can make safe reservations, helping us protect every booking and avoid double booking.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="loved" class="container fade-in">
+    <span class="section-label center-label">Top Experiences</span>
     <h2>Our Most Loved Experiences</h2>
-    <p class="center" style="color: var(--muted);">Discover why travelers love exploring Mauritius with Mautours.</p>
+    <p class="center section-subtitle">
+      Discover why travellers love exploring Mauritius with Mautours.
+    </p>
 
     <div class="loved-grid">
-      <div class="loved-card">
-        <img src="assets/ile.jpg" alt="Île aux Cerfs" />
+      <div class="loved-card premium-card">
+        <div class="card-image-wrap">
+          <img src="assets/ile.jpg" alt="Île aux Cerfs" />
+          <span class="card-tag">Most Popular</span>
+        </div>
         <div class="loved-info">
           <h3>Île aux Cerfs Adventure</h3>
-          <p>Crystal clear lagoons, golden beaches, and thrilling water sports await you on this breathtaking island.</p>
+          <p>Crystal clear lagoons, golden beaches, and exciting water activities on one of Mauritius' most iconic islands.</p>
+          <a href="booking.html" class="card-link">View Package →</a>
         </div>
       </div>
 
-      <div class="loved-card">
-        <img src="assets/south.jpg" alt="South Tour" />
+      <div class="loved-card premium-card">
+        <div class="card-image-wrap">
+          <img src="assets/south.jpg" alt="South Tour" />
+          <span class="card-tag">Nature Escape</span>
+        </div>
         <div class="loved-info">
           <h3>Southern Wonders Tour</h3>
-          <p>Visit the iconic Chamarel Waterfall, Seven Colored Earth, and Black River Gorges — a true nature escape.</p>
+          <p>Visit Chamarel, Seven Colored Earth, Black River Gorges and breathtaking viewpoints in the south.</p>
+          <a href="booking.html" class="card-link">View Package →</a>
         </div>
       </div>
 
-      <div class="loved-card">
-        <img src="assets/transfer.jpg" alt="Transfers" />
+      <div class="loved-card premium-card">
+        <div class="card-image-wrap">
+          <img src="assets/transfer.jpg" alt="Transfers" />
+          <span class="card-tag">Stress-Free</span>
+        </div>
         <div class="loved-info">
           <h3>Premium Airport Transfers</h3>
-          <p>Start and end your trip stress-free with reliable, air-conditioned, and affordable private transfers.</p>
+          <p>Start and end your journey with comfortable, reliable and air-conditioned private transfers.</p>
+          <a href="booking.html" class="card-link">View Package →</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== Contact Section ===== -->
+  <section class="cta-section fade-in">
+    <div class="cta-content">
+      <span class="section-label">Ready to Explore?</span>
+      <h2>Make Your Mauritius Trip Unforgettable</h2>
+      <p>
+        Book your next island experience with Mautours and enjoy a smooth,
+        secure and beautiful travel journey.
+      </p>
+      <a href="booking.html" class="btn">Start Booking</a>
+    </div>
+  </section>
+
   <section id="contact" class="container fade-in">
-    <h2>Contact Us</h2>
-    <p class="center">Have a question or want to customize your experience? Reach out to our friendly support team.</p>
-    <div class="contact-info center" style="margin-top: 1.5rem;">
+    <span class="section-label center-label">Contact Us</span>
+    <h2>Speak With Our Travel Team</h2>
+    <p class="center section-subtitle">
+      Have a question or want a customised experience? Reach out to our friendly support team.
+    </p>
+
+    <div class="contact-info center">
       <p><strong>Phone:</strong> +230 5254 2792</p>
       <p><strong>Email:</strong> info@mautours.com</p>
       <p><strong>Location:</strong> Port Louis, Mauritius</p>
     </div>
   </section>
 
-  <!-- ===== Footer ===== -->
+  <a class="whatsapp-float" href="https://wa.me/23052542792" target="_blank" aria-label="Chat on WhatsApp">
+    WhatsApp
+  </a>
+
   <footer class="footer">
     <p>&copy; 2025 Mautours. All Rights Reserved.</p>
   </footer>
