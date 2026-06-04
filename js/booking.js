@@ -41,7 +41,10 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
   };
 }
 
@@ -99,6 +102,7 @@ if (bookingForm) {
 
     const selectedDate = new Date(date);
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
@@ -115,17 +119,18 @@ if (bookingForm) {
 
     const basePrice = packagePrices[selectedPackage] || 0;
     const totalPrice = basePrice * people;
+    const confirmedPackage = selectedPackage;
 
     try {
       await addDoc(collection(db, "bookings"), {
-        name,
-        email,
-        phone,
-        people,
-        date,
-        package: selectedPackage,
+        name: name,
+        email: email,
+        phone: phone,
+        people: people,
+        date: date,
+        package: confirmedPackage,
         pricePerPerson: basePrice,
-        totalPrice,
+        totalPrice: totalPrice,
         paymentStatus: "Pending",
         bookingStatus: "New",
         createdAt: serverTimestamp()
@@ -137,12 +142,16 @@ if (bookingForm) {
 
       showPopup(
         "Booking Confirmed 🎉",
-        `Your booking has been recorded.\n\nPackage: ${selectedPackageInput.value}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to payment.`,
+        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to payment.`,
         "https://secureacceptance.cybersource.com/pay"
       );
+
     } catch (error) {
       console.error("Booking Error:", error);
-      showPopup("Error", "There was an issue processing your booking. Please try again.");
+      showPopup(
+        "Error",
+        "There was an issue processing your booking. Please try again."
+      );
     }
   });
 }
