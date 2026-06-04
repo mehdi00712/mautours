@@ -3,9 +3,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebas
 import {
   getFirestore,
   collection,
-  addDoc,
+  doc,
+  runTransaction,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import {
   getFunctions,
   httpsCallable
@@ -13,6 +18,7 @@ import {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 const functions = getFunctions(app);
 
 const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");
@@ -22,6 +28,9 @@ const packagePrices = {
   "Île aux Cerfs Experience": 3000,
   "Airport Transfers": 1200
 };
+
+let currentUser = null;
+let selectedPackage = "";
 
 const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
@@ -33,7 +42,9 @@ const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
-let selectedPackage = "";
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+});
 
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
@@ -52,7 +63,26 @@ function showPopup(title, message, redirect = null) {
   };
 }
 
+function createSlotId(packageName, date) {
+  return `${packageName}_${date}`
+    .toLowerCase()
+    .replaceAll(" ", "-")
+    .replaceAll("î", "i")
+    .replaceAll("'", "")
+    .replaceAll("’", "")
+    .replace(/[^a-z0-9-_]/g, "");
+}
+
 function openBookingModal(packageName) {
+  if (!currentUser) {
+    showPopup(
+      "Login Required",
+      "Please sign in before making a booking.",
+      "login.html?redirect=booking.html"
+    );
+    return;
+  }
+
   selectedPackage = packageName;
 
   if (selectedPackageInput) {
@@ -88,6 +118,15 @@ if (bookingForm) {
   bookingForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    if (!currentUser) {
+      showPopup(
+        "Login Required",
+        "Please sign in before making a booking.",
+        "login.html?redirect=booking.html"
+      );
+      return;
+    }
+
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
@@ -120,28 +159,56 @@ if (bookingForm) {
       return;
     }
 
-    const basePrice = packagePrices[selectedPackage] || 0;
-    const totalPrice = basePrice * people;
     const confirmedPackage = selectedPackage;
+    const basePrice = packagePrices[confirmedPackage] || 0;
+    const totalPrice = basePrice * people;
+    const slotId = createSlotId(confirmedPackage, date);
 
     try {
-      const bookingRef = await addDoc(collection(db, "bookings"), {
-        name,
-        email,
-        phone,
-        people,
-        date,
-        package: confirmedPackage,
-        pricePerPerson: basePrice,
-        totalPrice,
-        paymentMethod: "Absa Bank",
-        paymentStatus: "Pending",
-        bookingStatus: "New",
-        createdAt: serverTimestamp()
+      const result = await runTransaction(db, async (transaction) => {
+        const slotRef = doc(db, "bookingSlots", slotId);
+        const slotSnap = await transaction.get(slotRef);
+
+        if (slotSnap.exists()) {
+          throw new Error("DOUBLE_BOOKING");
+        }
+
+        const bookingRef = doc(collection(db, "bookings"));
+
+        transaction.set(slotRef, {
+          package: confirmedPackage,
+          date,
+          bookingId: bookingRef.id,
+          userId: currentUser.uid,
+          status: "Reserved",
+          createdAt: serverTimestamp()
+        });
+
+        transaction.set(bookingRef, {
+          userId: currentUser.uid,
+          userEmail: currentUser.email,
+          name,
+          email,
+          phone,
+          people,
+          date,
+          package: confirmedPackage,
+          pricePerPerson: basePrice,
+          totalPrice,
+          slotId,
+          paymentMethod: "Absa Bank",
+          paymentStatus: "Pending",
+          bookingStatus: "New",
+          createdAt: serverTimestamp()
+        });
+
+        return {
+          bookingId: bookingRef.id
+        };
       });
 
       const paymentResponse = await createAbsaPayment({
-        bookingId: bookingRef.id,
+        bookingId: result.bookingId,
         amount: totalPrice,
         customerName: name,
         customerEmail: email,
@@ -159,16 +226,24 @@ if (bookingForm) {
 
       showPopup(
         "Booking Confirmed 🎉",
-        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\nPayment: Absa Bank\n\nClick OK to continue to secure payment.`,
+        `Your booking has been reserved.\n\nPackage: ${confirmedPackage}\nDate: ${date}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to secure payment.`,
         paymentUrl
       );
 
     } catch (error) {
       console.error("Booking Error:", error);
 
+      if (error.message === "DOUBLE_BOOKING") {
+        showPopup(
+          "Date Unavailable",
+          "This package is already booked for the selected date. Please choose another date."
+        );
+        return;
+      }
+
       showPopup(
         "Error",
-        "There was an issue processing your booking or payment. Please try again."
+        "There was an issue processing your booking. Please try again."
       );
     }
   });
