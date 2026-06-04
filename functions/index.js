@@ -1,31 +1,29 @@
-const functions = require("firebase-functions");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-exports.createAbsaPayment = functions.https.onCall(async (data, context) => {
+setGlobalOptions({
+  region: "us-central1",
+  serviceAccount: "mautours-functions-runtime@mautours-60318.iam.gserviceaccount.com"
+});
+
+exports.createAbsaPayment = onCall(async (request) => {
   const {
     bookingId,
     amount,
     customerName,
     customerEmail,
     packageName
-  } = data;
+  } = request.data;
 
   if (!bookingId || !amount || !customerName || !customerEmail || !packageName) {
-    throw new functions.https.HttpsError(
+    throw new HttpsError(
       "invalid-argument",
       "Missing required payment details."
     );
   }
-
-  /*
-    IMPORTANT:
-    Replace this part with the official Absa/CyberSource request
-    once Absa gives the client the merchant credentials.
-
-    Do NOT put merchant ID, access key, or secret key in frontend JS.
-  */
 
   const paymentUrl =
     `https://secureacceptance.cybersource.com/pay?bookingId=${bookingId}&amount=${amount}`;
