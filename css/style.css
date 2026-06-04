@@ -1331,3 +1331,105 @@ p {
     padding: 3.5rem 1rem;
   }
 }
+
+/* ===== Mobile Homepage Fix ===== */
+
+@media (max-width: 768px) {
+  .hero {
+    height: auto;
+    min-height: 92vh;
+    padding: 4rem 1rem 2rem;
+    margin-top: 72px;
+    align-items: flex-start;
+  }
+
+  .hero-content {
+    max-width: 100%;
+    padding: 1rem 0;
+  }
+
+  .hero-content h2 {
+    font-size: 2.25rem;
+    line-height: 1.12;
+    margin-top: 1rem;
+    color: #ffffff;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 340px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin: 1.4rem auto 0;
+  }
+
+  .hero-actions .btn,
+  .hero-actions .btn-outline {
+    width: 100%;
+  }
+
+  .hero-stats {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    margin: 2rem auto 0;
+    width: min(100%, 340px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+    padding: 1rem;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .hero-stats div {
+    min-width: 0;
+    padding: 0.8rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .hero-stats strong {
+    font-size: 1.8rem;
+  }
+
+  .hero-stats span {
+    font-size: 0.9rem;
+  }
+
+  .hero-badge {
+    margin-top: 0.5rem;
+  }
+
+  .whatsapp-float {
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.8rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    min-height: 95vh;
+    padding-top: 3rem;
+  }
+
+  .hero-content h2 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    max-width: 300px;
+  }
+
+  .hero-stats {
+    max-width: 310px;
+  }
+}
