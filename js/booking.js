@@ -1,5 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+
 import {
   getFirestore,
   collection,
@@ -7,10 +8,12 @@ import {
   runTransaction,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
 import {
   getAuth,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
 import {
   getFunctions,
   httpsCallable
@@ -25,8 +28,37 @@ const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");
 
 const packagePrices = {
   "Southern Wonders Tour": 2500,
+  "Northern Discovery Tour": 2300,
+  "Port Louis & Market Tour": 1800,
+  "Scenic East Coast Tour": 2200,
+  "Scenic West Coast Tour": 2200,
+
   "Île aux Cerfs Experience": 3000,
-  "Airport Transfers": 1200
+  "Dolphin Swimming Experience": 3500,
+  "Whale Watching Adventure": 4500,
+  "Crystal Rock Discovery": 3200,
+  "Sunset Catamaran Cruise": 3800,
+
+  "Undersea Walk Experience": 3500,
+  "Submarine Dive Experience": 5500,
+  "Parasailing Adventure": 2800,
+  "Quad Biking Adventure": 2600,
+  "Zipline Experience": 2200,
+  "Le Morne Hiking Experience": 2400,
+
+  "Tube Ride Adventure": 1500,
+  "Fishing Trip Experience": 3000,
+  "Speedboat Lagoon Tour": 3800,
+  "Catamaran BBQ Cruise": 4200,
+
+  "Airport Transfers": 1200,
+  "Domestic Transfers": 900,
+  "Restaurant Transfers": 700,
+  "Nightclub Transfers": 800,
+
+  "Helicopter Tour": 12000,
+  "Luxury Island Discovery": 8500,
+  "Honeymoon Escape Package": 9000
 };
 
 let currentUser = null;
@@ -49,7 +81,11 @@ onAuthStateChanged(auth, (user) => {
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
+
     return;
   }
 
@@ -59,7 +95,10 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
   };
 }
 
@@ -139,7 +178,7 @@ if (bookingForm) {
     }
 
     if (people < 1) {
-      showPopup("Invalid Number", "Please enter at least 1 person.");
+      showPopup("Invalid Number", "Please enter at least 1 person or trip.");
       return;
     }
 
@@ -225,7 +264,7 @@ if (bookingForm) {
       selectedPackage = "";
 
       showPopup(
-        "Booking Confirmed 🎉",
+        "Booking Reserved 🎉",
         `Your booking has been reserved.\n\nPackage: ${confirmedPackage}\nDate: ${date}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to secure payment.`,
         paymentUrl
       );
