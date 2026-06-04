@@ -6,12 +6,16 @@ import {
   addDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import {
+  getFunctions,
+  httpsCallable
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const functions = getFunctions(app);
 
-// Replace this with the real Absa payment portal link given by Absa
-const ABSA_PAYMENT_PORTAL = "https://secureacceptance.cybersource.com/pay";
+const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");
 
 const packagePrices = {
   "Southern Wonders Tour": 2500,
@@ -34,11 +38,7 @@ let selectedPackage = "";
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
-
+    if (redirect) window.location.href = redirect;
     return;
   }
 
@@ -48,10 +48,7 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
+    if (redirect) window.location.href = redirect;
   };
 }
 
@@ -128,7 +125,7 @@ if (bookingForm) {
     const confirmedPackage = selectedPackage;
 
     try {
-      await addDoc(collection(db, "bookings"), {
+      const bookingRef = await addDoc(collection(db, "bookings"), {
         name,
         email,
         phone,
@@ -143,6 +140,16 @@ if (bookingForm) {
         createdAt: serverTimestamp()
       });
 
+      const paymentResponse = await createAbsaPayment({
+        bookingId: bookingRef.id,
+        amount: totalPrice,
+        customerName: name,
+        customerEmail: email,
+        packageName: confirmedPackage
+      });
+
+      const paymentUrl = paymentResponse.data.paymentUrl;
+
       if (modal) {
         modal.classList.remove("show");
       }
@@ -152,8 +159,8 @@ if (bookingForm) {
 
       showPopup(
         "Booking Confirmed 🎉",
-        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\nPayment: Absa Bank\n\nClick OK to continue to Absa payment portal.`,
-        ABSA_PAYMENT_PORTAL
+        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\nPayment: Absa Bank\n\nClick OK to continue to secure payment.`,
+        paymentUrl
       );
 
     } catch (error) {
@@ -161,7 +168,7 @@ if (bookingForm) {
 
       showPopup(
         "Error",
-        "There was an issue processing your booking. Please try again."
+        "There was an issue processing your booking or payment. Please try again."
       );
     }
   });
