@@ -7,115 +7,364 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- ===== Header ===== -->
-  <header class="site-header">
-    <div class="nav-container">
-      <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="nav">
-        <a href="index.html">Home</a>
-        <a href="booking.html" class="active">Book</a>
-        <a href="login.html">Login</a>
-        <a href="admin.html">Dashboard</a>
-      </nav>
-      <div class="hamburger" id="hamburger">
-        <span></span><span></span><span></span>
-      </div>
+
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautours</h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html" class="active">Book</a>
+      <a href="login.html">Sign In</a>
+      <a href="admin.html">Dashboard</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- ===== Hero Section (Video Background) ===== -->
-  <section class="hero">
-    <video autoplay muted loop playsinline class="hero-video">
-      <source src="mauvid2.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-    <div class="hero-content">
-      <h2>Book Your Perfect Adventure</h2>
-      <p>Choose from our top destinations and enjoy the beauty of Mauritius like never before.</p>
-      <a href="#packages" class="btn">Explore Packages</a>
-    </div>
-  </section>
+<section class="hero booking-hero">
+  <video autoplay muted loop playsinline class="hero-video">
+    <source src="mauvid2.mp4" type="video/mp4" />
+  </video>
 
-  <!-- ===== Packages Section ===== -->
-  <section id="packages" class="container fade-in">
-    <h2>Our Packages</h2>
-    <div class="package-list">
-      
-      <!-- Southern Wonders Tour -->
-      <div class="package-card">
-        <img src="assets/south.jpg" alt="South Tour">
-        <div class="package-info">
-          <h3>Southern Wonders Tour</h3>
-          <p>Explore the stunning landscapes of the South – Chamarel, Black River Gorges, and more.</p>
-          <div class="package-footer">
-            <span class="price">Rs 2,500 / person</span>
-            <button class="btn book-btn" data-package="Southern Wonders Tour">Book Now</button>
-          </div>
-        </div>
+  <div class="hero-content">
+    <span class="hero-badge">Secure Booking Portal</span>
+    <h2>Choose Your Mauritius Experience</h2>
+    <p>Browse tours, sea activities, adventures, transfers and premium packages.</p>
+    <a href="#packages" class="btn">View Packages</a>
+  </div>
+</section>
+
+<section class="container booking-intro fade-in">
+  <span class="section-label center-label">Mautours Packages</span>
+  <h2>Book Your Perfect Trip</h2>
+  <p class="center section-subtitle">
+    Sign in is required before booking to secure your reservation and avoid double booking.
+  </p>
+</section>
+
+<section id="packages" class="container fade-in">
+
+  <div class="package-category">
+    <h2>Island Tours</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Southern Wonders Tour">
+        <span>Nature Escape</span>
+        <h3>Southern Wonders Tour</h3>
+        <p>Chamarel, Seven Colored Earth, waterfalls and Black River Gorges.</p>
+        <strong>Rs 2,500 / person</strong>
+        <button class="btn book-btn" data-package="Southern Wonders Tour">Sign In & Book</button>
       </div>
 
-      <!-- Ile aux Cerfs Experience -->
-      <div class="package-card">
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Northern Discovery Tour">
+        <span>Scenic Tour</span>
+        <h3>Northern Discovery Tour</h3>
+        <p>Discover the north coast, beaches, shopping areas and local attractions.</p>
+        <strong>Rs 2,300 / person</strong>
+        <button class="btn book-btn" data-package="Northern Discovery Tour">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/transfer.jpg" alt="Port Louis Market Tour">
+        <span>Culture</span>
+        <h3>Port Louis & Market Tour</h3>
+        <p>Visit Port Louis, local markets, shopping streets and cultural landmarks.</p>
+        <strong>Rs 1,800 / person</strong>
+        <button class="btn book-btn" data-package="Port Louis & Market Tour">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="East Coast Tour">
+        <span>Coastal View</span>
+        <h3>Scenic East Coast Tour</h3>
+        <p>Enjoy peaceful beaches, coastal routes and island viewpoints.</p>
+        <strong>Rs 2,200 / person</strong>
+        <button class="btn book-btn" data-package="Scenic East Coast Tour">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="West Coast Tour">
+        <span>Sunset Route</span>
+        <h3>Scenic West Coast Tour</h3>
+        <p>Explore west coast viewpoints, beaches and relaxing island scenery.</p>
+        <strong>Rs 2,200 / person</strong>
+        <button class="btn book-btn" data-package="Scenic West Coast Tour">Sign In & Book</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="package-category">
+    <h2>Island Experiences</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
         <img src="assets/ile.jpg" alt="Ile aux Cerfs">
-        <div class="package-info">
-          <h3>Île aux Cerfs Experience</h3>
-          <p>Relax and soak in the sun on Mauritius’s most iconic island paradise.</p>
-          <div class="package-footer">
-            <span class="price">Rs 3,000 / person</span>
-            <button class="btn book-btn" data-package="Île aux Cerfs Experience">Book Now</button>
-          </div>
-        </div>
+        <span>Most Popular</span>
+        <h3>Île aux Cerfs Experience</h3>
+        <p>Relax on beautiful beaches and enjoy turquoise lagoon views.</p>
+        <strong>Rs 3,000 / person</strong>
+        <button class="btn book-btn" data-package="Île aux Cerfs Experience">Sign In & Book</button>
       </div>
 
-      <!-- Airport Transfers -->
-      <div class="package-card">
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Dolphin Swimming">
+        <span>Marine</span>
+        <h3>Dolphin Swimming Experience</h3>
+        <p>Enjoy a memorable dolphin experience on the west coast.</p>
+        <strong>Rs 3,500 / person</strong>
+        <button class="btn book-btn" data-package="Dolphin Swimming Experience">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Whale Watching">
+        <span>Ocean Adventure</span>
+        <h3>Whale Watching Adventure</h3>
+        <p>Experience an unforgettable whale watching trip in Mauritius waters.</p>
+        <strong>Rs 4,500 / person</strong>
+        <button class="btn book-btn" data-package="Whale Watching Adventure">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Crystal Rock">
+        <span>Lagoon Trip</span>
+        <h3>Crystal Rock Discovery</h3>
+        <p>Visit one of Mauritius' most iconic lagoon landmarks.</p>
+        <strong>Rs 3,200 / person</strong>
+        <button class="btn book-btn" data-package="Crystal Rock Discovery">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Sunset Catamaran">
+        <span>Romantic</span>
+        <h3>Sunset Catamaran Cruise</h3>
+        <p>Enjoy a peaceful catamaran cruise with beautiful sunset views.</p>
+        <strong>Rs 3,800 / person</strong>
+        <button class="btn book-btn" data-package="Sunset Catamaran Cruise">Sign In & Book</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="package-category">
+    <h2>Adventure Activities</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Undersea Walk">
+        <span>Underwater</span>
+        <h3>Undersea Walk Experience</h3>
+        <p>Walk under the sea and discover marine life in a unique way.</p>
+        <strong>Rs 3,500 / person</strong>
+        <button class="btn book-btn" data-package="Undersea Walk Experience">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Submarine Dive">
+        <span>Premium Sea</span>
+        <h3>Submarine Dive Experience</h3>
+        <p>Explore the ocean from a submarine experience.</p>
+        <strong>Rs 5,500 / person</strong>
+        <button class="btn book-btn" data-package="Submarine Dive Experience">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Parasailing">
+        <span>Thrill</span>
+        <h3>Parasailing Adventure</h3>
+        <p>Fly above the lagoon and enjoy amazing views from the sky.</p>
+        <strong>Rs 2,800 / person</strong>
+        <button class="btn book-btn" data-package="Parasailing Adventure">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Quad Biking">
+        <span>Off-road</span>
+        <h3>Quad Biking Adventure</h3>
+        <p>Ride through scenic trails and adventurous landscapes.</p>
+        <strong>Rs 2,600 / person</strong>
+        <button class="btn book-btn" data-package="Quad Biking Adventure">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Zipline">
+        <span>Adrenaline</span>
+        <h3>Zipline Experience</h3>
+        <p>Enjoy exciting zipline views over natural landscapes.</p>
+        <strong>Rs 2,200 / person</strong>
+        <button class="btn book-btn" data-package="Zipline Experience">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Le Morne Hiking">
+        <span>Hiking</span>
+        <h3>Le Morne Hiking Experience</h3>
+        <p>Explore one of Mauritius' most iconic mountain locations.</p>
+        <strong>Rs 2,400 / person</strong>
+        <button class="btn book-btn" data-package="Le Morne Hiking Experience">Sign In & Book</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="package-category">
+    <h2>Marine Activities</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Tube Ride">
+        <span>Fun Ride</span>
+        <h3>Tube Ride Adventure</h3>
+        <p>A fun water activity for travellers who enjoy lagoon rides.</p>
+        <strong>Rs 1,500 / person</strong>
+        <button class="btn book-btn" data-package="Tube Ride Adventure">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Fishing Trip">
+        <span>Fishing</span>
+        <h3>Fishing Trip Experience</h3>
+        <p>Enjoy a fishing experience around Mauritius waters.</p>
+        <strong>Rs 3,000 / person</strong>
+        <button class="btn book-btn" data-package="Fishing Trip Experience">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Speedboat Lagoon Tour">
+        <span>Speedboat</span>
+        <h3>Speedboat Lagoon Tour</h3>
+        <p>Explore lagoons and coastal views by speedboat.</p>
+        <strong>Rs 3,800 / person</strong>
+        <button class="btn book-btn" data-package="Speedboat Lagoon Tour">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Catamaran BBQ Cruise">
+        <span>Catamaran</span>
+        <h3>Catamaran BBQ Cruise</h3>
+        <p>Enjoy a catamaran trip with BBQ-style island experience.</p>
+        <strong>Rs 4,200 / person</strong>
+        <button class="btn book-btn" data-package="Catamaran BBQ Cruise">Sign In & Book</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="package-category">
+    <h2>Transfer Services</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
         <img src="assets/transfer.jpg" alt="Airport Transfers">
-        <div class="package-info">
-          <h3>Airport Transfers</h3>
-          <p>Comfortable and reliable transport from and to your hotel or airport – stress-free!</p>
-          <div class="package-footer">
-            <span class="price">Rs 1,200 / trip</span>
-            <button class="btn book-btn" data-package="Airport Transfers">Book Now</button>
-          </div>
-        </div>
+        <span>Airport</span>
+        <h3>Airport Transfers</h3>
+        <p>Comfortable pickup and drop-off from airport to hotel.</p>
+        <strong>Rs 1,200 / trip</strong>
+        <button class="btn book-btn" data-package="Airport Transfers">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/transfer.jpg" alt="Domestic Transfers">
+        <span>Local Transfer</span>
+        <h3>Domestic Transfers</h3>
+        <p>Private transport between hotels, towns and attractions.</p>
+        <strong>Rs 900 / trip</strong>
+        <button class="btn book-btn" data-package="Domestic Transfers">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/transfer.jpg" alt="Restaurant Transfers">
+        <span>Dining</span>
+        <h3>Restaurant Transfers</h3>
+        <p>Pickup and drop-off for lunch, dinner and restaurant visits.</p>
+        <strong>Rs 700 / trip</strong>
+        <button class="btn book-btn" data-package="Restaurant Transfers">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/transfer.jpg" alt="Nightclub Transfers">
+        <span>Nightlife</span>
+        <h3>Nightclub Transfers</h3>
+        <p>Safe late-night pickup and drop-off for nightlife outings.</p>
+        <strong>Rs 800 / trip</strong>
+        <button class="btn book-btn" data-package="Nightclub Transfers">Sign In & Book</button>
       </div>
 
     </div>
-  </section>
+  </div>
 
-  <!-- ===== Booking Modal ===== -->
-  <div id="bookingModal" class="modal">
-    <div class="modal-content">
-      <span id="closeModal" class="close">&times;</span>
-      <h3>Book Your Trip</h3>
-      <form id="bookingForm">
-        <input type="text" id="name" placeholder="Full Name" required>
-        <input type="email" id="email" placeholder="Email Address" required>
-        <input type="text" id="phone" placeholder="Phone Number" required>
-        <input type="number" id="people" placeholder="Number of People" required>
-        <input type="date" id="date" required>
-        <input type="text" id="selectedPackage" readonly>
-        <button type="submit" class="btn">Proceed to Checkout</button>
-      </form>
+  <div class="package-category">
+    <h2>Premium Experiences</h2>
+    <div class="booking-grid">
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Helicopter Tour">
+        <span>Luxury</span>
+        <h3>Helicopter Tour</h3>
+        <p>See Mauritius from above with a premium helicopter tour.</p>
+        <strong>Rs 12,000 / person</strong>
+        <button class="btn book-btn" data-package="Helicopter Tour">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/south.jpg" alt="Luxury Island Discovery">
+        <span>Luxury Tour</span>
+        <h3>Luxury Island Discovery</h3>
+        <p>A premium island discovery experience with comfort and style.</p>
+        <strong>Rs 8,500 / person</strong>
+        <button class="btn book-btn" data-package="Luxury Island Discovery">Sign In & Book</button>
+      </div>
+
+      <div class="booking-card">
+        <img src="assets/ile.jpg" alt="Honeymoon Escape">
+        <span>Couples</span>
+        <h3>Honeymoon Escape Package</h3>
+        <p>A romantic Mauritius experience designed for couples.</p>
+        <strong>Rs 9,000 / couple</strong>
+        <button class="btn book-btn" data-package="Honeymoon Escape Package">Sign In & Book</button>
+      </div>
+
     </div>
   </div>
 
-  <!-- ===== Custom Popup ===== -->
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <h3 id="popupTitle"></h3>
-      <p id="popupMessage"></p>
-      <button id="popupBtn" class="btn">OK</button>
-    </div>
+</section>
+
+<div id="bookingModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h3>Complete Your Booking</h3>
+
+    <form id="bookingForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="text" id="phone" placeholder="Phone Number" required />
+      <input type="number" id="people" placeholder="Number of People / Trips" min="1" required />
+      <input type="date" id="date" required />
+      <input type="text" id="selectedPackage" readonly />
+      <button type="submit" class="btn">Reserve & Continue to Payment</button>
+    </form>
   </div>
+</div>
 
-  <!-- ===== Footer ===== -->
-  <footer class="footer">
-    <p>&copy; 2025 Mautours. All Rights Reserved.</p>
-  </footer>
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">OK</button>
+  </div>
+</div>
 
-  <!-- ===== Scripts ===== -->
-  <script src="js/main.js"></script>
-  <script type="module" src="js/booking.js"></script>
+<footer class="footer">
+  <p>&copy; 2025 Mautours. All Rights Reserved.</p>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/booking.js"></script>
 </body>
 </html>
