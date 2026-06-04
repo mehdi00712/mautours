@@ -10,6 +10,9 @@ import {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Replace this with the real Absa payment portal link given by Absa
+const ABSA_PAYMENT_PORTAL = "https://secureacceptance.cybersource.com/pay";
+
 const packagePrices = {
   "Southern Wonders Tour": 2500,
   "Île aux Cerfs Experience": 3000,
@@ -31,7 +34,11 @@ let selectedPackage = "";
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
+
     return;
   }
 
@@ -102,7 +109,6 @@ if (bookingForm) {
 
     const selectedDate = new Date(date);
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
@@ -123,31 +129,36 @@ if (bookingForm) {
 
     try {
       await addDoc(collection(db, "bookings"), {
-        name: name,
-        email: email,
-        phone: phone,
-        people: people,
-        date: date,
+        name,
+        email,
+        phone,
+        people,
+        date,
         package: confirmedPackage,
         pricePerPerson: basePrice,
-        totalPrice: totalPrice,
+        totalPrice,
+        paymentMethod: "Absa Bank",
         paymentStatus: "Pending",
         bookingStatus: "New",
         createdAt: serverTimestamp()
       });
 
-      modal.classList.remove("show");
+      if (modal) {
+        modal.classList.remove("show");
+      }
+
       bookingForm.reset();
       selectedPackage = "";
 
       showPopup(
         "Booking Confirmed 🎉",
-        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to payment.`,
-        "https://secureacceptance.cybersource.com/pay"
+        `Your booking has been recorded.\n\nPackage: ${confirmedPackage}\nTotal: Rs ${totalPrice.toLocaleString()}\nPayment: Absa Bank\n\nClick OK to continue to Absa payment portal.`,
+        ABSA_PAYMENT_PORTAL
       );
 
     } catch (error) {
       console.error("Booking Error:", error);
+
       showPopup(
         "Error",
         "There was an issue processing your booking. Please try again."
