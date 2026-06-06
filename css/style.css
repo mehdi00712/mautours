@@ -1,4 +1,3 @@
-/* ===== Root Theme ===== */
 :root {
   --blue: #0077b6;
   --darkblue: #023e8a;
@@ -128,7 +127,6 @@ body {
   transform: rotate(-45deg) translateY(-8px);
 }
 
-/* ===== Hero ===== */
 .hero {
   position: relative;
   min-height: 88vh;
@@ -203,7 +201,6 @@ body {
   flex-wrap: wrap;
 }
 
-/* ===== Buttons ===== */
 .btn,
 .btn-outline {
   display: inline-block;
@@ -247,7 +244,6 @@ body {
   color: var(--darkblue);
 }
 
-/* ===== General Layout ===== */
 section {
   padding: 4.5rem 0;
 }
@@ -296,7 +292,6 @@ p {
   background: rgba(0, 180, 216, 0.12);
 }
 
-/* ===== Homepage Stats ===== */
 .mobile-stats {
   width: min(1000px, 92%);
   margin: -3rem auto 4rem;
@@ -326,7 +321,6 @@ p {
   font-weight: 800;
 }
 
-/* ===== About ===== */
 .about-split {
   display: grid;
   grid-template-columns: 1fr 0.9fr;
@@ -343,17 +337,22 @@ p {
 }
 
 .about-points {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
   margin-top: 1.5rem;
+  width: 100%;
 }
 
 .about-points div {
+  position: relative;
+  width: 100%;
   background: #fff;
   padding: 1rem 1.2rem;
   border-radius: 18px;
   box-shadow: var(--shadow);
   border-left: 5px solid var(--orange);
+  min-height: auto;
 }
 
 .about-points strong {
@@ -371,6 +370,7 @@ p {
 }
 
 .about-card img {
+  display: block;
   width: 100%;
   height: 460px;
   object-fit: cover;
@@ -387,6 +387,7 @@ p {
   border-radius: 20px;
   box-shadow: var(--shadow);
   max-width: 260px;
+  z-index: 2;
 }
 
 .floating-card strong {
@@ -399,7 +400,6 @@ p {
   color: var(--muted);
 }
 
-/* ===== Categories, Experiences, Services ===== */
 .category-grid,
 .service-grid {
   display: grid;
@@ -490,7 +490,6 @@ p {
   margin-top: 0.5rem;
 }
 
-/* ===== Booking Page Catalogue ===== */
 .booking-hero {
   min-height: 72vh;
 }
@@ -499,7 +498,14 @@ p {
   padding-bottom: 1rem;
 }
 
+#packages {
+  display: block;
+  padding-top: 1rem;
+  padding-bottom: 4rem;
+}
+
 .package-category {
+  display: block;
   margin-bottom: 4rem;
 }
 
@@ -574,7 +580,6 @@ p {
   text-align: center;
 }
 
-/* ===== Modal / Popup ===== */
 .modal,
 .popup {
   position: fixed;
@@ -663,7 +668,6 @@ p {
   color: var(--orange);
 }
 
-/* ===== Login Page ===== */
 .login-page {
   min-height: 100vh;
   padding: 120px 1.5rem 4rem;
@@ -829,7 +833,6 @@ p {
   font-weight: 700;
 }
 
-/* ===== Dashboard ===== */
 .dashboard-container {
   width: min(1100px, 92%);
   margin: 2rem auto;
@@ -912,7 +915,6 @@ p {
   font-size: 1.25rem;
 }
 
-/* ===== Contact / CTA / Footer ===== */
 .contact-info {
   background: var(--white);
   box-shadow: var(--shadow);
@@ -981,7 +983,6 @@ p {
   color: var(--white);
 }
 
-/* ===== Animations ===== */
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -1010,7 +1011,6 @@ p {
   transform: translateY(0);
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 900px) {
   .about-split,
   .login-hero {
@@ -1026,9 +1026,10 @@ p {
   }
 
   .floating-card {
-    left: 1rem;
-    right: 1rem;
+    position: static;
+    margin-top: 1rem;
     max-width: none;
+    width: 100%;
   }
 
   .trust-section {
@@ -1102,6 +1103,38 @@ p {
     grid-template-columns: 1fr;
   }
 
+  .about-split {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-points {
+    gap: 1.2rem;
+  }
+
+  .about-points div {
+    padding: 1rem;
+    min-height: auto;
+  }
+
+  .about-card {
+    width: 100%;
+  }
+
+  .about-card img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+
+  .floating-card {
+    position: static;
+    margin-top: 1rem;
+    width: 100%;
+  }
+
   .booking-hero {
     min-height: 65vh;
   }
@@ -1118,8 +1151,8 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .about-card img {
-    height: 320px;
+  #packages {
+    padding-top: 0;
   }
 
   .dashboard-container {
