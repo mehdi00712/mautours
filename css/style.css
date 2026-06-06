@@ -576,8 +576,31 @@ p {
 }
 
 .booking-card .btn {
-  margin: 0 1.2rem 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 85%;
+  min-height: 56px;
+  margin: 0 auto 1.5rem auto;
   text-align: center;
+  border-radius: 50px;
+  font-weight: 700;
+}
+
+.booking-card {
+  text-align: left;
+}
+
+.booking-card strong {
+  display: block;
+}
+
+.booking-card span {
+  display: inline-block;
+}
+
+.booking-card img {
+  display: block;
 }
 
 .modal,
@@ -1162,6 +1185,11 @@ p {
   #bookingsTable {
     font-size: 0.85rem;
   }
+
+  .booking-card .btn {
+  width: 82%;
+  margin: 0 auto 1.3rem auto;
+}
 
   section {
     padding: 3.5rem 0;
