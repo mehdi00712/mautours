@@ -1,31 +1,45 @@
-// js/admin.js
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+
 import {
   getAuth,
   onAuthStateChanged,
   signOut
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
 import {
   getFirestore,
   collection,
   getDocs,
   deleteDoc,
-  doc
+  updateDoc,
+  doc,
+  query,
+  orderBy,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Popup references
+const adminUIDs = [
+  "d6IRCgOfwhZrKyRIoP6siAM8EOf2",
+  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"
+];
+
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
 function showPopup(title, message, redirect = null) {
+  if (!popup || !popupTitle || !popupMessage || !popupBtn) {
+    alert(`${title}\n\n${message}`);
+    if (redirect) window.location.href = redirect;
+    return;
+  }
+
   popupTitle.textContent = title;
   popupMessage.textContent = message;
   popup.classList.add("show");
@@ -36,26 +50,21 @@ function showPopup(title, message, redirect = null) {
   };
 }
 
-// ===== Admin Access =====
-const adminUIDs = [
-  "d6IRCgOfwhZrKyRIoP6siAM8EOf2",
-  "OeS88yW5sjSPxSk9kUlVjPeoZeY2"
-];
-
-// ===== Auth Check =====
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     showPopup("Login Required", "Please log in first.", "login.html");
-  } else if (!adminUIDs.includes(user.uid)) {
+    return;
+  }
+
+  if (!adminUIDs.includes(user.uid)) {
     await signOut(auth);
     showPopup("Access Denied", "Admin privileges required.", "index.html");
-  } else {
-    console.log("✅ Admin access granted:", user.email);
-    loadBookings();
+    return;
   }
+
+  loadBookings();
 });
 
-// ===== Load Bookings =====
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
   const revenueFill = document.getElementById("revenueFill");
@@ -63,14 +72,16 @@ async function loadBookings() {
 
   if (!tableBody) return;
 
-  tableBody.innerHTML = `<tr><td colspan="9">Loading...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="10">Loading bookings...</td></tr>`;
 
   try {
-    const snapshot = await getDocs(collection(db, "bookings"));
+    const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
+
     tableBody.innerHTML = "";
 
     if (snapshot.empty) {
-      tableBody.innerHTML = `<tr><td colspan="9">No bookings found.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="10">No bookings found.</td></tr>`;
       if (revenueFill) revenueFill.style.width = "0%";
       if (revenueValue) revenueValue.textContent = "Rs 0";
       return;
@@ -80,62 +91,106 @@ async function loadBookings() {
 
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
+      const bookingId = docSnap.id;
+
+      if (data.bookingStatus === "Confirmed") {
+        totalRevenue += Number(data.totalPrice || 0);
+      }
+
+      const status = data.bookingStatus || "Pending";
+      const total =
+        data.totalPrice && data.totalPrice > 0
+          ? `Rs ${Number(data.totalPrice).toLocaleString()}`
+          : "Custom Quote";
+
+      const proofLink = data.paymentProofUrl
+        ? `<a href="${data.paymentProofUrl}" target="_blank" class="proof-link">View Proof</a>`
+        : "No Proof";
+
       const row = document.createElement("tr");
 
-      const price = data.pricePerPerson || 0;
-      const total = data.totalPrice || price * (data.people || 1);
-      totalRevenue += total;
-
       row.innerHTML = `
-        <td>${data.name}</td>
+        <td>${data.name || "-"}</td>
         <td>${data.phone || "-"}</td>
-        <td>${data.email}</td>
-        <td>${data.package}</td>
-        <td>${data.date}</td>
-        <td>${data.people}</td>
-        <td>Rs ${price.toLocaleString()}</td>
-        <td><strong>Rs ${total.toLocaleString()}</strong></td>
-        <td><button class="delete-btn" data-id="${docSnap.id}">Delete</button></td>
+        <td>${data.email || "-"}</td>
+        <td>${data.package || "-"}</td>
+        <td>${data.date || "-"}</td>
+        <td>${data.people || "-"}</td>
+        <td><strong>${total}</strong></td>
+        <td>${proofLink}</td>
+        <td>${status}</td>
+        <td>
+          <button class="approve-btn" data-id="${bookingId}">Approve</button>
+          <button class="reject-btn" data-id="${bookingId}">Reject</button>
+          <button class="delete-btn" data-id="${bookingId}">Delete</button>
+        </td>
       `;
+
       tableBody.appendChild(row);
     });
 
-    // ===== Revenue Bar Update =====
-    const cappedRevenue = Math.min(totalRevenue, 200000);
-    const percentage = (cappedRevenue / 200000) * 100;
-
-    if (revenueFill) {
-      revenueFill.style.width = `${percentage}%`;
-    }
     if (revenueValue) {
       revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
     }
 
-    // ===== Delete Buttons =====
-    document.querySelectorAll(".delete-btn").forEach((btn) =>
-      btn.addEventListener("click", async () => {
-        showPopup(
-          "Confirm Deletion",
-          "Do you want to delete this booking?",
-          null
-        );
+    if (revenueFill) {
+      const cappedRevenue = Math.min(totalRevenue, 200000);
+      revenueFill.style.width = `${(cappedRevenue / 200000) * 100}%`;
+    }
 
-        popupBtn.onclick = async () => {
-          await deleteDoc(doc(db, "bookings", btn.dataset.id));
-          popup.classList.remove("show");
-          showPopup("Booking Deleted", "The booking has been removed.", null);
-          loadBookings();
-        };
-      })
-    );
+    bindAdminButtons();
+
   } catch (error) {
     console.error("Error loading bookings:", error);
-    tableBody.innerHTML = `<tr><td colspan="9" style="color:red;">Error: ${error.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="10" style="color:red;">Error: ${error.message}</td></tr>`;
   }
 }
 
-// ===== Logout =====
+function bindAdminButtons() {
+  document.querySelectorAll(".approve-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await updateDoc(doc(db, "bookings", btn.dataset.id), {
+        bookingStatus: "Confirmed",
+        paymentStatus: "Verified",
+        adminDecision: "Approved",
+        updatedAt: serverTimestamp()
+      });
+
+      showPopup("Booking Approved", "The booking has been confirmed.");
+      loadBookings();
+    });
+  });
+
+  document.querySelectorAll(".reject-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const reason = prompt("Enter rejection reason:");
+
+      await updateDoc(doc(db, "bookings", btn.dataset.id), {
+        bookingStatus: "Rejected",
+        paymentStatus: "Rejected",
+        adminDecision: "Rejected",
+        rejectionReason: reason || "No reason provided",
+        updatedAt: serverTimestamp()
+      });
+
+      showPopup("Booking Rejected", "The booking has been rejected.");
+      loadBookings();
+    });
+  });
+
+  document.querySelectorAll(".delete-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Delete this booking?")) return;
+
+      await deleteDoc(doc(db, "bookings", btn.dataset.id));
+      showPopup("Booking Deleted", "The booking has been removed.");
+      loadBookings();
+    });
+  });
+}
+
 const logoutBtn = document.getElementById("logoutBtn");
+
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
     await signOut(auth);
