@@ -1459,3 +1459,25 @@ p {
   }
 
 }
+
+.loading-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.payment-note {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 180, 216, 0.08);
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.upload-label {
+  text-align: left;
+  color: var(--darkblue);
+  font-weight: 800;
+}
