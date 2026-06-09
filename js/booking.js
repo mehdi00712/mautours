@@ -6,6 +6,10 @@ import {
   collection,
   doc,
   setDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -27,23 +31,9 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 
 let currentUser = null;
-let selectedPackage = "";
+let selectedTrip = null;
 
-const packagePrices = {
-  "Standard Package": 2500,
-  "Family Package": 18000,
-  "VIP Luxury Package": 45000,
-
-  "Day 1 - 23 Colours Nature Park": 0,
-  "Day 2 - Alexandra Falls and Tea Factory": 0,
-  "Day 3 - Dolphins and Whale Watching": 0,
-  "Day 4 - Casela Safari Park": 0,
-  "Day 5 - Ile aux Cerfs Island": 0,
-  "Day 6 - Port Louis City Tour": 0,
-  "Day 7 - Chamarel and Horse Riding": 0,
-  "Day 8 - Helicopter Tour": 0,
-  "Day 9 - Fishing or Catamaran Tour": 0
-};
+const dynamicTrips = document.getElementById("dynamicTrips");
 
 const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
@@ -76,7 +66,70 @@ function showPopup(title, message, redirect = null) {
   };
 }
 
-function openBookingModal(packageName) {
+async function loadTrips() {
+  if (!dynamicTrips) return;
+
+  dynamicTrips.innerHTML = `<p>Loading packages...</p>`;
+
+  try {
+    const q = query(
+      collection(db, "trips"),
+      where("active", "==", true),
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      dynamicTrips.innerHTML = `<p class="center">No packages available yet.</p>`;
+      return;
+    }
+
+    dynamicTrips.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const trip = docSnap.data();
+      const tripId = docSnap.id;
+
+      const priceText =
+        Number(trip.price || 0) > 0
+          ? `${trip.priceType || "Starting From"} Rs ${Number(trip.price).toLocaleString()}`
+          : "Custom Quote";
+
+      const includes = Array.isArray(trip.includes)
+        ? trip.includes.map(item => `<li>${item}</li>`).join("")
+        : "";
+
+      const card = document.createElement("div");
+      card.className = "booking-card package-premium";
+
+      card.innerHTML = `
+        <img src="${trip.imageUrl || "assets/ile.jpg"}" alt="${trip.title}">
+        <span>${trip.category || "Package"}</span>
+        <h3>${trip.title}</h3>
+        <p>${trip.description || ""}</p>
+        <ul class="package-includes">${includes}</ul>
+        <strong>${priceText}</strong>
+        <button class="btn book-btn" data-id="${tripId}">Book Package</button>
+      `;
+
+      dynamicTrips.appendChild(card);
+
+      card.querySelector(".book-btn").addEventListener("click", () => {
+        openBookingModal({
+          id: tripId,
+          ...trip
+        });
+      });
+    });
+
+  } catch (error) {
+    console.error("Load Trips Error:", error);
+    dynamicTrips.innerHTML = `<p class="center">Could not load packages.</p>`;
+  }
+}
+
+function openBookingModal(trip) {
   if (!currentUser) {
     showPopup(
       "Login Required",
@@ -86,10 +139,10 @@ function openBookingModal(packageName) {
     return;
   }
 
-  selectedPackage = packageName;
+  selectedTrip = trip;
 
   if (selectedPackageInput) {
-    selectedPackageInput.value = packageName;
+    selectedPackageInput.value = trip.title;
   }
 
   if (modal) {
@@ -97,23 +150,13 @@ function openBookingModal(packageName) {
   }
 }
 
-document.querySelectorAll(".book-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    openBookingModal(btn.dataset.package);
-  });
-});
-
 if (closeModal && modal) {
-  closeModal.addEventListener("click", () => {
-    modal.classList.remove("show");
-  });
+  closeModal.addEventListener("click", () => modal.classList.remove("show"));
 }
 
 if (modal) {
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.classList.remove("show");
-    }
+    if (e.target === modal) modal.classList.remove("show");
   });
 }
 
@@ -122,11 +165,12 @@ if (bookingForm) {
     e.preventDefault();
 
     if (!currentUser) {
-      showPopup(
-        "Login Required",
-        "Please sign in before making a booking.",
-        "login.html?redirect=booking.html"
-      );
+      showPopup("Login Required", "Please sign in first.", "login.html?redirect=booking.html");
+      return;
+    }
+
+    if (!selectedTrip) {
+      showPopup("No Package Selected", "Please select a package first.");
       return;
     }
 
@@ -141,34 +185,27 @@ if (bookingForm) {
     const date = document.getElementById("date").value.trim();
     const proofFile = document.getElementById("paymentProof").files[0];
 
-    if (!name || !email || !phone || !people || !date || !selectedPackage || !proofFile) {
+    if (!name || !email || !phone || !people || !date || !proofFile) {
       showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Booking for Validation";
       return;
     }
 
-    if (people < 1) {
-      showPopup("Invalid Number", "Please enter at least 1 person.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Booking for Validation";
-      return;
-    }
-
-    const selectedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (selectedDate < today) {
-      showPopup("Invalid Date", "Please select today or a future date.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Booking for Validation";
-      return;
-    }
-
     try {
+      const slotId = `${selectedTrip.id}_${date}`;
+      const slotRef = doc(db, "bookingSlots", slotId);
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
+
+      await setDoc(slotRef, {
+        tripId: selectedTrip.id,
+        package: selectedTrip.title,
+        date,
+        userId: currentUser.uid,
+        bookingId,
+        createdAt: serverTimestamp()
+      });
 
       const storageRef = ref(
         storage,
@@ -178,23 +215,24 @@ if (bookingForm) {
       await uploadBytes(storageRef, proofFile);
       const paymentProofUrl = await getDownloadURL(storageRef);
 
-      const basePrice = packagePrices[selectedPackage] || 0;
+      const basePrice = Number(selectedTrip.price || 0);
       const totalPrice = basePrice > 0 ? basePrice * people : 0;
 
       await setDoc(bookingRef, {
         userId: currentUser.uid,
         userEmail: currentUser.email,
 
+        tripId: selectedTrip.id,
         name,
         email,
         phone,
         people,
         date,
-        package: selectedPackage,
+        package: selectedTrip.title,
 
         pricePerPerson: basePrice,
         totalPrice,
-        priceType: basePrice > 0 ? "Fixed" : "Custom Quote",
+        priceType: selectedTrip.priceType || "Custom Quote",
 
         paymentMethod: "Bank Transfer",
         paymentStatus: "Proof Uploaded",
@@ -207,23 +245,24 @@ if (bookingForm) {
         updatedAt: serverTimestamp()
       });
 
-      if (modal) modal.classList.remove("show");
-
+      modal.classList.remove("show");
       bookingForm.reset();
-      selectedPackage = "";
+      selectedTrip = null;
 
       showPopup(
         "Booking Submitted ✅",
-        "Your booking request and payment proof have been submitted.\n\nOur admin team will verify your payment and confirm or reject your booking.",
+        "Your booking and payment proof have been submitted.\n\nAdmin will validate your payment and confirm your booking.",
         "index.html"
       );
 
     } catch (error) {
       console.error("Booking Error:", error);
+
       showPopup(
-        "Error",
-        "There was an issue submitting your booking. Please try again."
+        "Date Unavailable",
+        "This package may already be booked for this date, or there was an error submitting your booking."
       );
+
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit Booking for Validation";
@@ -231,8 +270,4 @@ if (bookingForm) {
   });
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modal && modal.classList.contains("show")) {
-    modal.classList.remove("show");
-  }
-});
+loadTrips();
