@@ -1232,3 +1232,230 @@ p {
     font-size: 0.85rem;
   }
 }
+
+/* =========================================================
+   MAUTOUR HOLIDAYS - LUXURY ADMIN & BOOKING UPGRADE
+========================================================= */
+
+.admin-heading {
+  margin-bottom: 2rem;
+}
+
+.admin-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin: 2rem 0;
+}
+
+.admin-status-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(2, 62, 138, 0.08);
+}
+
+.admin-status-card h3 {
+  color: var(--orange);
+  font-size: 2rem;
+  margin-bottom: 0.4rem;
+}
+
+.admin-status-card p {
+  color: var(--darkblue);
+  font-weight: 700;
+}
+
+.admin-note {
+  background: rgba(244, 201, 93, 0.15);
+  border-left: 5px solid var(--orange);
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+}
+
+.proof-link {
+  display: inline-block;
+  background: rgba(0,180,216,.12);
+  color: var(--darkblue);
+  padding: .5rem .8rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.proof-link:hover {
+  background: var(--darkblue);
+  color: #fff;
+}
+
+.approve-btn,
+.reject-btn,
+.delete-btn {
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  padding: .55rem .95rem;
+  font-weight: 700;
+  margin: .15rem;
+  transition: .25s;
+}
+
+.approve-btn {
+  background: #16a34a;
+  color: white;
+}
+
+.reject-btn {
+  background: #ea580c;
+  color: white;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.approve-btn:hover,
+.reject-btn:hover,
+.delete-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* =========================================================
+   BANK TRANSFER BOX
+========================================================= */
+
+.bank-box {
+  background: linear-gradient(
+    135deg,
+    rgba(0,180,216,.08),
+    rgba(244,201,93,.12)
+  );
+  border: 1px solid rgba(0,180,216,.15);
+  border-radius: 18px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.bank-box h4 {
+  color: var(--darkblue);
+  margin-bottom: .8rem;
+}
+
+.bank-box p {
+  margin-bottom: .45rem;
+}
+
+.bank-box small {
+  display: block;
+  margin-top: .7rem;
+  color: var(--muted);
+}
+
+/* =========================================================
+   PACKAGE LISTS
+========================================================= */
+
+.package-includes {
+  margin: 0 1.2rem 1rem;
+  padding-left: 1.2rem;
+}
+
+.package-includes li {
+  margin-bottom: .5rem;
+  color: var(--text);
+}
+
+.package-premium {
+  border-top: 5px solid var(--orange);
+}
+
+/* =========================================================
+   BOOKING CARD IMPROVEMENTS
+========================================================= */
+
+.booking-card {
+  height: 100%;
+}
+
+.booking-card h3 {
+  min-height: 58px;
+}
+
+.booking-card p {
+  min-height: 110px;
+}
+
+.booking-card strong {
+  font-size: 1.15rem;
+}
+
+.booking-card .btn {
+  width: 85%;
+  margin: auto auto 1.4rem auto;
+}
+
+/* =========================================================
+   DASHBOARD TABLE IMPROVEMENTS
+========================================================= */
+
+.table-wrapper {
+  background: #fff;
+  border-radius: 20px;
+}
+
+#bookingsTable th {
+  white-space: nowrap;
+}
+
+#bookingsTable td {
+  vertical-align: middle;
+}
+
+#bookingsTable tr:hover {
+  background: rgba(0,180,216,.05);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .admin-status-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .booking-card p {
+    min-height: auto;
+  }
+
+  .booking-card h3 {
+    min-height: auto;
+  }
+
+  .booking-card .btn {
+    width: 88%;
+  }
+
+}
+
+@media (max-width: 520px) {
+
+  .admin-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bank-box {
+    padding: 1rem;
+  }
+
+}
