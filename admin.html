@@ -21,9 +21,7 @@
     </nav>
 
     <div class="hamburger" id="hamburger">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </div>
   </div>
 </header>
@@ -33,12 +31,77 @@
 
     <div class="admin-heading">
       <span class="section-label center-label">Admin Panel</span>
-      <h2 class="center">Booking Validation Dashboard</h2>
+      <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Review bookings, check payment proof, approve confirmed payments or reject invalid submissions.
+        Manage homepage content, trips, package images, bookings and payment validation.
       </p>
     </div>
 
+    <!-- HOME PAGE MANAGER -->
+    <div class="admin-media-box">
+      <h3>Homepage Manager</h3>
+      <p>Edit the main homepage content shown to customers.</p>
+
+      <form id="homeContentForm" class="media-upload-form">
+        <input type="text" id="homeHeroTitle" placeholder="Hero title" required />
+        <textarea id="homeHeroSubtitle" placeholder="Hero subtitle" required></textarea>
+        <input type="text" id="homeBadge" placeholder="Hero badge text" />
+        <input type="text" id="homeWhatsapp" placeholder="WhatsApp number e.g. 23059066404" required />
+        <input type="email" id="homeEmail" placeholder="Business email" required />
+        <input type="text" id="homeCtaText" placeholder="CTA button text" required />
+        <input type="file" id="homeHeroImage" accept="image/*" />
+
+        <button type="submit" class="btn">Save Homepage</button>
+      </form>
+
+      <div id="homeContentMessage"></div>
+    </div>
+
+    <!-- TRIP MANAGER -->
+    <div class="admin-media-box">
+      <h3>Trip / Package Manager</h3>
+      <p>Add, edit, activate or remove trips shown on the booking page.</p>
+
+      <form id="tripForm" class="media-upload-form">
+        <input type="hidden" id="tripId" />
+
+        <input type="text" id="tripTitle" placeholder="Trip title" required />
+
+        <select id="tripCategory" required>
+          <option value="">Select category</option>
+          <option value="Standard Package">Standard Package</option>
+          <option value="Family Package">Family Package</option>
+          <option value="VIP Luxury Package">VIP Luxury Package</option>
+          <option value="Day Activity">Day Activity</option>
+          <option value="Transfer">Transfer</option>
+          <option value="Custom Tour">Custom Tour</option>
+        </select>
+
+        <textarea id="tripDescription" placeholder="Trip description" required></textarea>
+
+        <input type="text" id="tripDuration" placeholder="Duration e.g. Full day / 3 days" required />
+
+        <input type="number" id="tripPrice" placeholder="Price. Use 0 for custom quote" required />
+
+        <select id="tripPriceType" required>
+          <option value="Fixed">Fixed Price</option>
+          <option value="Starting From">Starting From</option>
+          <option value="Custom Quote">Custom Quote</option>
+        </select>
+
+        <textarea id="tripIncludes" placeholder="What is included? Write one item per line"></textarea>
+
+        <input type="file" id="tripImage" accept="image/*" />
+
+        <button type="submit" class="btn">Save Trip</button>
+        <button type="button" id="resetTripForm" class="btn-outline">Clear Form</button>
+      </form>
+
+      <div id="tripMessage"></div>
+      <div id="adminTripsList" class="admin-trip-list"></div>
+    </div>
+
+    <!-- REVENUE -->
     <div id="revenueSummary" class="summary-box">
       <h3>Total Confirmed Revenue</h3>
       <div class="revenue-bar">
@@ -71,9 +134,10 @@
 
     <div class="admin-note">
       <strong>Payment process:</strong>
-      Customers submit a booking with bank transfer proof. Admin must open the proof, verify the transfer, then approve or reject the booking.
+      Customers submit booking details and upload bank transfer proof. Admin verifies the proof, then approves or rejects the booking.
     </div>
 
+    <!-- BOOKINGS TABLE -->
     <div class="table-wrapper">
       <table id="bookingsTable">
         <thead>
