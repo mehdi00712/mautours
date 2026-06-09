@@ -3,86 +3,122 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours – Admin Dashboard</title>
+
+  <title>Mautour Holidays – Admin Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- ===== Header ===== -->
-  <header class="site-header">
-    <div class="nav-container">
-      <h1 class="logo">Mautours</h1>
-      <nav class="nav" id="nav">
-        <a href="index.html">Home</a>
-        <a href="booking.html">Book</a>
-        <a href="login.html">Login</a>
-        <a href="admin.html" class="active">Dashboard</a>
-      </nav>
-      <div class="hamburger" id="hamburger">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  </header>
 
-  <!-- ===== Dashboard ===== -->
-  <main style="padding-top: 100px;">
-    <section class="dashboard-container">
-      <h2 class="center">Admin Dashboard</h2>
-      <p class="center" style="color: var(--muted);">Manage all your bookings and view total revenue.</p>
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautour Holidays</h1>
 
-      <!-- ===== Revenue Summary ===== -->
-      <div id="revenueSummary" class="summary-box fade-in">
-        <h3>Total Revenue</h3>
-        <div class="revenue-bar">
-          <div id="revenueFill"></div>
-        </div>
-        <p id="revenueValue">Rs 0</p>
-      </div>
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="login.html">Sign In</a>
+      <a href="admin.html" class="active">Dashboard</a>
+    </nav>
 
-      <!-- ===== Bookings Table ===== -->
-      <div class="table-wrapper">
-        <table id="bookingsTable">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Package</th>
-              <th>Date</th>
-              <th>People</th>
-              <th>Price/Person</th>
-              <th>Total</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td colspan="9">Loading bookings...</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- ===== Logout Button ===== -->
-      <div class="center" style="margin-top: 2rem;">
-        <button id="logoutBtn" class="btn">Logout</button>
-      </div>
-    </section>
-  </main>
-
-  <!-- ===== Custom Popup ===== -->
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <h3 id="popupTitle"></h3>
-      <p id="popupMessage"></p>
-      <button id="popupBtn" class="btn">OK</button>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
   </div>
+</header>
 
-  <!-- ===== Footer ===== -->
-  <footer class="footer">
-    <p>&copy; 2025 Mautours. All Rights Reserved.</p>
-  </footer>
+<main style="padding-top: 105px;">
+  <section class="dashboard-container">
 
-  <!-- ===== Scripts ===== -->
-  <script type="module" src="js/admin.js"></script>
-  <script src="js/main.js"></script>
+    <div class="admin-heading">
+      <span class="section-label center-label">Admin Panel</span>
+      <h2 class="center">Booking Validation Dashboard</h2>
+      <p class="center" style="color: var(--muted);">
+        Review bookings, check payment proof, approve confirmed payments or reject invalid submissions.
+      </p>
+    </div>
+
+    <div id="revenueSummary" class="summary-box">
+      <h3>Total Confirmed Revenue</h3>
+      <div class="revenue-bar">
+        <div id="revenueFill"></div>
+      </div>
+      <p id="revenueValue">Rs 0</p>
+    </div>
+
+    <div class="admin-status-grid">
+      <div class="admin-status-card">
+        <h3 id="totalBookingsValue">0</h3>
+        <p>Total Bookings</p>
+      </div>
+
+      <div class="admin-status-card">
+        <h3 id="pendingBookingsValue">0</h3>
+        <p>Pending Validation</p>
+      </div>
+
+      <div class="admin-status-card">
+        <h3 id="confirmedBookingsValue">0</h3>
+        <p>Confirmed</p>
+      </div>
+
+      <div class="admin-status-card">
+        <h3 id="rejectedBookingsValue">0</h3>
+        <p>Rejected</p>
+      </div>
+    </div>
+
+    <div class="admin-note">
+      <strong>Payment process:</strong>
+      Customers submit a booking with bank transfer proof. Admin must open the proof, verify the transfer, then approve or reject the booking.
+    </div>
+
+    <div class="table-wrapper">
+      <table id="bookingsTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Package</th>
+            <th>Date</th>
+            <th>People</th>
+            <th>Total</th>
+            <th>Proof</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td colspan="10">Loading bookings...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="center" style="margin-top: 2rem;">
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+
+  </section>
+</main>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">OK</button>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
+</footer>
+
+<script type="module" src="js/admin.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
