@@ -6,6 +6,7 @@ import {
   collection,
   doc,
   setDoc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -52,7 +53,11 @@ onAuthStateChanged(auth, (user) => {
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
+
     return;
   }
 
@@ -62,26 +67,80 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
+
+    if (redirect) {
+      window.location.href = redirect;
+    }
   };
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function normalizeSlotId(tripId, date) {
+  return `${tripId}_${date}`
+    .toLowerCase()
+    .replaceAll(" ", "-")
+    .replace(/[^a-z0-9-_]/g, "");
+}
+
+function formatPrice(trip) {
+  const price = Number(trip.price || 0);
+
+  if (price <= 0 || trip.priceType === "Custom Quote") {
+    return "Custom Quote";
+  }
+
+  if (trip.priceType === "Fixed") {
+    return `Rs ${price.toLocaleString()}`;
+  }
+
+  return `${trip.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
+}
+
+function formatIncludes(includes) {
+  if (!Array.isArray(includes) || includes.length === 0) {
+    return "";
+  }
+
+  return includes
+    .filter((item) => String(item || "").trim())
+    .map((item) => `<li>${escapeHtml(item)}</li>`)
+    .join("");
 }
 
 async function loadTrips() {
   if (!dynamicTrips) return;
 
-  dynamicTrips.innerHTML = `<p>Loading packages...</p>`;
+  dynamicTrips.innerHTML = `
+    <div class="loading-card">
+      <h3>Loading Experiences...</h3>
+      <p>Please wait while we load the latest tours and packages.</p>
+    </div>
+  `;
 
   try {
-    const q = query(
+    const tripsQuery = query(
       collection(db, "trips"),
       where("active", "==", true),
       orderBy("createdAt", "desc")
     );
 
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(tripsQuery);
 
     if (snapshot.empty) {
-      dynamicTrips.innerHTML = `<p class="center">No packages available yet.</p>`;
+      dynamicTrips.innerHTML = `
+        <div class="loading-card">
+          <h3>No Packages Available</h3>
+          <p>The admin has not added any active trips yet.</p>
+        </div>
+      `;
       return;
     }
 
@@ -91,31 +150,39 @@ async function loadTrips() {
       const trip = docSnap.data();
       const tripId = docSnap.id;
 
-      const priceText =
-        Number(trip.price || 0) > 0
-          ? `${trip.priceType || "Starting From"} Rs ${Number(trip.price).toLocaleString()}`
-          : "Custom Quote";
-
-      const includes = Array.isArray(trip.includes)
-        ? trip.includes.map(item => `<li>${item}</li>`).join("")
-        : "";
+      const title = escapeHtml(trip.title || "Untitled Trip");
+      const category = escapeHtml(trip.category || "Package");
+      const description = escapeHtml(trip.description || "");
+      const duration = escapeHtml(trip.duration || "");
+      const imageUrl = escapeHtml(trip.imageUrl || "assets/ile.jpg");
+      const includes = formatIncludes(trip.includes);
+      const priceText = escapeHtml(formatPrice(trip));
 
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
 
       card.innerHTML = `
-        <img src="${trip.imageUrl || "assets/ile.jpg"}" alt="${trip.title}">
-        <span>${trip.category || "Package"}</span>
-        <h3>${trip.title}</h3>
-        <p>${trip.description || ""}</p>
-        <ul class="package-includes">${includes}</ul>
+        <img src="${imageUrl}" alt="${title}" loading="lazy">
+        <span>${category}</span>
+        <h3>${title}</h3>
+        <p>${description}</p>
+
+        ${duration ? `<p><strong class="duration-label">Duration:</strong> ${duration}</p>` : ""}
+
+        ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
+
         <strong>${priceText}</strong>
-        <button class="btn book-btn" data-id="${tripId}">Book Package</button>
+
+        <button class="btn book-btn" data-id="${tripId}">
+          Book Package
+        </button>
       `;
 
       dynamicTrips.appendChild(card);
 
-      card.querySelector(".book-btn").addEventListener("click", () => {
+      const bookBtn = card.querySelector(".book-btn");
+
+      bookBtn.addEventListener("click", () => {
         openBookingModal({
           id: tripId,
           ...trip
@@ -125,7 +192,13 @@ async function loadTrips() {
 
   } catch (error) {
     console.error("Load Trips Error:", error);
-    dynamicTrips.innerHTML = `<p class="center">Could not load packages.</p>`;
+
+    dynamicTrips.innerHTML = `
+      <div class="loading-card">
+        <h3>Could Not Load Packages</h3>
+        <p>Please try again later or contact us on WhatsApp.</p>
+      </div>
+    `;
   }
 }
 
@@ -142,7 +215,7 @@ function openBookingModal(trip) {
   selectedTrip = trip;
 
   if (selectedPackageInput) {
-    selectedPackageInput.value = trip.title;
+    selectedPackageInput.value = trip.title || "";
   }
 
   if (modal) {
@@ -151,12 +224,16 @@ function openBookingModal(trip) {
 }
 
 if (closeModal && modal) {
-  closeModal.addEventListener("click", () => modal.classList.remove("show"));
+  closeModal.addEventListener("click", () => {
+    modal.classList.remove("show");
+  });
 }
 
 if (modal) {
   modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.classList.remove("show");
+    if (e.target === modal) {
+      modal.classList.remove("show");
+    }
   });
 }
 
@@ -165,16 +242,22 @@ if (bookingForm) {
     e.preventDefault();
 
     if (!currentUser) {
-      showPopup("Login Required", "Please sign in first.", "login.html?redirect=booking.html");
+      showPopup(
+        "Login Required",
+        "Please sign in first.",
+        "login.html?redirect=booking.html"
+      );
       return;
     }
 
-    if (!selectedTrip) {
+    if (!selectedTrip || !selectedTrip.id) {
       showPopup("No Package Selected", "Please select a package first.");
       return;
     }
 
     const submitBtn = bookingForm.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.textContent;
+
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
 
@@ -183,36 +266,74 @@ if (bookingForm) {
     const phone = document.getElementById("phone").value.trim();
     const people = Number(document.getElementById("people").value);
     const date = document.getElementById("date").value.trim();
-    const proofFile = document.getElementById("paymentProof").files[0];
+    const proofInput = document.getElementById("paymentProof");
+    const proofFile = proofInput && proofInput.files ? proofInput.files[0] : null;
 
     if (!name || !email || !phone || !people || !date || !proofFile) {
-      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
+      showPopup(
+        "Incomplete Form",
+        "Please fill in all fields and upload payment proof."
+      );
       submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Booking for Validation";
+      submitBtn.textContent = originalBtnText;
+      return;
+    }
+
+    if (people < 1) {
+      showPopup("Invalid Number", "Please enter at least 1 person.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      return;
+    }
+
+    const selectedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      showPopup("Invalid Date", "Please select today or a future date.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
       return;
     }
 
     try {
-      const slotId = `${selectedTrip.id}_${date}`;
+      const slotId = normalizeSlotId(selectedTrip.id, date);
       const slotRef = doc(db, "bookingSlots", slotId);
+      const slotSnap = await getDoc(slotRef);
+
+      if (slotSnap.exists()) {
+        showPopup(
+          "Date Unavailable",
+          "This package is already booked for the selected date. Please choose another date."
+        );
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalBtnText;
+        return;
+      }
+
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
 
       await setDoc(slotRef, {
         tripId: selectedTrip.id,
-        package: selectedTrip.title,
+        package: selectedTrip.title || "",
         date,
         userId: currentUser.uid,
         bookingId,
+        status: "Reserved",
         createdAt: serverTimestamp()
       });
 
+      const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
       const storageRef = ref(
         storage,
-        `payment_proofs/${currentUser.uid}/${bookingId}_${proofFile.name}`
+        `payment_proofs/${currentUser.uid}/${bookingId}_${safeFileName}`
       );
 
       await uploadBytes(storageRef, proofFile);
+
       const paymentProofUrl = await getDownloadURL(storageRef);
 
       const basePrice = Number(selectedTrip.price || 0);
@@ -220,7 +341,7 @@ if (bookingForm) {
 
       await setDoc(bookingRef, {
         userId: currentUser.uid,
-        userEmail: currentUser.email,
+        userEmail: currentUser.email || "",
 
         tripId: selectedTrip.id,
         name,
@@ -228,7 +349,7 @@ if (bookingForm) {
         phone,
         people,
         date,
-        package: selectedTrip.title,
+        package: selectedTrip.title || "",
 
         pricePerPerson: basePrice,
         totalPrice,
@@ -245,7 +366,10 @@ if (bookingForm) {
         updatedAt: serverTimestamp()
       });
 
-      modal.classList.remove("show");
+      if (modal) {
+        modal.classList.remove("show");
+      }
+
       bookingForm.reset();
       selectedTrip = null;
 
@@ -259,15 +383,21 @@ if (bookingForm) {
       console.error("Booking Error:", error);
 
       showPopup(
-        "Date Unavailable",
-        "This package may already be booked for this date, or there was an error submitting your booking."
+        "Booking Error",
+        "There was an error submitting your booking. Please try again."
       );
 
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = "Submit Booking for Validation";
+      submitBtn.textContent = originalBtnText;
     }
   });
 }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && modal && modal.classList.contains("show")) {
+    modal.classList.remove("show");
+  }
+});
 
 loadTrips();
