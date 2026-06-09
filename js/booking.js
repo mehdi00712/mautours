@@ -5,7 +5,7 @@ import {
   getFirestore,
   collection,
   doc,
-  runTransaction,
+  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -15,54 +15,35 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
 import {
-  getFunctions,
-  httpsCallable
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const functions = getFunctions(app);
-
-const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");
-
-const packagePrices = {
-  "Southern Wonders Tour": 2500,
-  "Northern Discovery Tour": 2300,
-  "Port Louis & Market Tour": 1800,
-  "Scenic East Coast Tour": 2200,
-  "Scenic West Coast Tour": 2200,
-
-  "Île aux Cerfs Experience": 3000,
-  "Dolphin Swimming Experience": 3500,
-  "Whale Watching Adventure": 4500,
-  "Crystal Rock Discovery": 3200,
-  "Sunset Catamaran Cruise": 3800,
-
-  "Undersea Walk Experience": 3500,
-  "Submarine Dive Experience": 5500,
-  "Parasailing Adventure": 2800,
-  "Quad Biking Adventure": 2600,
-  "Zipline Experience": 2200,
-  "Le Morne Hiking Experience": 2400,
-
-  "Tube Ride Adventure": 1500,
-  "Fishing Trip Experience": 3000,
-  "Speedboat Lagoon Tour": 3800,
-  "Catamaran BBQ Cruise": 4200,
-
-  "Airport Transfers": 1200,
-  "Domestic Transfers": 900,
-  "Restaurant Transfers": 700,
-  "Nightclub Transfers": 800,
-
-  "Helicopter Tour": 12000,
-  "Luxury Island Discovery": 8500,
-  "Honeymoon Escape Package": 9000
-};
+const storage = getStorage(app);
 
 let currentUser = null;
 let selectedPackage = "";
+
+const packagePrices = {
+  "Standard Package": 2500,
+  "Family Package": 18000,
+  "VIP Luxury Package": 45000,
+
+  "Day 1 - 23 Colours Nature Park": 0,
+  "Day 2 - Alexandra Falls and Tea Factory": 0,
+  "Day 3 - Dolphins and Whale Watching": 0,
+  "Day 4 - Casela Safari Park": 0,
+  "Day 5 - Ile aux Cerfs Island": 0,
+  "Day 6 - Port Louis City Tour": 0,
+  "Day 7 - Chamarel and Horse Riding": 0,
+  "Day 8 - Helicopter Tour": 0,
+  "Day 9 - Fishing or Catamaran Tour": 0
+};
 
 const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
@@ -81,11 +62,7 @@ onAuthStateChanged(auth, (user) => {
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
-
+    if (redirect) window.location.href = redirect;
     return;
   }
 
@@ -95,21 +72,8 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
+    if (redirect) window.location.href = redirect;
   };
-}
-
-function createSlotId(packageName, date) {
-  return `${packageName}_${date}`
-    .toLowerCase()
-    .replaceAll(" ", "-")
-    .replaceAll("î", "i")
-    .replaceAll("'", "")
-    .replaceAll("’", "")
-    .replace(/[^a-z0-9-_]/g, "");
 }
 
 function openBookingModal(packageName) {
@@ -166,19 +130,28 @@ if (bookingForm) {
       return;
     }
 
+    const submitBtn = bookingForm.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const people = Number(document.getElementById("people").value);
     const date = document.getElementById("date").value.trim();
+    const proofFile = document.getElementById("paymentProof").files[0];
 
-    if (!name || !email || !phone || !people || !date || !selectedPackage) {
-      showPopup("Incomplete Form", "Please fill in all fields before proceeding.");
+    if (!name || !email || !phone || !people || !date || !selectedPackage || !proofFile) {
+      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Booking for Validation";
       return;
     }
 
     if (people < 1) {
-      showPopup("Invalid Number", "Please enter at least 1 person or trip.");
+      showPopup("Invalid Number", "Please enter at least 1 person.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Booking for Validation";
       return;
     }
 
@@ -188,102 +161,72 @@ if (bookingForm) {
 
     if (selectedDate < today) {
       showPopup("Invalid Date", "Please select today or a future date.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Booking for Validation";
       return;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(email)) {
-      showPopup("Invalid Email", "Please enter a valid email address.");
-      return;
-    }
-
-    const confirmedPackage = selectedPackage;
-    const basePrice = packagePrices[confirmedPackage] || 0;
-    const totalPrice = basePrice * people;
-    const slotId = createSlotId(confirmedPackage, date);
 
     try {
-      const result = await runTransaction(db, async (transaction) => {
-        const slotRef = doc(db, "bookingSlots", slotId);
-        const slotSnap = await transaction.get(slotRef);
+      const bookingRef = doc(collection(db, "bookings"));
+      const bookingId = bookingRef.id;
 
-        if (slotSnap.exists()) {
-          throw new Error("DOUBLE_BOOKING");
-        }
+      const storageRef = ref(
+        storage,
+        `payment_proofs/${currentUser.uid}/${bookingId}_${proofFile.name}`
+      );
 
-        const bookingRef = doc(collection(db, "bookings"));
+      await uploadBytes(storageRef, proofFile);
+      const paymentProofUrl = await getDownloadURL(storageRef);
 
-        transaction.set(slotRef, {
-          package: confirmedPackage,
-          date,
-          bookingId: bookingRef.id,
-          userId: currentUser.uid,
-          status: "Reserved",
-          createdAt: serverTimestamp()
-        });
+      const basePrice = packagePrices[selectedPackage] || 0;
+      const totalPrice = basePrice > 0 ? basePrice * people : 0;
 
-        transaction.set(bookingRef, {
-          userId: currentUser.uid,
-          userEmail: currentUser.email,
-          name,
-          email,
-          phone,
-          people,
-          date,
-          package: confirmedPackage,
-          pricePerPerson: basePrice,
-          totalPrice,
-          slotId,
-          paymentMethod: "Absa Bank",
-          paymentStatus: "Pending",
-          bookingStatus: "New",
-          createdAt: serverTimestamp()
-        });
+      await setDoc(bookingRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
 
-        return {
-          bookingId: bookingRef.id
-        };
+        name,
+        email,
+        phone,
+        people,
+        date,
+        package: selectedPackage,
+
+        pricePerPerson: basePrice,
+        totalPrice,
+        priceType: basePrice > 0 ? "Fixed" : "Custom Quote",
+
+        paymentMethod: "Bank Transfer",
+        paymentStatus: "Proof Uploaded",
+        paymentProofUrl,
+
+        adminDecision: "Pending",
+        bookingStatus: "Awaiting Admin Validation",
+
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
 
-      const paymentResponse = await createAbsaPayment({
-        bookingId: result.bookingId,
-        amount: totalPrice,
-        customerName: name,
-        customerEmail: email,
-        packageName: confirmedPackage
-      });
-
-      const paymentUrl = paymentResponse.data.paymentUrl;
-
-      if (modal) {
-        modal.classList.remove("show");
-      }
+      if (modal) modal.classList.remove("show");
 
       bookingForm.reset();
       selectedPackage = "";
 
       showPopup(
-        "Booking Reserved 🎉",
-        `Your booking has been reserved.\n\nPackage: ${confirmedPackage}\nDate: ${date}\nTotal: Rs ${totalPrice.toLocaleString()}\n\nClick OK to continue to secure payment.`,
-        paymentUrl
+        "Booking Submitted ✅",
+        "Your booking request and payment proof have been submitted.\n\nOur admin team will verify your payment and confirm or reject your booking.",
+        "index.html"
       );
 
     } catch (error) {
       console.error("Booking Error:", error);
-
-      if (error.message === "DOUBLE_BOOKING") {
-        showPopup(
-          "Date Unavailable",
-          "This package is already booked for the selected date. Please choose another date."
-        );
-        return;
-      }
-
       showPopup(
         "Error",
-        "There was an issue processing your booking. Please try again."
+        "There was an issue submitting your booking. Please try again."
       );
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Booking for Validation";
     }
   });
 }
