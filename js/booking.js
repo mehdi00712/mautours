@@ -50,11 +50,7 @@ onAuthStateChanged(auth, (user) => {
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
-
+    if (redirect) window.location.href = redirect;
     return;
   }
 
@@ -64,10 +60,7 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-
-    if (redirect) {
-      window.location.href = redirect;
-    }
+    if (redirect) window.location.href = redirect;
   };
 }
 
@@ -102,9 +95,7 @@ function formatPrice(trip) {
 }
 
 function formatIncludes(includes) {
-  if (!Array.isArray(includes) || includes.length === 0) {
-    return "";
-  }
+  if (!Array.isArray(includes) || includes.length === 0) return "";
 
   return includes
     .filter((item) => String(item || "").trim())
@@ -122,6 +113,19 @@ function getTripTime(trip) {
   }
 
   return 0;
+}
+
+function lockBodyScroll() {
+  document.body.style.overflow = "hidden";
+}
+
+function unlockBodyScroll() {
+  document.body.style.overflow = "";
+}
+
+function closeBookingModal() {
+  if (modal) modal.classList.remove("show");
+  unlockBodyScroll();
 }
 
 async function loadTrips() {
@@ -189,9 +193,7 @@ async function loadTrips() {
       card.innerHTML = `
         <img src="${imageUrl}" alt="${title}" loading="lazy">
         <span>${category}</span>
-
         <h3>${title}</h3>
-
         <p>${description}</p>
 
         ${duration ? `<p><strong class="duration-label">Duration:</strong> ${duration}</p>` : ""}
@@ -207,9 +209,7 @@ async function loadTrips() {
 
       dynamicTrips.appendChild(card);
 
-      const bookBtn = card.querySelector(".book-btn");
-
-      bookBtn.addEventListener("click", () => {
+      card.querySelector(".book-btn").addEventListener("click", () => {
         openBookingModal(trip);
       });
     });
@@ -244,19 +244,18 @@ function openBookingModal(trip) {
 
   if (modal) {
     modal.classList.add("show");
+    lockBodyScroll();
   }
 }
 
-if (closeModal && modal) {
-  closeModal.addEventListener("click", () => {
-    modal.classList.remove("show");
-  });
+if (closeModal) {
+  closeModal.addEventListener("click", closeBookingModal);
 }
 
 if (modal) {
   modal.addEventListener("click", (e) => {
     if (e.target === modal) {
-      modal.classList.remove("show");
+      closeBookingModal();
     }
   });
 }
@@ -295,11 +294,7 @@ if (bookingForm) {
     const proofFile = proofInput && proofInput.files ? proofInput.files[0] : null;
 
     if (!name || !email || !phone || !people || !date || !proofFile) {
-      showPopup(
-        "Incomplete Form",
-        "Please fill in all fields and upload payment proof."
-      );
-
+      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -307,7 +302,6 @@ if (bookingForm) {
 
     if (people < 1) {
       showPopup("Invalid Number", "Please enter at least 1 person.");
-
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -315,12 +309,10 @@ if (bookingForm) {
 
     const selectedDate = new Date(date);
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       showPopup("Invalid Date", "Please select today or a future date.");
-
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -336,7 +328,6 @@ if (bookingForm) {
           "Date Unavailable",
           "This package is already booked for the selected date. Please choose another date."
         );
-
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
         return;
@@ -395,10 +386,7 @@ if (bookingForm) {
         updatedAt: serverTimestamp()
       });
 
-      if (modal) {
-        modal.classList.remove("show");
-      }
-
+      closeBookingModal();
       bookingForm.reset();
       selectedTrip = null;
 
@@ -425,7 +413,7 @@ if (bookingForm) {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && modal && modal.classList.contains("show")) {
-    modal.classList.remove("show");
+    closeBookingModal();
   }
 });
 
