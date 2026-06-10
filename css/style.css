@@ -1427,3 +1427,41 @@ h2::after {
     font-size: 0.85rem;
   }
 }
+
+/* ===== Mobile Admin Form Fix ===== */
+
+.media-upload-form,
+.media-upload-form input,
+.media-upload-form select,
+.media-upload-form textarea,
+.admin-media-box {
+  width: 100%;
+  max-width: 100%;
+}
+
+.media-upload-form input,
+.media-upload-form select,
+.media-upload-form textarea {
+  min-width: 0;
+}
+
+.admin-media-box {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    width: 94%;
+    padding: 1rem;
+  }
+
+  .admin-media-box {
+    padding: 1.2rem;
+  }
+
+  .media-upload-form input,
+  .media-upload-form select,
+  .media-upload-form textarea {
+    font-size: 0.95rem;
+  }
+}
