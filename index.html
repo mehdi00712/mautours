@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Mautour Holidays | Luxury Private Tours in Mauritius</title>
-  <meta name="description" content="Luxury private tours, airport transfers, honeymoon packages and premium Mauritius experiences for UAE, Saudi, Qatar and GCC travellers." />
+  <meta
+    name="description"
+    content="Luxury private tours, airport transfers, honeymoon packages and premium Mauritius experiences for UAE, Saudi, Qatar and GCC travellers."
+  />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -13,7 +16,7 @@
 
 <header class="site-header">
   <div class="nav-container">
-    <h1 class="logo">Mautour Holidays</h1>
+    <h1 class="logo" id="siteBusinessName">Mautour Holidays</h1>
 
     <nav class="nav" id="nav">
       <a href="index.html" class="active">Home</a>
@@ -30,27 +33,27 @@
   </div>
 </header>
 
-<section class="hero home-hero">
-  <video autoplay muted loop playsinline class="hero-video">
+<section class="hero home-hero" id="homeHero">
+  <video autoplay muted loop playsinline class="hero-video" id="heroVideo">
     <source src="mauvid1.mp4" type="video/mp4" />
   </video>
 
   <div class="hero-content luxury-hero-content">
-    <span class="hero-badge">Serving UAE, Saudi, Qatar & GCC Travellers</span>
-    <h2>Luxury Private Tours & Experiences in Mauritius 🇲🇺</h2>
-    <p>
-      Private island tours, premium airport transfers, honeymoon escapes,
-      catamaran trips and curated Mauritius experiences made for comfort,
-      privacy and style.
+    <span class="hero-badge" id="homeHeroBadge">
+      Serving UAE, Saudi, Qatar & GCC Travellers
+    </span>
+
+    <h2 id="homeHeroTitle">
+      Luxury Private Tours & Experiences in Mauritius
+    </h2>
+
+    <p id="homeHeroSubtitle">
+      Tailor-made holidays, airport transfers, honeymoon escapes and unforgettable island adventures.
     </p>
 
     <div class="hero-actions">
-      <a
-        href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
-        target="_blank"
-        class="btn"
-      >
-        Book via WhatsApp
+      <a id="heroWhatsappBtn" href="#" target="_blank" class="btn">
+        Book on WhatsApp
       </a>
 
       <a href="booking.html" class="btn-outline hero-outline">
@@ -61,8 +64,8 @@
 </section>
 
 <section class="mobile-stats">
-  <div><strong>500+</strong><span>Happy Clients</span></div>
-  <div><strong>9</strong><span>Luxury Day Plans</span></div>
+  <div><strong id="statClients">500+</strong><span>Happy Clients</span></div>
+  <div><strong id="statExperiences">9+</strong><span>Premium Experiences</span></div>
   <div><strong>24/7</strong><span>WhatsApp Support</span></div>
 </section>
 
@@ -71,59 +74,21 @@
   <h2>Private, Comfortable and Built for GCC Travellers</h2>
 
   <div class="service-grid">
-    <div class="service-card">
-      ✨
-      <h3>Premium Private Service</h3>
-      <p>Private transfers, flexible planning and a comfortable experience from arrival to departure.</p>
-    </div>
-
-    <div class="service-card">
-      🌍
-      <h3>GCC Friendly</h3>
-      <p>Serving travellers from UAE, Saudi Arabia, Qatar and Kuwait with WhatsApp-first support.</p>
-    </div>
-
-    <div class="service-card">
-      🔒
-      <h3>Secure Booking</h3>
-      <p>Bookings are confirmed after bank transfer proof is verified by our admin team.</p>
-    </div>
+    <div class="service-card">🏝️<h3>Local Experts</h3><p>Private island knowledge and carefully planned routes.</p></div>
+    <div class="service-card">🚘<h3>Private Transfers</h3><p>Comfortable airport and island-wide transfers.</p></div>
+    <div class="service-card">✨<h3>Tailor-Made Experiences</h3><p>Trips designed around your travel style.</p></div>
+    <div class="service-card">💬<h3>24/7 Support</h3><p>Simple WhatsApp booking and travel assistance.</p></div>
   </div>
 </section>
 
 <section id="packages-preview" class="container">
-  <span class="section-label center-label">Popular Packages</span>
+  <span class="section-label center-label">Featured Packages</span>
   <h2>Choose Your Mauritius Experience</h2>
 
-  <div class="experience-grid">
-    <div class="experience-card">
-      <img src="assets/south.jpg" alt="Standard Mauritius Package" />
-      <div>
-        <span>Standard Package</span>
-        <h3>Essential Mauritius</h3>
-        <p>Perfect for first-time travellers who want the best island highlights with comfort.</p>
-        <a href="booking.html" class="card-link">View Package →</a>
-      </div>
-    </div>
-
-    <div class="experience-card">
-      <img src="assets/ile.jpg" alt="Family Mauritius Package" />
-      <div>
-        <span>Family Package</span>
-        <h3>Family Island Escape</h3>
-        <p>Family-friendly sightseeing, beaches, nature parks and safe private transfers.</p>
-        <a href="booking.html" class="card-link">View Package →</a>
-      </div>
-    </div>
-
-    <div class="experience-card">
-      <img src="assets/transfer.jpg" alt="VIP Mauritius Package" />
-      <div>
-        <span>VIP Luxury Package</span>
-        <h3>Luxury Mauritius Experience</h3>
-        <p>Premium tours, luxury transfers, helicopter options and private planning.</p>
-        <a href="booking.html" class="card-link">View Package →</a>
-      </div>
+  <div id="homeTripsGrid" class="experience-grid">
+    <div class="loading-card">
+      <h3>Loading Packages...</h3>
+      <p>Please wait while we load the latest experiences.</p>
     </div>
   </div>
 </section>
@@ -133,38 +98,35 @@
     <span class="section-label center-label">Featured Experiences</span>
     <h2>Activities We Arrange</h2>
 
-    <div class="service-grid">
-      <div class="service-card">🌈<h3>23 Colours Nature Park</h3><p>Zipline, quad biking, Nepalese bridge, waterfall zipline, luge cart and more.</p></div>
+    <div id="homeExperiencesGrid" class="service-grid">
+      <div class="service-card">🌈<h3>23 Colours Nature Park</h3><p>Zipline, quad biking, Nepalese bridge, waterfall zipline and more.</p></div>
       <div class="service-card">🐬<h3>Dolphins & Whale Watching</h3><p>Boat trips with dolphin watching and optional swimming experience.</p></div>
       <div class="service-card">🦁<h3>Casela Safari Park</h3><p>Safari, giraffe, zebra, wild cat interaction and walk with lions by advance booking.</p></div>
-      <div class="service-card">🏝️<h3>Île aux Cerfs</h3><p>Island trip with waterfall, undersea walk, parasailing and tube ride options.</p></div>
-      <div class="service-card">🚁<h3>Helicopter Tour</h3><p>Premium helicopter experience available with advance booking.</p></div>
-      <div class="service-card">⛵<h3>Fishing or Catamaran</h3><p>Big game fishing or luxury catamaran day tour options.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="container">
+  <span class="section-label center-label">Gallery</span>
+  <h2>Experience Mauritius</h2>
+
+  <div id="homeGalleryGrid" class="experience-grid">
+    <div class="loading-card">
+      <h3>Loading Gallery...</h3>
+      <p>Images will appear here once added by admin.</p>
     </div>
   </div>
 </section>
 
 <section id="reviews" class="container">
-  <span class="section-label center-label">Client Reviews</span>
-  <h2>Trusted by International Travellers</h2>
+  <span class="section-label center-label">Guest Reviews</span>
+  <h2>What Our Guests Say</h2>
 
-  <div class="service-grid">
+  <div id="homeReviewsGrid" class="service-grid">
     <div class="service-card">
       ⭐⭐⭐⭐⭐
       <h3>Ahmed, UAE</h3>
-      <p>Very smooth private tour experience. Everything was arranged through WhatsApp and the driver was excellent.</p>
-    </div>
-
-    <div class="service-card">
-      ⭐⭐⭐⭐⭐
-      <h3>Fatima, Saudi Arabia</h3>
-      <p>Perfect for families. The itinerary was comfortable and the team was very responsive.</p>
-    </div>
-
-    <div class="service-card">
-      ⭐⭐⭐⭐⭐
-      <h3>Khalid, Qatar</h3>
-      <p>The private transfer and island tour felt premium and well organised.</p>
+      <p>Very smooth private tour experience. Everything was arranged through WhatsApp.</p>
     </div>
   </div>
 </section>
@@ -175,12 +137,8 @@
     <h2>Book Your Luxury Mauritius Experience Today</h2>
     <p>One WhatsApp message is enough to start planning your private trip.</p>
 
-    <a
-      href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
-      target="_blank"
-      class="btn"
-    >
-      Book via WhatsApp
+    <a id="ctaWhatsappBtn" href="#" target="_blank" class="btn">
+      Book on WhatsApp
     </a>
   </div>
 </section>
@@ -190,25 +148,22 @@
   <h2>Speak With Our Travel Team</h2>
 
   <div class="contact-info center">
-    <p><strong>Email:</strong> mautourholidays@gmail.com</p>
-    <p><strong>Phone:</strong> +230 5906 6404</p>
-    <p><strong>Mobile:</strong> +230 5254 2792</p>
-    <p><strong>Serving:</strong> UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼</p>
+    <p><strong>Email:</strong> <span id="contactEmail">mautourholidays@gmail.com</span></p>
+    <p><strong>Phone:</strong> <span id="contactPhone">+230 5906 6404</span></p>
+    <p><strong>Mobile:</strong> <span id="contactMobile">+230 5254 2792</span></p>
+    <p><strong>Serving:</strong> <span id="contactRegions">UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼</span></p>
   </div>
 </section>
 
-<a
-  class="whatsapp-float"
-  href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
-  target="_blank"
->
+<a id="floatingWhatsappBtn" class="whatsapp-float" href="#" target="_blank">
   WhatsApp
 </a>
 
 <footer class="footer">
-  <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
+  <p>&copy; 2026 <span id="footerBusinessName">Mautour Holidays</span>. All Rights Reserved.</p>
 </footer>
 
 <script src="js/main.js"></script>
+<script type="module" src="js/home.js"></script>
 </body>
 </html>
