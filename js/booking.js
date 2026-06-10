@@ -8,9 +8,6 @@ import {
   setDoc,
   getDoc,
   getDocs,
-  query,
-  where,
-  orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
@@ -115,6 +112,18 @@ function formatIncludes(includes) {
     .join("");
 }
 
+function getTripTime(trip) {
+  if (trip.createdAt && typeof trip.createdAt.toMillis === "function") {
+    return trip.createdAt.toMillis();
+  }
+
+  if (trip.updatedAt && typeof trip.updatedAt.toMillis === "function") {
+    return trip.updatedAt.toMillis();
+  }
+
+  return 0;
+}
+
 async function loadTrips() {
   if (!dynamicTrips) return;
 
@@ -126,19 +135,38 @@ async function loadTrips() {
   `;
 
   try {
-    const tripsQuery = query(
-      collection(db, "trips"),
-      where("active", "==", true),
-      orderBy("createdAt", "desc")
-    );
-
-    const snapshot = await getDocs(tripsQuery);
+    const snapshot = await getDocs(collection(db, "trips"));
 
     if (snapshot.empty) {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
           <h3>No Packages Available</h3>
-          <p>The admin has not added any active trips yet.</p>
+          <p>The admin has not added any trips yet.</p>
+        </div>
+      `;
+      return;
+    }
+
+    const trips = [];
+
+    snapshot.forEach((docSnap) => {
+      const trip = docSnap.data();
+
+      if (trip.active === false) return;
+
+      trips.push({
+        id: docSnap.id,
+        ...trip
+      });
+    });
+
+    trips.sort((a, b) => getTripTime(b) - getTripTime(a));
+
+    if (trips.length === 0) {
+      dynamicTrips.innerHTML = `
+        <div class="loading-card">
+          <h3>No Active Packages</h3>
+          <p>All trips are currently disabled by the admin.</p>
         </div>
       `;
       return;
@@ -146,10 +174,7 @@ async function loadTrips() {
 
     dynamicTrips.innerHTML = "";
 
-    snapshot.forEach((docSnap) => {
-      const trip = docSnap.data();
-      const tripId = docSnap.id;
-
+    trips.forEach((trip) => {
       const title = escapeHtml(trip.title || "Untitled Trip");
       const category = escapeHtml(trip.category || "Package");
       const description = escapeHtml(trip.description || "");
@@ -164,7 +189,9 @@ async function loadTrips() {
       card.innerHTML = `
         <img src="${imageUrl}" alt="${title}" loading="lazy">
         <span>${category}</span>
+
         <h3>${title}</h3>
+
         <p>${description}</p>
 
         ${duration ? `<p><strong class="duration-label">Duration:</strong> ${duration}</p>` : ""}
@@ -173,7 +200,7 @@ async function loadTrips() {
 
         <strong>${priceText}</strong>
 
-        <button class="btn book-btn" data-id="${tripId}">
+        <button class="btn book-btn" data-id="${trip.id}">
           Book Package
         </button>
       `;
@@ -183,10 +210,7 @@ async function loadTrips() {
       const bookBtn = card.querySelector(".book-btn");
 
       bookBtn.addEventListener("click", () => {
-        openBookingModal({
-          id: tripId,
-          ...trip
-        });
+        openBookingModal(trip);
       });
     });
 
@@ -196,7 +220,7 @@ async function loadTrips() {
     dynamicTrips.innerHTML = `
       <div class="loading-card">
         <h3>Could Not Load Packages</h3>
-        <p>Please try again later or contact us on WhatsApp.</p>
+        <p>${escapeHtml(error.message || "Please try again later or contact us on WhatsApp.")}</p>
       </div>
     `;
   }
@@ -266,6 +290,7 @@ if (bookingForm) {
     const phone = document.getElementById("phone").value.trim();
     const people = Number(document.getElementById("people").value);
     const date = document.getElementById("date").value.trim();
+
     const proofInput = document.getElementById("paymentProof");
     const proofFile = proofInput && proofInput.files ? proofInput.files[0] : null;
 
@@ -274,6 +299,7 @@ if (bookingForm) {
         "Incomplete Form",
         "Please fill in all fields and upload payment proof."
       );
+
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -281,6 +307,7 @@ if (bookingForm) {
 
     if (people < 1) {
       showPopup("Invalid Number", "Please enter at least 1 person.");
+
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -288,10 +315,12 @@ if (bookingForm) {
 
     const selectedDate = new Date(date);
     const today = new Date();
+
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       showPopup("Invalid Date", "Please select today or a future date.");
+
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
       return;
@@ -307,6 +336,7 @@ if (bookingForm) {
           "Date Unavailable",
           "This package is already booked for the selected date. Please choose another date."
         );
+
         submitBtn.disabled = false;
         submitBtn.textContent = originalBtnText;
         return;
@@ -332,9 +362,8 @@ if (bookingForm) {
         `payment_proofs/${currentUser.uid}/${bookingId}_${safeFileName}`
       );
 
-      await uploadBytes(storageRef, proofFile);
-
-      const paymentProofUrl = await getDownloadURL(storageRef);
+      const uploadResult = await uploadBytes(storageRef, proofFile);
+      const paymentProofUrl = await getDownloadURL(uploadResult.ref);
 
       const basePrice = Number(selectedTrip.price || 0);
       const totalPrice = basePrice > 0 ? basePrice * people : 0;
@@ -384,7 +413,7 @@ if (bookingForm) {
 
       showPopup(
         "Booking Error",
-        "There was an error submitting your booking. Please try again."
+        error.message || "There was an error submitting your booking. Please try again."
       );
 
     } finally {
