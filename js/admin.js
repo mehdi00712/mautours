@@ -43,12 +43,7 @@ const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
-
 const logoutBtn = document.getElementById("logoutBtn");
-
-/* =========================
-   HELPERS
-========================= */
 
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
@@ -77,7 +72,7 @@ function setMessage(id, message, isError = false) {
   if (!el) return;
 
   el.textContent = message;
-  el.style.color = isError ? "#dc2626" : "#023e8a";
+  el.style.color = isError ? "#dc2626" : "#071827";
 }
 
 function escapeHtml(value) {
@@ -111,16 +106,20 @@ function formatPrice(data) {
 }
 
 async function uploadFile(path, file) {
+  if (!file) return "";
+
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const storageRef = ref(storage, `${path}/${Date.now()}_${safeName}`);
+  const fullPath = `${path}/${Date.now()}_${safeName}`;
+  const storageRef = ref(storage, fullPath);
 
-  await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
+  try {
+    const uploadResult = await uploadBytes(storageRef, file);
+    return await getDownloadURL(uploadResult.ref);
+  } catch (error) {
+    console.error("Upload failed:", error);
+    throw new Error("Image upload failed. Check Firebase Storage rules.");
+  }
 }
-
-/* =========================
-   AUTH CHECK
-========================= */
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -165,7 +164,8 @@ if (websiteSettingsForm) {
       showPopup("Saved", "Website settings have been updated.");
     } catch (error) {
       console.error("Settings Error:", error);
-      setMessage("settingsMessage", "Failed to save website settings.", true);
+      setMessage("settingsMessage", error.message || "Failed to save website settings.", true);
+      showPopup("Settings Error", error.message || "Failed to save website settings.");
     }
   });
 }
@@ -220,7 +220,8 @@ if (homeContentForm) {
       showPopup("Saved", "Homepage content has been updated.");
     } catch (error) {
       console.error("Homepage Error:", error);
-      setMessage("homeContentMessage", "Failed to save homepage.", true);
+      setMessage("homeContentMessage", error.message || "Failed to save homepage.", true);
+      showPopup("Homepage Error", error.message || "Failed to save homepage.");
     }
   });
 }
@@ -275,6 +276,10 @@ if (tripForm) {
         updatedAt: serverTimestamp()
       };
 
+      if (!payload.title || !payload.category || !payload.description || !payload.duration) {
+        throw new Error("Please fill in all required trip fields.");
+      }
+
       if (!tripId) {
         payload.createdAt = serverTimestamp();
       }
@@ -286,14 +291,18 @@ if (tripForm) {
       await setDoc(tripRef, payload, { merge: true });
 
       tripForm.reset();
-      if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
+
+      if (document.getElementById("tripId")) {
+        document.getElementById("tripId").value = "";
+      }
 
       setMessage("tripMessage", "Trip saved successfully.");
       showPopup("Trip Saved", "The trip/package has been saved.");
       loadTrips();
     } catch (error) {
       console.error("Trip Save Error:", error);
-      setMessage("tripMessage", "Failed to save trip.", true);
+      setMessage("tripMessage", error.message || "Failed to save trip.", true);
+      showPopup("Trip Save Error", error.message || "Failed to save trip.");
     }
   });
 }
@@ -301,7 +310,11 @@ if (tripForm) {
 if (resetTripForm) {
   resetTripForm.addEventListener("click", () => {
     tripForm.reset();
-    if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
+
+    if (document.getElementById("tripId")) {
+      document.getElementById("tripId").value = "";
+    }
+
     setMessage("tripMessage", "Form cleared.");
   });
 }
@@ -336,7 +349,11 @@ async function loadTrips() {
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
 
-        ${data.imageUrl ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">` : ""}
+        ${
+          data.imageUrl
+            ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
+            : ""
+        }
 
         <div class="admin-trip-actions">
           <button class="edit-trip-btn" data-id="${tripId}">Edit</button>
@@ -353,7 +370,7 @@ async function loadTrips() {
     bindTripButtons(snapshot);
   } catch (error) {
     console.error("Load Trips Error:", error);
-    adminTripsList.innerHTML = `<p style="color:red;">Failed to load trips.</p>`;
+    adminTripsList.innerHTML = `<p style="color:red;">Failed to load trips: ${escapeHtml(error.message)}</p>`;
   }
 }
 
@@ -372,24 +389,30 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripDuration").value = data.duration || "";
       document.getElementById("tripPrice").value = data.price || 0;
       document.getElementById("tripPriceType").value = data.priceType || "Custom Quote";
-      document.getElementById("tripIncludes").value = Array.isArray(data.includes) ? data.includes.join("\n") : "";
+      document.getElementById("tripIncludes").value = Array.isArray(data.includes)
+        ? data.includes.join("\n")
+        : "";
 
       setMessage("tripMessage", "Editing trip. Make changes and click Save Trip.");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("tripForm")?.scrollIntoView({ behavior: "smooth" });
     });
   });
 
   document.querySelectorAll(".toggle-trip-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const currentlyActive = btn.dataset.active === "true";
+      try {
+        const currentlyActive = btn.dataset.active === "true";
 
-      await updateDoc(doc(db, "trips", btn.dataset.id), {
-        active: !currentlyActive,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          active: !currentlyActive,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Trip Updated", currentlyActive ? "Trip disabled." : "Trip enabled.");
-      loadTrips();
+        showPopup("Trip Updated", currentlyActive ? "Trip disabled." : "Trip enabled.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Trip Error", error.message || "Could not update trip.");
+      }
     });
   });
 
@@ -397,9 +420,13 @@ function bindTripButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this trip permanently?")) return;
 
-      await deleteDoc(doc(db, "trips", btn.dataset.id));
-      showPopup("Trip Deleted", "The trip has been removed.");
-      loadTrips();
+      try {
+        await deleteDoc(doc(db, "trips", btn.dataset.id));
+        showPopup("Trip Deleted", "The trip has been removed.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete trip.");
+      }
     });
   });
 }
@@ -434,15 +461,18 @@ if (galleryForm) {
         category,
         imageUrl,
         active: true,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
       });
 
       galleryForm.reset();
       setMessage("galleryMessage", "Gallery image uploaded.");
+      showPopup("Gallery Saved", "Gallery image uploaded successfully.");
       loadGalleryImages();
     } catch (error) {
       console.error("Gallery Upload Error:", error);
-      setMessage("galleryMessage", "Failed to upload gallery image.", true);
+      setMessage("galleryMessage", error.message || "Failed to upload gallery image.", true);
+      showPopup("Gallery Error", error.message || "Failed to upload gallery image.");
     }
   });
 }
@@ -473,7 +503,12 @@ async function loadGalleryImages() {
         <h4>${escapeHtml(data.title || "Gallery Image")}</h4>
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
-        <img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">
+
+        ${
+          data.imageUrl
+            ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
+            : ""
+        }
 
         <div class="admin-trip-actions">
           <button class="toggle-gallery-btn" data-id="${docSnap.id}" data-active="${data.active}">
@@ -489,22 +524,26 @@ async function loadGalleryImages() {
     bindGalleryButtons();
   } catch (error) {
     console.error("Load Gallery Error:", error);
-    galleryImagesList.innerHTML = `<p style="color:red;">Failed to load gallery images.</p>`;
+    galleryImagesList.innerHTML = `<p style="color:red;">Failed to load gallery images: ${escapeHtml(error.message)}</p>`;
   }
 }
 
 function bindGalleryButtons() {
   document.querySelectorAll(".toggle-gallery-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const active = btn.dataset.active === "true";
+      try {
+        const active = btn.dataset.active === "true";
 
-      await updateDoc(doc(db, "gallery", btn.dataset.id), {
-        active: !active,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "gallery", btn.dataset.id), {
+          active: !active,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
-      loadGalleryImages();
+        showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
+        loadGalleryImages();
+      } catch (error) {
+        showPopup("Gallery Error", error.message || "Could not update gallery image.");
+      }
     });
   });
 
@@ -512,9 +551,13 @@ function bindGalleryButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this gallery image?")) return;
 
-      await deleteDoc(doc(db, "gallery", btn.dataset.id));
-      showPopup("Image Deleted", "Gallery image removed.");
-      loadGalleryImages();
+      try {
+        await deleteDoc(doc(db, "gallery", btn.dataset.id));
+        showPopup("Image Deleted", "Gallery image removed.");
+        loadGalleryImages();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete gallery image.");
+      }
     });
   });
 }
@@ -616,15 +659,19 @@ async function loadBookings() {
 function bindBookingButtons() {
   document.querySelectorAll(".approve-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      await updateDoc(doc(db, "bookings", btn.dataset.id), {
-        bookingStatus: "Confirmed",
-        paymentStatus: "Verified",
-        adminDecision: "Approved",
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "bookings", btn.dataset.id), {
+          bookingStatus: "Confirmed",
+          paymentStatus: "Verified",
+          adminDecision: "Approved",
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Booking Approved", "The booking has been confirmed.");
-      loadBookings();
+        showPopup("Booking Approved", "The booking has been confirmed.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Approve Error", error.message || "Could not approve booking.");
+      }
     });
   });
 
@@ -632,16 +679,20 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       const reason = prompt("Enter rejection reason:");
 
-      await updateDoc(doc(db, "bookings", btn.dataset.id), {
-        bookingStatus: "Rejected",
-        paymentStatus: "Rejected",
-        adminDecision: "Rejected",
-        rejectionReason: reason || "No reason provided",
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "bookings", btn.dataset.id), {
+          bookingStatus: "Rejected",
+          paymentStatus: "Rejected",
+          adminDecision: "Rejected",
+          rejectionReason: reason || "No reason provided",
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Booking Rejected", "The booking has been rejected.");
-      loadBookings();
+        showPopup("Booking Rejected", "The booking has been rejected.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Reject Error", error.message || "Could not reject booking.");
+      }
     });
   });
 
@@ -649,9 +700,13 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this booking?")) return;
 
-      await deleteDoc(doc(db, "bookings", btn.dataset.id));
-      showPopup("Booking Deleted", "The booking has been removed.");
-      loadBookings();
+      try {
+        await deleteDoc(doc(db, "bookings", btn.dataset.id));
+        showPopup("Booking Deleted", "The booking has been removed.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete booking.");
+      }
     });
   });
 }
