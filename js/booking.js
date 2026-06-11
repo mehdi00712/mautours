@@ -30,6 +30,7 @@ const storage = getStorage(app);
 
 let currentUser = null;
 let selectedTrip = null;
+let selectedVehicle = null;
 
 const dynamicTrips = document.getElementById("dynamicTrips");
 
@@ -37,6 +38,13 @@ const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
 const bookingForm = document.getElementById("bookingForm");
 const selectedPackageInput = document.getElementById("selectedPackage");
+
+const vehicleOptionsList = document.getElementById("vehicleOptionsList");
+const selectedVehicleNameInput = document.getElementById("selectedVehicleName");
+const selectedVehiclePriceInput = document.getElementById("selectedVehiclePrice");
+const selectedVehicleCapacityInput = document.getElementById("selectedVehicleCapacity");
+const selectedVehicleImageUrlInput = document.getElementById("selectedVehicleImageUrl");
+const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
@@ -87,18 +95,15 @@ function getDurationDays(durationText) {
   if (text.includes("full")) return 1;
 
   const match = text.match(/\d+/);
-
   if (!match) return 1;
 
   const days = Number(match[0]);
-
   return days > 0 ? days : 1;
 }
 
 function addDaysToDate(dateString, daysToAdd) {
   const date = new Date(`${dateString}T00:00:00`);
   date.setDate(date.getDate() + daysToAdd);
-
   return date.toISOString().split("T")[0];
 }
 
@@ -119,6 +124,16 @@ function formatDateList(dates) {
 
 function formatPrice(trip) {
   const price = Number(trip.price || 0);
+
+  if (Array.isArray(trip.vehicles) && trip.vehicles.length > 0) {
+    const prices = trip.vehicles
+      .map((vehicle) => Number(vehicle.price || 0))
+      .filter((priceValue) => priceValue > 0);
+
+    if (prices.length > 0) {
+      return `From Rs ${Math.min(...prices).toLocaleString()}`;
+    }
+  }
 
   if (price <= 0 || trip.priceType === "Custom Quote") {
     return "Custom Quote";
@@ -163,6 +178,112 @@ function unlockBodyScroll() {
 function closeBookingModal() {
   if (modal) modal.classList.remove("show");
   unlockBodyScroll();
+}
+
+function getPeopleCount() {
+  const peopleInput = document.getElementById("people");
+  const people = Number(peopleInput?.value || 1);
+  return people > 0 ? people : 1;
+}
+
+function updateEstimatedTotal() {
+  if (!bookingEstimatedTotal) return;
+
+  const people = getPeopleCount();
+  const vehiclePrice = Number(selectedVehicle?.price || 0);
+  const basePrice = Number(selectedTrip?.price || 0);
+
+  let total = 0;
+
+  if (selectedVehicle && vehiclePrice > 0) {
+    total = vehiclePrice * people;
+  } else if (basePrice > 0) {
+    total = basePrice * people;
+  }
+
+  bookingEstimatedTotal.textContent =
+    total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
+}
+
+function setSelectedVehicle(vehicle, vehicleCard = null) {
+  selectedVehicle = vehicle;
+
+  if (selectedVehicleNameInput) selectedVehicleNameInput.value = vehicle.name || "";
+  if (selectedVehiclePriceInput) selectedVehiclePriceInput.value = Number(vehicle.price || 0);
+  if (selectedVehicleCapacityInput) selectedVehicleCapacityInput.value = Number(vehicle.capacity || 0);
+  if (selectedVehicleImageUrlInput) selectedVehicleImageUrlInput.value = vehicle.imageUrl || "";
+
+  document.querySelectorAll(".vehicle-option-card").forEach((card) => {
+    card.classList.remove("selected");
+  });
+
+  if (vehicleCard) {
+    vehicleCard.classList.add("selected");
+  }
+
+  updateEstimatedTotal();
+}
+
+function renderVehicleOptions(trip) {
+  if (!vehicleOptionsList) return;
+
+  selectedVehicle = null;
+
+  if (selectedVehicleNameInput) selectedVehicleNameInput.value = "";
+  if (selectedVehiclePriceInput) selectedVehiclePriceInput.value = "";
+  if (selectedVehicleCapacityInput) selectedVehicleCapacityInput.value = "";
+  if (selectedVehicleImageUrlInput) selectedVehicleImageUrlInput.value = "";
+
+  const vehicles = Array.isArray(trip.vehicles)
+    ? trip.vehicles.filter((vehicle) => vehicle && vehicle.name)
+    : [];
+
+  if (vehicles.length === 0) {
+    vehicleOptionsList.innerHTML = `
+      <div class="vehicle-empty">
+        No vehicle options were added for this package.
+      </div>
+    `;
+
+    updateEstimatedTotal();
+    return;
+  }
+
+  vehicleOptionsList.innerHTML = "";
+
+  vehicles.forEach((vehicle, index) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "vehicle-option-card";
+
+    const price = Number(vehicle.price || 0);
+    const capacity = Number(vehicle.capacity || 0);
+
+    card.innerHTML = `
+      ${
+        vehicle.imageUrl
+          ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
+          : `<div class="vehicle-placeholder">🚘</div>`
+      }
+
+      <div class="vehicle-option-info">
+        <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+        ${capacity > 0 ? `<span>${capacity} passengers</span>` : ""}
+        ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
+        <b>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</b>
+      </div>
+    `;
+
+    card.addEventListener("click", () => {
+      setSelectedVehicle(vehicle, card);
+    });
+
+    vehicleOptionsList.appendChild(card);
+
+    if (index === 0) {
+      setSelectedVehicle(vehicle, card);
+    }
+  });
 }
 
 async function loadTrips() {
@@ -224,6 +345,8 @@ async function loadTrips() {
       const includes = formatIncludes(trip.includes);
       const priceText = escapeHtml(formatPrice(trip));
 
+      const vehicleCount = Array.isArray(trip.vehicles) ? trip.vehicles.length : 0;
+
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
 
@@ -234,6 +357,12 @@ async function loadTrips() {
         <p>${description}</p>
 
         ${duration ? `<p><strong class="duration-label">Duration:</strong> ${duration}</p>` : ""}
+
+        ${
+          vehicleCount > 0
+            ? `<p><strong>Vehicles:</strong> ${vehicleCount} option${vehicleCount > 1 ? "s" : ""}</p>`
+            : ""
+        }
 
         ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
 
@@ -274,15 +403,25 @@ function openBookingModal(trip) {
   }
 
   selectedTrip = trip;
+  selectedVehicle = null;
 
   if (selectedPackageInput) {
     selectedPackageInput.value = trip.title || "";
   }
 
+  renderVehicleOptions(trip);
+  updateEstimatedTotal();
+
   if (modal) {
     modal.classList.add("show");
     lockBodyScroll();
   }
+}
+
+const peopleInput = document.getElementById("people");
+
+if (peopleInput) {
+  peopleInput.addEventListener("input", updateEstimatedTotal);
 }
 
 if (closeModal) {
@@ -312,6 +451,15 @@ if (bookingForm) {
 
     if (!selectedTrip || !selectedTrip.id) {
       showPopup("No Package Selected", "Please select a package first.");
+      return;
+    }
+
+    const vehicles = Array.isArray(selectedTrip.vehicles)
+      ? selectedTrip.vehicles.filter((vehicle) => vehicle && vehicle.name)
+      : [];
+
+    if (vehicles.length > 0 && !selectedVehicle) {
+      showPopup("Vehicle Required", "Please choose a vehicle before submitting your booking.");
       return;
     }
 
@@ -387,6 +535,8 @@ if (bookingForm) {
         await setDoc(slotRef, {
           tripId: selectedTrip.id,
           package: selectedTrip.title || "",
+          vehicleName: selectedVehicle?.name || "",
+          vehiclePrice: Number(selectedVehicle?.price || 0),
           date: bookingDate,
           startDate: date,
           reservedDates: bookingDates,
@@ -409,8 +559,10 @@ if (bookingForm) {
       const uploadResult = await uploadBytes(storageRef, proofFile);
       const paymentProofUrl = await getDownloadURL(uploadResult.ref);
 
+      const vehiclePrice = Number(selectedVehicle?.price || 0);
       const basePrice = Number(selectedTrip.price || 0);
-      const totalPrice = basePrice > 0 ? basePrice * people : 0;
+      const pricePerPerson = vehiclePrice > 0 ? vehiclePrice : basePrice;
+      const totalPrice = pricePerPerson > 0 ? pricePerPerson * people : 0;
 
       await setDoc(bookingRef, {
         userId: currentUser.uid,
@@ -430,7 +582,13 @@ if (bookingForm) {
 
         package: selectedTrip.title || "",
 
-        pricePerPerson: basePrice,
+        vehicleName: selectedVehicle?.name || "",
+        vehiclePrice,
+        vehicleCapacity: Number(selectedVehicle?.capacity || 0),
+        vehicleImageUrl: selectedVehicle?.imageUrl || "",
+        vehicleDescription: selectedVehicle?.description || "",
+
+        pricePerPerson,
         totalPrice,
         priceType: selectedTrip.priceType || "Custom Quote",
 
@@ -448,6 +606,7 @@ if (bookingForm) {
       closeBookingModal();
       bookingForm.reset();
       selectedTrip = null;
+      selectedVehicle = null;
 
       showPopup(
         "Booking Submitted ✅",
