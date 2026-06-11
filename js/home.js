@@ -145,8 +145,8 @@ async function loadFeaturedTrips() {
 
   grid.innerHTML = `
     <div class="loading-card">
-      <h3>Loading Packages...</h3>
-      <p>Please wait while we load the latest experiences.</p>
+      <h3>Loading Featured Packages...</h3>
+      <p>Please wait while we load selected packages.</p>
     </div>
   `;
 
@@ -156,8 +156,8 @@ async function loadFeaturedTrips() {
     if (snapshot.empty) {
       grid.innerHTML = `
         <div class="loading-card">
-          <h3>No Packages Yet</h3>
-          <p>Add trips from the admin dashboard to show them here.</p>
+          <h3>No Featured Packages Yet</h3>
+          <p>Add trips from the admin dashboard and tick “Show on Featured Packages”.</p>
         </div>
       `;
       return;
@@ -169,6 +169,7 @@ async function loadFeaturedTrips() {
       const trip = docSnap.data();
 
       if (trip.active === false) return;
+      if (trip.featured !== true) return;
 
       trips.push({
         id: docSnap.id,
@@ -183,8 +184,8 @@ async function loadFeaturedTrips() {
     if (featuredTrips.length === 0) {
       grid.innerHTML = `
         <div class="loading-card">
-          <h3>No Active Packages</h3>
-          <p>All trips are currently disabled by the admin.</p>
+          <h3>No Featured Packages Selected</h3>
+          <p>Go to Admin → Trip Manager and tick “Show on Featured Packages” for the packages you want here.</p>
         </div>
       `;
       return;
@@ -221,7 +222,7 @@ async function loadFeaturedTrips() {
 
     grid.innerHTML = `
       <div class="loading-card">
-        <h3>Could Not Load Packages</h3>
+        <h3>Could Not Load Featured Packages</h3>
         <p>${escapeHtml(error.message || "Please try again later.")}</p>
       </div>
     `;
