@@ -35,11 +35,10 @@
       <span class="section-label center-label">Admin Panel</span>
       <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Manage homepage content, trips, gallery images, bookings and payment validation.
+        Manage homepage content, trips, vehicles, gallery images, bookings and payment validation.
       </p>
     </div>
 
-    <!-- WEBSITE SETTINGS -->
     <div class="admin-media-box">
       <h3>Website Settings</h3>
       <p>Update the main business details used across the website.</p>
@@ -57,24 +56,15 @@
       <div id="settingsMessage"></div>
     </div>
 
-    <!-- HOMEPAGE MANAGER -->
     <div class="admin-media-box">
       <h3>Homepage Manager</h3>
       <p>Edit the main homepage hero content shown to customers.</p>
 
       <form id="homeContentForm" class="media-upload-form">
         <input type="text" id="homeHeroTitle" placeholder="Hero title" required />
-
-        <textarea
-          id="homeHeroSubtitle"
-          placeholder="Hero subtitle"
-          required
-        ></textarea>
-
+        <textarea id="homeHeroSubtitle" placeholder="Hero subtitle" required></textarea>
         <input type="text" id="homeBadge" placeholder="Hero badge text" />
-
         <input type="text" id="homeCtaText" placeholder="CTA button text e.g. Book via WhatsApp" required />
-
         <input type="file" id="homeHeroImage" accept="image/*" />
 
         <button type="submit" class="btn">Save Homepage</button>
@@ -83,7 +73,6 @@
       <div id="homeContentMessage"></div>
     </div>
 
-    <!-- GALLERY MANAGER -->
     <div class="admin-media-box">
       <h3>Gallery Manager</h3>
       <p>Upload images for homepage gallery, luxury visuals, activities or packages.</p>
@@ -98,6 +87,7 @@
           <option value="package">Package</option>
           <option value="luxury">Luxury</option>
           <option value="activity">Activity</option>
+          <option value="vehicle">Vehicle</option>
         </select>
 
         <input type="file" id="galleryImage" accept="image/*" required />
@@ -106,11 +96,9 @@
       </form>
 
       <div id="galleryMessage"></div>
-
       <div id="galleryImagesList" class="admin-trip-list"></div>
     </div>
 
-    <!-- TRIP MANAGER -->
     <div class="admin-media-box">
       <h3>Trip / Package Manager</h3>
       <p>
@@ -138,23 +126,19 @@
           <option value="Helicopter">Helicopter</option>
         </select>
 
-        <textarea
-          id="tripDescription"
-          placeholder="Trip description"
-          required
-        ></textarea>
+        <textarea id="tripDescription" placeholder="Trip description" required></textarea>
 
         <input
           type="text"
           id="tripDuration"
-          placeholder="Duration e.g. Full day / 3 days / 5–9 days"
+          placeholder="Duration e.g. Full day / 3 days / 5 days"
           required
         />
 
         <input
           type="number"
           id="tripPrice"
-          placeholder="Price. Use 0 for custom quote"
+          placeholder="Base price. Use 0 if price depends only on vehicle"
           required
         />
 
@@ -162,6 +146,7 @@
           <option value="Fixed">Fixed Price</option>
           <option value="Starting From">Starting From</option>
           <option value="Custom Quote">Custom Quote</option>
+          <option value="Vehicle Based">Vehicle Based</option>
         </select>
 
         <textarea
@@ -174,6 +159,56 @@
           <span>Show on Featured Packages</span>
         </label>
 
+        <div class="vehicle-manager">
+          <h4>Vehicle Options</h4>
+          <p>
+            Add vehicles available for this package. Customers will choose one during booking.
+            Vehicle price will be used to calculate the booking total.
+          </p>
+
+          <div id="vehicleOptionsContainer">
+            <div class="vehicle-item">
+              <input
+                type="text"
+                class="vehicleName"
+                placeholder="Vehicle name e.g. SUV, Luxury Sedan, Minibus"
+              />
+
+              <input
+                type="number"
+                class="vehiclePrice"
+                placeholder="Vehicle price"
+              />
+
+              <input
+                type="number"
+                class="vehicleCapacity"
+                placeholder="Passenger capacity"
+              />
+
+              <input
+                type="text"
+                class="vehicleDescription"
+                placeholder="Short description e.g. Comfortable SUV for families"
+              />
+
+              <input
+                type="file"
+                class="vehicleImage"
+                accept="image/*"
+              />
+
+              <button type="button" class="btn-outline removeVehicleBtn">
+                Remove Vehicle
+              </button>
+            </div>
+          </div>
+
+          <button type="button" id="addVehicleBtn" class="btn">
+            + Add Vehicle
+          </button>
+        </div>
+
         <input type="file" id="tripImage" accept="image/*" />
 
         <button type="submit" class="btn">Save Trip</button>
@@ -181,11 +216,9 @@
       </form>
 
       <div id="tripMessage"></div>
-
       <div id="adminTripsList" class="admin-trip-list"></div>
     </div>
 
-    <!-- REVENUE -->
     <div id="revenueSummary" class="summary-box">
       <h3>Total Confirmed Revenue</h3>
 
@@ -196,7 +229,6 @@
       <p id="revenueValue">Rs 0</p>
     </div>
 
-    <!-- BOOKING STATS -->
     <div class="admin-status-grid">
       <div class="admin-status-card">
         <h3 id="totalBookingsValue">0</h3>
@@ -225,7 +257,6 @@
       Admin verifies the proof, then approves or rejects the booking.
     </div>
 
-    <!-- BOOKINGS TABLE -->
     <div class="table-wrapper">
       <table id="bookingsTable">
         <thead>
@@ -234,6 +265,7 @@
             <th>Phone</th>
             <th>Email</th>
             <th>Package</th>
+            <th>Vehicle</th>
             <th>Date</th>
             <th>People</th>
             <th>Total</th>
@@ -245,13 +277,12 @@
 
         <tbody>
           <tr>
-            <td colspan="10">Loading bookings...</td>
+            <td colspan="11">Loading bookings...</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- HOMEPAGE PREVIEW -->
     <div class="admin-media-box">
       <h3>Homepage Preview</h3>
       <p>Preview the public homepage after making changes.</p>
