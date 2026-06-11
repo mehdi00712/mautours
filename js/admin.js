@@ -70,7 +70,6 @@ function setText(id, value) {
 function setMessage(id, message, isError = false) {
   const el = document.getElementById(id);
   if (!el) return;
-
   el.textContent = message;
   el.style.color = isError ? "#dc2626" : "#071827";
 }
@@ -94,13 +93,8 @@ function toIncludesArray(value) {
 function formatPrice(data) {
   const price = Number(data.price || 0);
 
-  if (price <= 0 || data.priceType === "Custom Quote") {
-    return "Custom Quote";
-  }
-
-  if (data.priceType === "Fixed") {
-    return `Rs ${price.toLocaleString()}`;
-  }
+  if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
+  if (data.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
 
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
@@ -120,6 +114,175 @@ async function uploadFile(path, file) {
     throw new Error("Image upload failed. Check Firebase Storage rules.");
   }
 }
+
+/* =========================
+   VEHICLE MANAGER HELPERS
+========================= */
+
+const vehicleOptionsContainer = document.getElementById("vehicleOptionsContainer");
+const addVehicleBtn = document.getElementById("addVehicleBtn");
+
+function createVehicleItem(vehicle = {}) {
+  const div = document.createElement("div");
+  div.className = "vehicle-item";
+
+  div.innerHTML = `
+    <input
+      type="text"
+      class="vehicleName"
+      placeholder="Vehicle name e.g. SUV, Luxury Sedan, Minibus"
+      value="${escapeHtml(vehicle.name || "")}"
+    />
+
+    <input
+      type="number"
+      class="vehiclePrice"
+      placeholder="Vehicle price"
+      value="${escapeHtml(vehicle.price || "")}"
+    />
+
+    <input
+      type="number"
+      class="vehicleCapacity"
+      placeholder="Passenger capacity"
+      value="${escapeHtml(vehicle.capacity || "")}"
+    />
+
+    <input
+      type="text"
+      class="vehicleDescription"
+      placeholder="Short description e.g. Comfortable SUV for families"
+      value="${escapeHtml(vehicle.description || "")}"
+    />
+
+    ${
+      vehicle.imageUrl
+        ? `<img src="${escapeHtml(vehicle.imageUrl)}" class="vehicle-preview-img" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
+        : ""
+    }
+
+    <input
+      type="hidden"
+      class="vehicleExistingImageUrl"
+      value="${escapeHtml(vehicle.imageUrl || "")}"
+    />
+
+    <input
+      type="file"
+      class="vehicleImage"
+      accept="image/*"
+    />
+
+    <button type="button" class="btn-outline removeVehicleBtn">
+      Remove Vehicle
+    </button>
+  `;
+
+  const removeBtn = div.querySelector(".removeVehicleBtn");
+
+  removeBtn.addEventListener("click", () => {
+    const allVehicles = vehicleOptionsContainer.querySelectorAll(".vehicle-item");
+
+    if (allVehicles.length <= 1) {
+      div.querySelector(".vehicleName").value = "";
+      div.querySelector(".vehiclePrice").value = "";
+      div.querySelector(".vehicleCapacity").value = "";
+      div.querySelector(".vehicleDescription").value = "";
+      div.querySelector(".vehicleExistingImageUrl").value = "";
+
+      const preview = div.querySelector(".vehicle-preview-img");
+      if (preview) preview.remove();
+
+      return;
+    }
+
+    div.remove();
+  });
+
+  return div;
+}
+
+function resetVehicleOptions() {
+  if (!vehicleOptionsContainer) return;
+
+  vehicleOptionsContainer.innerHTML = "";
+  vehicleOptionsContainer.appendChild(createVehicleItem());
+}
+
+function loadVehiclesIntoForm(vehicles = []) {
+  if (!vehicleOptionsContainer) return;
+
+  vehicleOptionsContainer.innerHTML = "";
+
+  if (!Array.isArray(vehicles) || vehicles.length === 0) {
+    vehicleOptionsContainer.appendChild(createVehicleItem());
+    return;
+  }
+
+  vehicles.forEach((vehicle) => {
+    vehicleOptionsContainer.appendChild(createVehicleItem(vehicle));
+  });
+}
+
+async function collectVehicles(tripId) {
+  if (!vehicleOptionsContainer) return [];
+
+  const vehicleItems = Array.from(vehicleOptionsContainer.querySelectorAll(".vehicle-item"));
+  const vehicles = [];
+
+  for (let index = 0; index < vehicleItems.length; index++) {
+    const item = vehicleItems[index];
+
+    const name = item.querySelector(".vehicleName")?.value.trim() || "";
+    const price = Number(item.querySelector(".vehiclePrice")?.value || 0);
+    const capacity = Number(item.querySelector(".vehicleCapacity")?.value || 0);
+    const description = item.querySelector(".vehicleDescription")?.value.trim() || "";
+    const existingImageUrl = item.querySelector(".vehicleExistingImageUrl")?.value.trim() || "";
+    const imageFile = item.querySelector(".vehicleImage")?.files[0];
+
+    if (!name && !price && !capacity && !description && !imageFile && !existingImageUrl) {
+      continue;
+    }
+
+    if (!name) {
+      throw new Error("Each vehicle must have a vehicle name.");
+    }
+
+    if (price < 0) {
+      throw new Error("Vehicle price cannot be negative.");
+    }
+
+    let imageUrl = existingImageUrl;
+
+    if (imageFile) {
+      imageUrl = await uploadFile(`vehicle_images/${tripId}`, imageFile);
+    }
+
+    vehicles.push({
+      name,
+      price,
+      capacity,
+      description,
+      imageUrl
+    });
+  }
+
+  return vehicles;
+}
+
+if (addVehicleBtn && vehicleOptionsContainer) {
+  addVehicleBtn.addEventListener("click", () => {
+    vehicleOptionsContainer.appendChild(createVehicleItem());
+  });
+}
+
+if (vehicleOptionsContainer) {
+  resetVehicleOptions();
+}
+
+/* =========================
+   AUTH
+========================= */
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -264,6 +427,8 @@ if (tripForm) {
         ? doc(db, "trips", tripId)
         : doc(collection(db, "trips"));
 
+      const vehicles = await collectVehicles(tripRef.id);
+
       const payload = {
         title: document.getElementById("tripTitle")?.value.trim() || "",
         category: document.getElementById("tripCategory")?.value || "",
@@ -272,6 +437,7 @@ if (tripForm) {
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
+        vehicles,
         featured: document.getElementById("tripFeatured")?.checked || false,
         active: true,
         updatedAt: serverTimestamp()
@@ -292,13 +458,11 @@ if (tripForm) {
       await setDoc(tripRef, payload, { merge: true });
 
       tripForm.reset();
-
-      if (document.getElementById("tripId")) {
-        document.getElementById("tripId").value = "";
-      }
+      document.getElementById("tripId").value = "";
+      resetVehicleOptions();
 
       setMessage("tripMessage", "Trip saved successfully.");
-      showPopup("Trip Saved", "The trip/package has been saved.");
+      showPopup("Trip Saved", "The trip/package and vehicle options have been saved.");
       loadTrips();
     } catch (error) {
       console.error("Trip Save Error:", error);
@@ -320,6 +484,7 @@ if (resetTripForm) {
       document.getElementById("tripFeatured").checked = false;
     }
 
+    resetVehicleOptions();
     setMessage("tripMessage", "Form cleared.");
   });
 }
@@ -348,6 +513,26 @@ async function loadTrips() {
         ? `<p><strong>Featured:</strong> Yes, shown on homepage</p>`
         : `<p><strong>Featured:</strong> No</p>`;
 
+      const vehiclesHtml = Array.isArray(data.vehicles) && data.vehicles.length > 0
+        ? `
+          <div class="admin-vehicle-list">
+            <strong>Vehicles:</strong>
+            ${data.vehicles.map(vehicle => `
+              <div class="admin-vehicle-mini">
+                ${
+                  vehicle.imageUrl
+                    ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
+                    : ""
+                }
+                <span>${escapeHtml(vehicle.name || "Vehicle")}</span>
+                <span>Rs ${Number(vehicle.price || 0).toLocaleString()}</span>
+                <span>${Number(vehicle.capacity || 0)} pax</span>
+              </div>
+            `).join("")}
+          </div>
+        `
+        : `<p><strong>Vehicles:</strong> None added</p>`;
+
       const card = document.createElement("div");
       card.className = "admin-trip-card";
 
@@ -358,10 +543,11 @@ async function loadTrips() {
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
         ${featuredBadge}
+        ${vehiclesHtml}
 
         ${
           data.imageUrl
-            ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
+            ? `<img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
             : ""
         }
 
@@ -409,6 +595,8 @@ function bindTripButtons(snapshot) {
       if (document.getElementById("tripFeatured")) {
         document.getElementById("tripFeatured").checked = data.featured === true;
       }
+
+      loadVehiclesIntoForm(data.vehicles || []);
 
       setMessage("tripMessage", "Editing trip. Make changes and click Save Trip.");
       document.getElementById("tripForm")?.scrollIntoView({ behavior: "smooth" });
@@ -547,7 +735,7 @@ async function loadGalleryImages() {
 
         ${
           data.imageUrl
-            ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
+            ? `<img src="${escapeHtml(data.imageUrl)}" alt="${escapeHtml(data.title)}" style="width:100%;max-height:180px;object-fit:cover;border-radius:14px;">`
             : ""
         }
 
@@ -614,7 +802,7 @@ async function loadBookings() {
 
   if (!tableBody) return;
 
-  tableBody.innerHTML = `<tr><td colspan="10">Loading bookings...</td></tr>`;
+  tableBody.innerHTML = `<tr><td colspan="11">Loading bookings...</td></tr>`;
 
   try {
     const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
@@ -629,7 +817,7 @@ async function loadBookings() {
     let rejectedBookings = 0;
 
     if (snapshot.empty) {
-      tableBody.innerHTML = `<tr><td colspan="10">No bookings found.</td></tr>`;
+      tableBody.innerHTML = `<tr><td colspan="11">No bookings found.</td></tr>`;
     }
 
     snapshot.forEach((docSnap) => {
@@ -653,8 +841,12 @@ async function loadBookings() {
           : "Custom Quote";
 
       const proofLink = data.paymentProofUrl
-        ? `<a href="${data.paymentProofUrl}" target="_blank" class="proof-link">View Proof</a>`
+        ? `<a href="${escapeHtml(data.paymentProofUrl)}" target="_blank" class="proof-link">View Proof</a>`
         : "No Proof";
+
+      const vehicleText = data.vehicleName
+        ? `${data.vehicleName} / Rs ${Number(data.vehiclePrice || 0).toLocaleString()}`
+        : "-";
 
       const row = document.createElement("tr");
 
@@ -663,7 +855,8 @@ async function loadBookings() {
         <td>${escapeHtml(data.phone || "-")}</td>
         <td>${escapeHtml(data.email || "-")}</td>
         <td>${escapeHtml(data.package || "-")}</td>
-        <td>${escapeHtml(data.date || "-")}</td>
+        <td>${escapeHtml(vehicleText)}</td>
+        <td>${escapeHtml(data.date || data.startDate || "-")}</td>
         <td>${escapeHtml(data.people || "-")}</td>
         <td><strong>${total}</strong></td>
         <td>${proofLink}</td>
@@ -693,7 +886,7 @@ async function loadBookings() {
     bindBookingButtons();
   } catch (error) {
     console.error("Bookings Error:", error);
-    tableBody.innerHTML = `<tr><td colspan="10" style="color:red;">Error: ${error.message}</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="11" style="color:red;">Error: ${escapeHtml(error.message)}</td></tr>`;
   }
 }
 
@@ -751,10 +944,6 @@ function bindBookingButtons() {
     });
   });
 }
-
-/* =========================
-   LOGOUT
-========================= */
 
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
