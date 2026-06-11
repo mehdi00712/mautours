@@ -1513,3 +1513,86 @@ h2::after {
     width: 100%;
   }
 }
+
+/* ===== Homepage Layout Fix ===== */
+
+.home-hero {
+  min-height: 78vh;
+  margin-top: 72px;
+}
+
+.home-hero .hero-content {
+  padding-top: 1rem;
+  transform: translateY(-20px);
+}
+
+.home-hero .hero-content h2 {
+  font-size: clamp(3rem, 5vw, 5.2rem);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mobile-stats {
+  margin: -2.5rem auto 2.5rem;
+  background: var(--sand);
+  padding: 2rem;
+  border-radius: 0;
+}
+
+section {
+  padding: 4rem 0;
+}
+
+#packages-preview {
+  margin-top: 0;
+  padding-top: 4rem;
+}
+
+.services-section {
+  padding-top: 4rem;
+}
+
+.cta-section {
+  background:
+    linear-gradient(135deg, rgba(7, 24, 39, 0.82), rgba(7, 24, 39, 0.72)),
+    url("../assets/ile.jpg") center/cover no-repeat;
+}
+
+.cta-section h2,
+.cta-section p {
+  color: #ffffff !important;
+}
+
+.cta-section .section-label {
+  color: var(--gold);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#homeTripsGrid .loading-card,
+#homeGalleryGrid .loading-card {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .home-hero {
+    min-height: 78vh;
+  }
+
+  .home-hero .hero-content {
+    transform: translateY(0);
+  }
+
+  .mobile-stats {
+    margin: 0 auto 2rem;
+    padding: 1.5rem;
+  }
+
+  section {
+    padding: 3rem 0;
+  }
+
+  #packages-preview {
+    padding-top: 3rem;
+  }
+}
