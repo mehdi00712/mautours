@@ -1950,3 +1950,54 @@ section:nth-of-type(even) {
     max-height:92vh;
   }
 }
+
+.admin-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.admin-tab {
+  border: none;
+  background: #f5f1e8;
+  color: #071827;
+  padding: 14px 22px;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-tab.active {
+  background: #c9a227;
+  color: #071827;
+}
+
+.admin-tab-content {
+  display: none;
+}
+
+.admin-tab-content.active {
+  display: block;
+}
+
+.admin-section-title {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.friendly-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friendly-form label {
+  font-weight: 800;
+  color: #071827;
+}
+
+.friendly-form small {
+  color: #6b7280;
+}
