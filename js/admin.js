@@ -272,6 +272,7 @@ if (tripForm) {
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
+        featured: document.getElementById("tripFeatured")?.checked || false,
         active: true,
         updatedAt: serverTimestamp()
       };
@@ -315,6 +316,10 @@ if (resetTripForm) {
       document.getElementById("tripId").value = "";
     }
 
+    if (document.getElementById("tripFeatured")) {
+      document.getElementById("tripFeatured").checked = false;
+    }
+
     setMessage("tripMessage", "Form cleared.");
   });
 }
@@ -339,6 +344,10 @@ async function loadTrips() {
       const data = docSnap.data();
       const tripId = docSnap.id;
 
+      const featuredBadge = data.featured
+        ? `<p><strong>Featured:</strong> Yes, shown on homepage</p>`
+        : `<p><strong>Featured:</strong> No</p>`;
+
       const card = document.createElement("div");
       card.className = "admin-trip-card";
 
@@ -348,6 +357,7 @@ async function loadTrips() {
         <p><strong>Duration:</strong> ${escapeHtml(data.duration || "-")}</p>
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
+        ${featuredBadge}
 
         ${
           data.imageUrl
@@ -359,6 +369,9 @@ async function loadTrips() {
           <button class="edit-trip-btn" data-id="${tripId}">Edit</button>
           <button class="toggle-trip-btn" data-id="${tripId}" data-active="${data.active}">
             ${data.active ? "Disable" : "Enable"}
+          </button>
+          <button class="toggle-featured-trip-btn" data-id="${tripId}" data-featured="${data.featured === true}">
+            ${data.featured ? "Remove Featured" : "Make Featured"}
           </button>
           <button class="delete-trip-btn" data-id="${tripId}">Delete</button>
         </div>
@@ -393,6 +406,10 @@ function bindTripButtons(snapshot) {
         ? data.includes.join("\n")
         : "";
 
+      if (document.getElementById("tripFeatured")) {
+        document.getElementById("tripFeatured").checked = data.featured === true;
+      }
+
       setMessage("tripMessage", "Editing trip. Make changes and click Save Trip.");
       document.getElementById("tripForm")?.scrollIntoView({ behavior: "smooth" });
     });
@@ -412,6 +429,30 @@ function bindTripButtons(snapshot) {
         loadTrips();
       } catch (error) {
         showPopup("Trip Error", error.message || "Could not update trip.");
+      }
+    });
+  });
+
+  document.querySelectorAll(".toggle-featured-trip-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      try {
+        const currentlyFeatured = btn.dataset.featured === "true";
+
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          featured: !currentlyFeatured,
+          updatedAt: serverTimestamp()
+        });
+
+        showPopup(
+          "Featured Updated",
+          currentlyFeatured
+            ? "This trip was removed from Featured Packages."
+            : "This trip is now shown on Featured Packages."
+        );
+
+        loadTrips();
+      } catch (error) {
+        showPopup("Featured Error", error.message || "Could not update featured status.");
       }
     });
   });
