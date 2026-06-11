@@ -16,6 +16,7 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
       <a href="login.html">Sign In</a>
       <a href="admin.html" class="active">Dashboard</a>
     </nav>
@@ -39,26 +40,22 @@
       </p>
     </div>
 
-    <!-- QUICK ADMIN MENU -->
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="dashboardTab">Dashboard</button>
       <button class="admin-tab" data-tab="bookingsTab">Bookings</button>
+      <button class="admin-tab" data-tab="vehiclesTab">Vehicles</button>
       <button class="admin-tab" data-tab="packagesTab">Packages</button>
       <button class="admin-tab" data-tab="galleryTab">Gallery</button>
       <button class="admin-tab" data-tab="homepageTab">Homepage</button>
       <button class="admin-tab" data-tab="settingsTab">Settings</button>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboardTab" class="admin-tab-content active">
-
       <div id="revenueSummary" class="summary-box">
         <h3>Total Confirmed Revenue</h3>
-
         <div class="revenue-bar">
           <div id="revenueFill"></div>
         </div>
-
         <p id="revenueValue">Rs 0</p>
       </div>
 
@@ -90,9 +87,7 @@
       </div>
     </div>
 
-    <!-- BOOKINGS -->
     <div id="bookingsTab" class="admin-tab-content">
-
       <div class="admin-section-title">
         <h3>Customer Bookings</h3>
         <p>Approve, reject or delete customer bookings.</p>
@@ -115,7 +110,6 @@
               <th>Action</th>
             </tr>
           </thead>
-
           <tbody>
             <tr>
               <td colspan="11">Loading bookings...</td>
@@ -125,12 +119,76 @@
       </div>
     </div>
 
-    <!-- PACKAGES -->
-    <div id="packagesTab" class="admin-tab-content">
+    <div id="vehiclesTab" class="admin-tab-content">
+      <div class="admin-section-title">
+        <h3>Vehicle Fleet Manager</h3>
+        <p>
+          Add vehicles customers can view and select before booking.
+        </p>
+      </div>
 
+      <form id="vehicleForm" class="media-upload-form friendly-form">
+        <input type="hidden" id="vehicleId" />
+
+        <div class="form-group">
+          <label>Vehicle Name</label>
+          <input type="text" id="vehicleName" placeholder="Example: Toyota RAV4" required />
+        </div>
+
+        <div class="form-group">
+          <label>Vehicle Category</label>
+          <select id="vehicleCategory" required>
+            <option value="">Choose Category</option>
+            <option value="Standard">Standard</option>
+            <option value="SUV">SUV</option>
+            <option value="Minibus">Minibus</option>
+            <option value="Luxury">Luxury</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Passenger Capacity</label>
+          <input type="number" id="vehicleCapacity" placeholder="Example: 5" required />
+        </div>
+
+        <div class="form-group">
+          <label>Price</label>
+          <input type="number" id="vehiclePrice" placeholder="Example: 4500" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="vehicleDescription" placeholder="Comfortable SUV for families and airport transfers."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Vehicle Image</label>
+          <input type="file" id="vehicleImage" accept="image/*" />
+        </div>
+
+        <label class="admin-check-row">
+          <input type="checkbox" id="vehicleActive" checked />
+          <span>Vehicle Visible To Customers</span>
+        </label>
+
+        <button type="submit" class="btn">Save Vehicle</button>
+        <button type="button" id="resetVehicleForm" class="btn-outline">Clear Form</button>
+      </form>
+
+      <div id="vehicleMessage"></div>
+
+      <div id="adminVehiclesList" class="admin-trip-list">
+        <div class="loading-card">
+          <h3>Loading Vehicles...</h3>
+          <p>Please wait...</p>
+        </div>
+      </div>
+    </div>
+
+    <div id="packagesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Package Manager</h3>
-        <p>Add packages, vehicle choices, images, prices and duration.</p>
+        <p>Add packages, images, prices and duration.</p>
       </div>
 
       <form id="tripForm" class="media-upload-form friendly-form">
@@ -167,12 +225,12 @@
         <div class="form-group">
           <label>Duration</label>
           <input type="text" id="tripDuration" placeholder="Example: 1 day, 3 days, Full day" required />
-          <small>For multi-day packages, write like: 3 days. The system will block all booked dates automatically.</small>
+          <small>Example: 1 day, 3 days, Full day.</small>
         </div>
 
         <div class="form-group">
           <label>Base Price</label>
-          <input type="number" id="tripPrice" placeholder="Use 0 if price depends on vehicle" required />
+          <input type="number" id="tripPrice" placeholder="Use 0 if price is custom" required />
         </div>
 
         <div class="form-group">
@@ -195,29 +253,6 @@
           <span>Show this package on homepage Featured Packages</span>
         </label>
 
-        <div class="vehicle-manager">
-          <h4>Vehicle Options</h4>
-          <p>Add vehicles for this package. Customers will choose one when booking.</p>
-
-          <div id="vehicleOptionsContainer">
-            <div class="vehicle-item">
-              <input type="text" class="vehicleName" placeholder="Vehicle name e.g. SUV, Minibus" />
-              <input type="number" class="vehiclePrice" placeholder="Vehicle price" />
-              <input type="number" class="vehicleCapacity" placeholder="Passenger capacity" />
-              <input type="text" class="vehicleDescription" placeholder="Short description" />
-              <input type="file" class="vehicleImage" accept="image/*" />
-
-              <button type="button" class="btn-outline removeVehicleBtn">
-                Remove Vehicle
-              </button>
-            </div>
-          </div>
-
-          <button type="button" id="addVehicleBtn" class="btn">
-            + Add Vehicle
-          </button>
-        </div>
-
         <div class="form-group">
           <label>Package Image</label>
           <input type="file" id="tripImage" accept="image/*" />
@@ -231,9 +266,7 @@
       <div id="adminTripsList" class="admin-trip-list"></div>
     </div>
 
-    <!-- GALLERY -->
     <div id="galleryTab" class="admin-tab-content">
-
       <div class="admin-section-title">
         <h3>Gallery Manager</h3>
         <p>Upload homepage, activity, luxury, package and vehicle images.</p>
@@ -270,16 +303,13 @@
       <div id="galleryImagesList" class="admin-trip-list"></div>
     </div>
 
-    <!-- HOMEPAGE -->
     <div id="homepageTab" class="admin-tab-content">
-
       <div class="admin-section-title">
         <h3>Homepage Manager</h3>
         <p>Change the main homepage title, subtitle, button and hero image.</p>
       </div>
 
       <form id="homeContentForm" class="media-upload-form friendly-form">
-
         <div class="form-group">
           <label>Main Homepage Title</label>
           <input type="text" id="homeHeroTitle" placeholder="Luxury Private Tours & Experiences in Mauritius" required />
@@ -322,16 +352,13 @@
       </div>
     </div>
 
-    <!-- SETTINGS -->
     <div id="settingsTab" class="admin-tab-content">
-
       <div class="admin-section-title">
         <h3>Website Settings</h3>
         <p>Update your business name, WhatsApp, phone number, email and regions served.</p>
       </div>
 
       <form id="websiteSettingsForm" class="media-upload-form friendly-form">
-
         <div class="form-group">
           <label>Business Name</label>
           <input type="text" id="businessName" placeholder="Mautour Holidays" />
