@@ -113,7 +113,10 @@
     <!-- TRIP MANAGER -->
     <div class="admin-media-box">
       <h3>Trip / Package Manager</h3>
-      <p>Add, edit, activate, deactivate or remove trips shown on the booking page.</p>
+      <p>
+        Add, edit, activate, deactivate or remove trips shown on the booking page.
+        Tick “Show on Featured Packages” only for trips you want on the homepage.
+      </p>
 
       <form id="tripForm" class="media-upload-form">
         <input type="hidden" id="tripId" />
@@ -141,9 +144,19 @@
           required
         ></textarea>
 
-        <input type="text" id="tripDuration" placeholder="Duration e.g. Full day / 3 days / 5–9 days" required />
+        <input
+          type="text"
+          id="tripDuration"
+          placeholder="Duration e.g. Full day / 3 days / 5–9 days"
+          required
+        />
 
-        <input type="number" id="tripPrice" placeholder="Price. Use 0 for custom quote" required />
+        <input
+          type="number"
+          id="tripPrice"
+          placeholder="Price. Use 0 for custom quote"
+          required
+        />
 
         <select id="tripPriceType" required>
           <option value="Fixed">Fixed Price</option>
@@ -155,6 +168,11 @@
           id="tripIncludes"
           placeholder="What is included? Write one item per line"
         ></textarea>
+
+        <label class="admin-check-row">
+          <input type="checkbox" id="tripFeatured" />
+          <span>Show on Featured Packages</span>
+        </label>
 
         <input type="file" id="tripImage" accept="image/*" />
 
