@@ -7,7 +7,7 @@
   <title>Mautour Holidays | Mauritius Luxury Packages</title>
   <meta
     name="description"
-    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences. Bank transfer booking with payment proof validation."
+    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with private vehicle options. Bank transfer booking with payment proof validation."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -40,13 +40,13 @@
   </video>
 
   <div class="hero-content">
-    <span class="hero-badge">Admin Managed Packages</span>
+    <span class="hero-badge">Private Tours + Vehicle Options</span>
 
     <h2>Luxury Mauritius Experiences</h2>
 
     <p>
-      Choose from our latest private tours, luxury packages, transfers and
-      island experiences. All packages are updated directly by Mautour Holidays.
+      Choose from our latest private tours, luxury packages, transfers and island experiences.
+      Select your preferred vehicle when booking.
     </p>
 
     <div class="hero-actions">
@@ -70,7 +70,7 @@
 
   <p class="center section-subtitle">
     Browse our latest tours, excursions and luxury experiences.
-    All packages are managed directly by our team and updated in real time.
+    Choose a package, select your vehicle, upload payment proof and wait for admin validation.
   </p>
 </section>
 
@@ -152,6 +152,30 @@
         id="selectedPackage"
         readonly
       />
+
+      <div id="vehicleSelectionBox" class="vehicle-selection-box">
+        <h4>Choose Your Vehicle</h4>
+        <p>Select the vehicle you want for this package.</p>
+
+        <div id="vehicleOptionsList" class="vehicle-options-list">
+          <div class="vehicle-empty">
+            Vehicle options will appear after selecting a package.
+          </div>
+        </div>
+      </div>
+
+      <input type="hidden" id="selectedVehicleName" />
+      <input type="hidden" id="selectedVehiclePrice" />
+      <input type="hidden" id="selectedVehicleCapacity" />
+      <input type="hidden" id="selectedVehicleImageUrl" />
+
+      <div class="booking-total-box">
+        <span>Estimated Total</span>
+        <strong id="bookingEstimatedTotal">Rs 0</strong>
+        <small>
+          Final confirmation is done after admin validates your payment proof.
+        </small>
+      </div>
 
       <label class="upload-label" for="paymentProof">
         Upload Payment Proof
