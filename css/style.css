@@ -1614,3 +1614,154 @@ section {
   height: 20px;
   accent-color: var(--gold);
 }
+
+/* =========================
+   HOMEPAGE PREMIUM FIX
+========================= */
+
+#packages-preview,
+.services-section,
+#reviews,
+#contact {
+  width: 100%;
+  padding: 90px 0;
+}
+
+#packages-preview.container,
+#reviews.container,
+#contact.container {
+  max-width: 1180px;
+}
+
+#packages-preview {
+  background: #ffffff;
+}
+
+.services-section {
+  background: #f5f1e8;
+}
+
+#reviews {
+  background: #ffffff;
+}
+
+#contact {
+  background: #ffffff;
+}
+
+#packages-preview h2,
+.services-section h2,
+#reviews h2,
+#contact h2 {
+  color: #071827;
+  margin-bottom: 45px;
+}
+
+.experience-grid,
+.service-grid {
+  align-items: stretch;
+}
+
+.experience-card,
+.service-card {
+  background: #ffffff;
+  border: 1px solid rgba(7, 24, 39, 0.08);
+  box-shadow: 0 18px 40px rgba(7, 24, 39, 0.08);
+}
+
+.service-card {
+  min-height: 230px;
+  padding: 35px 28px;
+}
+
+.service-card h3 {
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+
+.service-card p {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* Fix CTA section */
+.cta-section {
+  width: min(1180px, 92%);
+  margin: 90px auto;
+  padding: 95px 30px;
+  border-radius: 34px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(7, 24, 39, 0.9),
+      rgba(7, 24, 39, 0.78)
+    ),
+    url("../assets/ile.jpg") center/cover no-repeat !important;
+}
+
+.cta-content h2 {
+  color: #ffffff !important;
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-content p {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-size: 1.1rem;
+}
+
+.cta-section .section-label {
+  background: rgba(201, 162, 39, 0.18);
+  color: #f5d46b;
+}
+
+.cta-section .btn {
+  margin-top: 20px;
+}
+
+/* Remove awkward white cut blocks */
+section:nth-of-type(even) {
+  background: transparent;
+}
+
+.mobile-stats {
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 0;
+}
+
+.mobile-stats div {
+  background: #ffffff;
+}
+
+/* Footer/contact spacing */
+#contact {
+  padding-top: 60px;
+}
+
+.footer {
+  margin-top: 0;
+}
+
+/* Mobile cleanup */
+@media (max-width: 768px) {
+  #packages-preview,
+  .services-section,
+  #reviews,
+  #contact {
+    padding: 60px 0;
+  }
+
+  .cta-section {
+    margin: 60px auto;
+    padding: 65px 20px;
+    border-radius: 26px;
+  }
+
+  .service-card {
+    min-height: auto;
+  }
+}
