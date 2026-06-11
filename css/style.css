@@ -1765,3 +1765,188 @@ section:nth-of-type(even) {
     min-height: auto;
   }
 }
+
+/* ==========================================
+   VEHICLE SELECTION
+========================================== */
+
+.vehicle-selection-box{
+  margin:20px 0;
+  padding:20px;
+  background:#f8f8f8;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+}
+
+.vehicle-selection-box h4{
+  margin-bottom:6px;
+  color:#0f172a;
+}
+
+.vehicle-selection-box p{
+  color:#64748b;
+  margin-bottom:16px;
+}
+
+.vehicle-options-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+
+.vehicle-option-card{
+  border:2px solid #e5e7eb;
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:.25s ease;
+  padding:0;
+  text-align:left;
+}
+
+.vehicle-option-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 25px rgba(0,0,0,.08);
+  border-color:#d4af37;
+}
+
+.vehicle-option-card.selected{
+  border-color:#d4af37;
+  box-shadow:0 0 0 3px rgba(212,175,55,.18);
+}
+
+.vehicle-option-card img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  display:block;
+}
+
+.vehicle-placeholder{
+  height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:3rem;
+  background:#f3f4f6;
+}
+
+.vehicle-option-info{
+  padding:14px;
+}
+
+.vehicle-option-info strong{
+  display:block;
+  font-size:1rem;
+  color:#111827;
+  margin-bottom:6px;
+}
+
+.vehicle-option-info span{
+  display:block;
+  color:#6b7280;
+  font-size:.9rem;
+  margin-bottom:5px;
+}
+
+.vehicle-option-info small{
+  display:block;
+  color:#6b7280;
+  margin-bottom:10px;
+  line-height:1.4;
+}
+
+.vehicle-option-info b{
+  color:#d4af37;
+  font-size:1rem;
+}
+
+.vehicle-empty{
+  padding:20px;
+  text-align:center;
+  border:2px dashed #d1d5db;
+  border-radius:12px;
+  color:#6b7280;
+  background:#fff;
+}
+
+/* ==========================================
+   BOOKING TOTAL BOX
+========================================== */
+
+.booking-total-box{
+  margin:20px 0;
+  padding:18px;
+  background:#0f172a;
+  color:#fff;
+  border-radius:16px;
+}
+
+.booking-total-box span{
+  display:block;
+  font-size:.9rem;
+  opacity:.8;
+}
+
+.booking-total-box strong{
+  display:block;
+  margin-top:5px;
+  font-size:2rem;
+  color:#d4af37;
+}
+
+.booking-total-box small{
+  display:block;
+  margin-top:8px;
+  opacity:.75;
+  line-height:1.5;
+}
+
+/* ==========================================
+   MODAL SCROLL FIX
+========================================== */
+
+.modal{
+  overflow-y:auto;
+  padding:30px 15px;
+}
+
+.luxury-modal{
+  max-height:90vh;
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+
+.luxury-modal::-webkit-scrollbar{
+  width:8px;
+}
+
+.luxury-modal::-webkit-scrollbar-thumb{
+  background:#d4af37;
+  border-radius:10px;
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media(max-width:768px){
+
+  .vehicle-options-list{
+    grid-template-columns:1fr;
+  }
+
+  .vehicle-option-card img{
+    height:180px;
+  }
+
+  .booking-total-box strong{
+    font-size:1.6rem;
+  }
+
+  .luxury-modal{
+    width:95%;
+    max-height:92vh;
+  }
+}
