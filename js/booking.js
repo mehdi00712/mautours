@@ -6,7 +6,6 @@ import {
   collection,
   doc,
   setDoc,
-  getDoc,
   getDocs,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -51,6 +50,8 @@ const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
+const vehicleFilter = new URLSearchParams(window.location.search).get("vehicle");
+
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 });
@@ -79,13 +80,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function normalizeSlotId(tripId, date) {
-  return `${tripId}_${date}`
-    .toLowerCase()
-    .replaceAll(" ", "-")
-    .replace(/[^a-z0-9-_]/g, "");
 }
 
 function getDurationDays(durationText) {
@@ -135,13 +129,8 @@ function formatPrice(trip) {
     }
   }
 
-  if (price <= 0 || trip.priceType === "Custom Quote") {
-    return "Custom Quote";
-  }
-
-  if (trip.priceType === "Fixed") {
-    return `Rs ${price.toLocaleString()}`;
-  }
+  if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
+  if (trip.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
 
   return `${trip.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
@@ -217,9 +206,7 @@ function setSelectedVehicle(vehicle, vehicleCard = null) {
     card.classList.remove("selected");
   });
 
-  if (vehicleCard) {
-    vehicleCard.classList.add("selected");
-  }
+  if (vehicleCard) vehicleCard.classList.add("selected");
 
   updateEstimatedTotal();
 }
@@ -286,6 +273,21 @@ function renderVehicleOptions(trip) {
   });
 }
 
+function tripMatchesVehicleFilter(trip) {
+  if (!vehicleFilter) return true;
+
+  const filter = vehicleFilter.toLowerCase();
+
+  if (!Array.isArray(trip.vehicles)) return false;
+
+  return trip.vehicles.some((vehicle) => {
+    const name = String(vehicle.name || "").toLowerCase();
+    const desc = String(vehicle.description || "").toLowerCase();
+
+    return name.includes(filter) || desc.includes(filter);
+  });
+}
+
 async function loadTrips() {
   if (!dynamicTrips) return;
 
@@ -315,6 +317,7 @@ async function loadTrips() {
       const trip = docSnap.data();
 
       if (trip.active === false) return;
+      if (!tripMatchesVehicleFilter(trip)) return;
 
       trips.push({
         id: docSnap.id,
@@ -327,8 +330,9 @@ async function loadTrips() {
     if (trips.length === 0) {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
-          <h3>No Active Packages</h3>
-          <p>All trips are currently disabled by the admin.</p>
+          <h3>No Matching Packages</h3>
+          <p>No packages found for this vehicle type. Try another vehicle or view all packages.</p>
+          <a href="booking.html" class="btn">View All Packages</a>
         </div>
       `;
       return;
@@ -441,11 +445,7 @@ if (bookingForm) {
     e.preventDefault();
 
     if (!currentUser) {
-      showPopup(
-        "Login Required",
-        "Please sign in first.",
-        "login.html?redirect=booking.html"
-      );
+      showPopup("Login Required", "Please sign in first.", "login.html?redirect=booking.html");
       return;
     }
 
@@ -467,7 +467,7 @@ if (bookingForm) {
     const originalBtnText = submitBtn.textContent;
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Checking availability...";
+    submitBtn.textContent = "Submitting...";
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -506,48 +506,8 @@ if (bookingForm) {
     try {
       const bookingDates = getBookingDates(date, selectedTrip.duration);
 
-      for (const bookingDate of bookingDates) {
-        const slotId = normalizeSlotId(selectedTrip.id, bookingDate);
-        const slotRef = doc(db, "bookingSlots", slotId);
-        const slotSnap = await getDoc(slotRef);
-
-        if (slotSnap.exists()) {
-          showPopup(
-            "Date Unavailable",
-            `This package cannot be booked from ${date} because ${bookingDate} is already reserved.\n\nReserved dates checked:\n${formatDateList(bookingDates)}`
-          );
-
-          submitBtn.disabled = false;
-          submitBtn.textContent = originalBtnText;
-          return;
-        }
-      }
-
-      submitBtn.textContent = "Submitting...";
-
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
-
-      for (const bookingDate of bookingDates) {
-        const slotId = normalizeSlotId(selectedTrip.id, bookingDate);
-        const slotRef = doc(db, "bookingSlots", slotId);
-
-        await setDoc(slotRef, {
-          tripId: selectedTrip.id,
-          package: selectedTrip.title || "",
-          vehicleName: selectedVehicle?.name || "",
-          vehiclePrice: Number(selectedVehicle?.price || 0),
-          date: bookingDate,
-          startDate: date,
-          reservedDates: bookingDates,
-          duration: selectedTrip.duration || "",
-          durationDays: bookingDates.length,
-          userId: currentUser.uid,
-          bookingId,
-          status: "Reserved",
-          createdAt: serverTimestamp()
-        });
-      }
 
       const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
@@ -610,7 +570,7 @@ if (bookingForm) {
 
       showPopup(
         "Booking Submitted ✅",
-        `Your booking and payment proof have been submitted.\n\nReserved dates:\n${formatDateList(bookingDates)}\n\nAdmin will validate your payment and confirm your booking.`,
+        `Your booking and payment proof have been submitted.\n\nRequested dates:\n${formatDateList(bookingDates)}\n\nAdmin will validate your payment and confirm your booking.`,
         "index.html"
       );
 
