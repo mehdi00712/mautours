@@ -22,7 +22,7 @@
       <a href="index.html" class="active">Home</a>
       <a href="booking.html">Packages</a>
       <a href="#why">Why Us</a>
-      <a href="#fleet">Vehicles</a>
+      <a href="#vehicles-section">Vehicles</a>
       <a href="#reviews">Reviews</a>
       <a href="#contact">Contact</a>
       <a href="login.html">Sign In</a>
@@ -88,28 +88,44 @@
   <h2>Private, Comfortable and Built for GCC Travellers</h2>
 
   <div class="service-grid">
-    <div class="service-card">
+    <div
+      class="service-card clickable-card"
+      onclick="document.getElementById('packages-preview').scrollIntoView({behavior:'smooth'})"
+    >
       🏝️
       <h3>Local Experts</h3>
-      <p>Private island knowledge and carefully planned routes across Mauritius.</p>
+      <p>View our selected packages and carefully planned Mauritius experiences.</p>
+      <span class="card-action">View Packages →</span>
     </div>
 
-    <div class="service-card">
+    <div
+      class="service-card clickable-card"
+      onclick="document.getElementById('vehicles-section').scrollIntoView({behavior:'smooth'})"
+    >
       🚘
       <h3>Private Transfers</h3>
-      <p>Comfortable airport and island-wide transfers with vehicle options.</p>
+      <p>Choose the vehicle that fits your comfort, group size and travel style.</p>
+      <span class="card-action">View Vehicles →</span>
     </div>
 
-    <div class="service-card">
+    <div
+      class="service-card clickable-card"
+      onclick="window.open(document.getElementById('heroWhatsappBtn').href,'_blank')"
+    >
       ✨
       <h3>Tailor-Made Experiences</h3>
-      <p>Trips designed around your travel style, group size and comfort level.</p>
+      <p>Need a custom trip? Message us and we will plan it for you.</p>
+      <span class="card-action">Plan on WhatsApp →</span>
     </div>
 
-    <div class="service-card">
+    <div
+      class="service-card clickable-card"
+      onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})"
+    >
       💬
       <h3>24/7 Support</h3>
-      <p>Simple WhatsApp booking and travel assistance before and during your trip.</p>
+      <p>Contact our team for assistance before and during your trip.</p>
+      <span class="card-action">Contact Us →</span>
     </div>
   </div>
 </section>
@@ -126,37 +142,41 @@
   </div>
 </section>
 
-<section id="fleet" class="container">
-  <span class="section-label center-label">Private Fleet</span>
-  <h2>Choose the Vehicle That Fits Your Trip</h2>
+<section id="vehicles-section" class="container">
+  <span class="section-label center-label">Private Vehicles</span>
+  <h2>Choose Your Preferred Vehicle</h2>
 
   <p class="center section-subtitle">
-    Each package can include different vehicle options. Clients can choose their preferred vehicle when booking.
+    Select a vehicle type and view packages that include that option.
   </p>
 
   <div class="service-grid">
-    <div class="service-card">
+    <div class="service-card clickable-card" onclick="window.location.href='booking.html?vehicle=standard'">
       🚗
       <h3>Standard Car</h3>
       <p>Comfortable option for couples or small groups.</p>
+      <span class="card-action">View Standard Car Packages →</span>
     </div>
 
-    <div class="service-card">
+    <div class="service-card clickable-card" onclick="window.location.href='booking.html?vehicle=suv'">
       🚙
       <h3>SUV</h3>
       <p>More space and comfort for families and premium trips.</p>
+      <span class="card-action">View SUV Packages →</span>
     </div>
 
-    <div class="service-card">
+    <div class="service-card clickable-card" onclick="window.location.href='booking.html?vehicle=minibus'">
       🚐
       <h3>Minibus</h3>
       <p>Ideal for larger families or group experiences.</p>
+      <span class="card-action">View Minibus Packages →</span>
     </div>
 
-    <div class="service-card">
+    <div class="service-card clickable-card" onclick="window.location.href='booking.html?vehicle=luxury'">
       ✨
       <h3>Luxury Vehicle</h3>
       <p>Premium option for VIP travellers and honeymoon packages.</p>
+      <span class="card-action">View Luxury Packages →</span>
     </div>
   </div>
 </section>
