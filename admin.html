@@ -35,168 +35,177 @@
       <span class="section-label center-label">Admin Panel</span>
       <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Manage homepage content, trips, vehicles, gallery images, bookings and payment validation.
+        Manage bookings, packages, vehicles, homepage, gallery and business settings.
       </p>
     </div>
 
-    <div class="admin-media-box">
-      <h3>Website Settings</h3>
-      <p>Update the main business details used across the website.</p>
-
-      <form id="websiteSettingsForm" class="media-upload-form">
-        <input type="text" id="businessName" placeholder="Business Name" />
-        <input type="text" id="whatsappNumber" placeholder="WhatsApp Number e.g. 23059066404" />
-        <input type="text" id="mobileNumber" placeholder="Mobile Number e.g. 23052542792" />
-        <input type="email" id="businessEmail" placeholder="Business Email" />
-        <input type="text" id="servedRegions" placeholder="Served Regions e.g. UAE, Saudi Arabia, Qatar, Kuwait" />
-
-        <button type="submit" class="btn">Save Website Settings</button>
-      </form>
-
-      <div id="settingsMessage"></div>
+    <!-- QUICK ADMIN MENU -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="dashboardTab">Dashboard</button>
+      <button class="admin-tab" data-tab="bookingsTab">Bookings</button>
+      <button class="admin-tab" data-tab="packagesTab">Packages</button>
+      <button class="admin-tab" data-tab="galleryTab">Gallery</button>
+      <button class="admin-tab" data-tab="homepageTab">Homepage</button>
+      <button class="admin-tab" data-tab="settingsTab">Settings</button>
     </div>
 
-    <div class="admin-media-box">
-      <h3>Homepage Manager</h3>
-      <p>Edit the main homepage hero content shown to customers.</p>
+    <!-- DASHBOARD -->
+    <div id="dashboardTab" class="admin-tab-content active">
 
-      <form id="homeContentForm" class="media-upload-form">
-        <input type="text" id="homeHeroTitle" placeholder="Hero title" required />
-        <textarea id="homeHeroSubtitle" placeholder="Hero subtitle" required></textarea>
-        <input type="text" id="homeBadge" placeholder="Hero badge text" />
-        <input type="text" id="homeCtaText" placeholder="CTA button text e.g. Book via WhatsApp" required />
-        <input type="file" id="homeHeroImage" accept="image/*" />
+      <div id="revenueSummary" class="summary-box">
+        <h3>Total Confirmed Revenue</h3>
 
-        <button type="submit" class="btn">Save Homepage</button>
-      </form>
+        <div class="revenue-bar">
+          <div id="revenueFill"></div>
+        </div>
 
-      <div id="homeContentMessage"></div>
+        <p id="revenueValue">Rs 0</p>
+      </div>
+
+      <div class="admin-status-grid">
+        <div class="admin-status-card">
+          <h3 id="totalBookingsValue">0</h3>
+          <p>Total Bookings</p>
+        </div>
+
+        <div class="admin-status-card">
+          <h3 id="pendingBookingsValue">0</h3>
+          <p>Pending Payments</p>
+        </div>
+
+        <div class="admin-status-card">
+          <h3 id="confirmedBookingsValue">0</h3>
+          <p>Confirmed</p>
+        </div>
+
+        <div class="admin-status-card">
+          <h3 id="rejectedBookingsValue">0</h3>
+          <p>Rejected</p>
+        </div>
+      </div>
+
+      <div class="admin-note">
+        <strong>How it works:</strong>
+        Customers choose a package and vehicle, upload payment proof, then you approve or reject the booking.
+      </div>
     </div>
 
-    <div class="admin-media-box">
-      <h3>Gallery Manager</h3>
-      <p>Upload images for homepage gallery, luxury visuals, activities or packages.</p>
+    <!-- BOOKINGS -->
+    <div id="bookingsTab" class="admin-tab-content">
 
-      <form id="galleryForm" class="media-upload-form">
-        <input type="text" id="galleryTitle" placeholder="Image title" required />
+      <div class="admin-section-title">
+        <h3>Customer Bookings</h3>
+        <p>Approve, reject or delete customer bookings.</p>
+      </div>
 
-        <select id="galleryCategory" required>
-          <option value="">Select image category</option>
-          <option value="homepage">Homepage</option>
-          <option value="gallery">Gallery</option>
-          <option value="package">Package</option>
-          <option value="luxury">Luxury</option>
-          <option value="activity">Activity</option>
-          <option value="vehicle">Vehicle</option>
-        </select>
+      <div class="table-wrapper">
+        <table id="bookingsTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Package</th>
+              <th>Vehicle</th>
+              <th>Date</th>
+              <th>People</th>
+              <th>Total</th>
+              <th>Proof</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-        <input type="file" id="galleryImage" accept="image/*" required />
-
-        <button type="submit" class="btn">Upload Gallery Image</button>
-      </form>
-
-      <div id="galleryMessage"></div>
-      <div id="galleryImagesList" class="admin-trip-list"></div>
+          <tbody>
+            <tr>
+              <td colspan="11">Loading bookings...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="admin-media-box">
-      <h3>Trip / Package Manager</h3>
-      <p>
-        Add, edit, activate, deactivate or remove trips shown on the booking page.
-        Tick “Show on Featured Packages” only for trips you want on the homepage.
-      </p>
+    <!-- PACKAGES -->
+    <div id="packagesTab" class="admin-tab-content">
 
-      <form id="tripForm" class="media-upload-form">
+      <div class="admin-section-title">
+        <h3>Package Manager</h3>
+        <p>Add packages, vehicle choices, images, prices and duration.</p>
+      </div>
+
+      <form id="tripForm" class="media-upload-form friendly-form">
         <input type="hidden" id="tripId" />
 
-        <input type="text" id="tripTitle" placeholder="Trip title" required />
+        <div class="form-group">
+          <label>Package Name</label>
+          <input type="text" id="tripTitle" placeholder="Example: VIP Mauritius Experience" required />
+        </div>
 
-        <select id="tripCategory" required>
-          <option value="">Select category</option>
-          <option value="Standard Package">Standard Package</option>
-          <option value="Family Package">Family Package</option>
-          <option value="VIP Luxury Package">VIP Luxury Package</option>
-          <option value="Day Activity">Day Activity</option>
-          <option value="Transfer">Transfer</option>
-          <option value="Custom Tour">Custom Tour</option>
-          <option value="Honeymoon Package">Honeymoon Package</option>
-          <option value="Adventure">Adventure</option>
-          <option value="Catamaran">Catamaran</option>
-          <option value="Safari">Safari</option>
-          <option value="Helicopter">Helicopter</option>
-        </select>
+        <div class="form-group">
+          <label>Package Category</label>
+          <select id="tripCategory" required>
+            <option value="">Choose category</option>
+            <option value="Standard Package">Standard Package</option>
+            <option value="Family Package">Family Package</option>
+            <option value="VIP Luxury Package">VIP Luxury Package</option>
+            <option value="Day Activity">Day Activity</option>
+            <option value="Transfer">Transfer</option>
+            <option value="Custom Tour">Custom Tour</option>
+            <option value="Honeymoon Package">Honeymoon Package</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Catamaran">Catamaran</option>
+            <option value="Safari">Safari</option>
+            <option value="Helicopter">Helicopter</option>
+          </select>
+        </div>
 
-        <textarea id="tripDescription" placeholder="Trip description" required></textarea>
+        <div class="form-group">
+          <label>What Customers Will See</label>
+          <textarea id="tripDescription" placeholder="Describe this package clearly for customers." required></textarea>
+        </div>
 
-        <input
-          type="text"
-          id="tripDuration"
-          placeholder="Duration e.g. Full day / 3 days / 5 days"
-          required
-        />
+        <div class="form-group">
+          <label>Duration</label>
+          <input type="text" id="tripDuration" placeholder="Example: 1 day, 3 days, Full day" required />
+          <small>For multi-day packages, write like: 3 days. The system will block all booked dates automatically.</small>
+        </div>
 
-        <input
-          type="number"
-          id="tripPrice"
-          placeholder="Base price. Use 0 if price depends only on vehicle"
-          required
-        />
+        <div class="form-group">
+          <label>Base Price</label>
+          <input type="number" id="tripPrice" placeholder="Use 0 if price depends on vehicle" required />
+        </div>
 
-        <select id="tripPriceType" required>
-          <option value="Fixed">Fixed Price</option>
-          <option value="Starting From">Starting From</option>
-          <option value="Custom Quote">Custom Quote</option>
-          <option value="Vehicle Based">Vehicle Based</option>
-        </select>
+        <div class="form-group">
+          <label>Price Type</label>
+          <select id="tripPriceType" required>
+            <option value="Fixed">Fixed Price</option>
+            <option value="Starting From">Starting From</option>
+            <option value="Custom Quote">Custom Quote</option>
+            <option value="Vehicle Based">Vehicle Based</option>
+          </select>
+        </div>
 
-        <textarea
-          id="tripIncludes"
-          placeholder="What is included? Write one item per line"
-        ></textarea>
+        <div class="form-group">
+          <label>What Is Included?</label>
+          <textarea id="tripIncludes" placeholder="Write one item per line. Example: Private transfer"></textarea>
+        </div>
 
         <label class="admin-check-row">
           <input type="checkbox" id="tripFeatured" />
-          <span>Show on Featured Packages</span>
+          <span>Show this package on homepage Featured Packages</span>
         </label>
 
         <div class="vehicle-manager">
           <h4>Vehicle Options</h4>
-          <p>
-            Add vehicles available for this package. Customers will choose one during booking.
-            Vehicle price will be used to calculate the booking total.
-          </p>
+          <p>Add vehicles for this package. Customers will choose one when booking.</p>
 
           <div id="vehicleOptionsContainer">
             <div class="vehicle-item">
-              <input
-                type="text"
-                class="vehicleName"
-                placeholder="Vehicle name e.g. SUV, Luxury Sedan, Minibus"
-              />
-
-              <input
-                type="number"
-                class="vehiclePrice"
-                placeholder="Vehicle price"
-              />
-
-              <input
-                type="number"
-                class="vehicleCapacity"
-                placeholder="Passenger capacity"
-              />
-
-              <input
-                type="text"
-                class="vehicleDescription"
-                placeholder="Short description e.g. Comfortable SUV for families"
-              />
-
-              <input
-                type="file"
-                class="vehicleImage"
-                accept="image/*"
-              />
+              <input type="text" class="vehicleName" placeholder="Vehicle name e.g. SUV, Minibus" />
+              <input type="number" class="vehiclePrice" placeholder="Vehicle price" />
+              <input type="number" class="vehicleCapacity" placeholder="Passenger capacity" />
+              <input type="text" class="vehicleDescription" placeholder="Short description" />
+              <input type="file" class="vehicleImage" accept="image/*" />
 
               <button type="button" class="btn-outline removeVehicleBtn">
                 Remove Vehicle
@@ -209,9 +218,12 @@
           </button>
         </div>
 
-        <input type="file" id="tripImage" accept="image/*" />
+        <div class="form-group">
+          <label>Package Image</label>
+          <input type="file" id="tripImage" accept="image/*" />
+        </div>
 
-        <button type="submit" class="btn">Save Trip</button>
+        <button type="submit" class="btn">Save Package</button>
         <button type="button" id="resetTripForm" class="btn-outline">Clear Form</button>
       </form>
 
@@ -219,81 +231,136 @@
       <div id="adminTripsList" class="admin-trip-list"></div>
     </div>
 
-    <div id="revenueSummary" class="summary-box">
-      <h3>Total Confirmed Revenue</h3>
+    <!-- GALLERY -->
+    <div id="galleryTab" class="admin-tab-content">
 
-      <div class="revenue-bar">
-        <div id="revenueFill"></div>
+      <div class="admin-section-title">
+        <h3>Gallery Manager</h3>
+        <p>Upload homepage, activity, luxury, package and vehicle images.</p>
       </div>
 
-      <p id="revenueValue">Rs 0</p>
+      <form id="galleryForm" class="media-upload-form friendly-form">
+        <div class="form-group">
+          <label>Image Title</label>
+          <input type="text" id="galleryTitle" placeholder="Example: Luxury Catamaran Tour" required />
+        </div>
+
+        <div class="form-group">
+          <label>Image Category</label>
+          <select id="galleryCategory" required>
+            <option value="">Choose image category</option>
+            <option value="homepage">Homepage</option>
+            <option value="gallery">Gallery</option>
+            <option value="package">Package</option>
+            <option value="luxury">Luxury</option>
+            <option value="activity">Activity</option>
+            <option value="vehicle">Vehicle</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Choose Image</label>
+          <input type="file" id="galleryImage" accept="image/*" required />
+        </div>
+
+        <button type="submit" class="btn">Upload Image</button>
+      </form>
+
+      <div id="galleryMessage"></div>
+      <div id="galleryImagesList" class="admin-trip-list"></div>
     </div>
 
-    <div class="admin-status-grid">
-      <div class="admin-status-card">
-        <h3 id="totalBookingsValue">0</h3>
-        <p>Total Bookings</p>
+    <!-- HOMEPAGE -->
+    <div id="homepageTab" class="admin-tab-content">
+
+      <div class="admin-section-title">
+        <h3>Homepage Manager</h3>
+        <p>Change the main homepage title, subtitle, button and hero image.</p>
       </div>
 
-      <div class="admin-status-card">
-        <h3 id="pendingBookingsValue">0</h3>
-        <p>Pending Validation</p>
-      </div>
+      <form id="homeContentForm" class="media-upload-form friendly-form">
 
-      <div class="admin-status-card">
-        <h3 id="confirmedBookingsValue">0</h3>
-        <p>Confirmed</p>
-      </div>
+        <div class="form-group">
+          <label>Main Homepage Title</label>
+          <input type="text" id="homeHeroTitle" placeholder="Luxury Private Tours & Experiences in Mauritius" required />
+        </div>
 
-      <div class="admin-status-card">
-        <h3 id="rejectedBookingsValue">0</h3>
-        <p>Rejected</p>
+        <div class="form-group">
+          <label>Homepage Subtitle</label>
+          <textarea id="homeHeroSubtitle" placeholder="Short text under the main title" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Small Badge Text</label>
+          <input type="text" id="homeBadge" placeholder="Serving UAE, Saudi, Qatar & GCC Travellers" />
+        </div>
+
+        <div class="form-group">
+          <label>Button Text</label>
+          <input type="text" id="homeCtaText" placeholder="Book via WhatsApp" required />
+        </div>
+
+        <div class="form-group">
+          <label>Homepage Hero Image</label>
+          <input type="file" id="homeHeroImage" accept="image/*" />
+        </div>
+
+        <button type="submit" class="btn">Save Homepage</button>
+      </form>
+
+      <div id="homeContentMessage"></div>
+
+      <div class="admin-media-box">
+        <h3>Homepage Preview</h3>
+        <iframe
+          src="index.html"
+          title="Homepage Preview"
+          width="100%"
+          height="650"
+          style="border: 1px solid #ddd; border-radius: 20px;"
+        ></iframe>
       </div>
     </div>
 
-    <div class="admin-note">
-      <strong>Payment process:</strong>
-      Customers submit booking details and upload bank transfer proof.
-      Admin verifies the proof, then approves or rejects the booking.
-    </div>
+    <!-- SETTINGS -->
+    <div id="settingsTab" class="admin-tab-content">
 
-    <div class="table-wrapper">
-      <table id="bookingsTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Email</th>
-            <th>Package</th>
-            <th>Vehicle</th>
-            <th>Date</th>
-            <th>People</th>
-            <th>Total</th>
-            <th>Proof</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+      <div class="admin-section-title">
+        <h3>Website Settings</h3>
+        <p>Update your business name, WhatsApp, phone number, email and regions served.</p>
+      </div>
 
-        <tbody>
-          <tr>
-            <td colspan="11">Loading bookings...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <form id="websiteSettingsForm" class="media-upload-form friendly-form">
 
-    <div class="admin-media-box">
-      <h3>Homepage Preview</h3>
-      <p>Preview the public homepage after making changes.</p>
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="businessName" placeholder="Mautour Holidays" />
+        </div>
 
-      <iframe
-        src="index.html"
-        title="Homepage Preview"
-        width="100%"
-        height="650"
-        style="border: 1px solid #ddd; border-radius: 20px;"
-      ></iframe>
+        <div class="form-group">
+          <label>WhatsApp Number</label>
+          <input type="text" id="whatsappNumber" placeholder="23059066404" />
+        </div>
+
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="text" id="mobileNumber" placeholder="23052542792" />
+        </div>
+
+        <div class="form-group">
+          <label>Business Email</label>
+          <input type="email" id="businessEmail" placeholder="mautourholidays@gmail.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Regions Served</label>
+          <input type="text" id="servedRegions" placeholder="UAE, Saudi Arabia, Qatar, Kuwait" />
+        </div>
+
+        <button type="submit" class="btn">Save Settings</button>
+      </form>
+
+      <div id="settingsMessage"></div>
     </div>
 
     <div class="center" style="margin-top: 2rem;">
@@ -317,5 +384,21 @@
 
 <script type="module" src="js/admin.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+  const adminTabs = document.querySelectorAll(".admin-tab");
+  const adminTabContents = document.querySelectorAll(".admin-tab-content");
+
+  adminTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      adminTabs.forEach((item) => item.classList.remove("active"));
+      adminTabContents.forEach((content) => content.classList.remove("active"));
+
+      tab.classList.add("active");
+      document.getElementById(tab.dataset.tab).classList.add("active");
+    });
+  });
+</script>
+
 </body>
 </html>
