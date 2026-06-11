@@ -80,6 +80,43 @@ function normalizeSlotId(tripId, date) {
     .replace(/[^a-z0-9-_]/g, "");
 }
 
+function getDurationDays(durationText) {
+  const text = String(durationText || "").toLowerCase();
+
+  if (text.includes("half")) return 1;
+  if (text.includes("full")) return 1;
+
+  const match = text.match(/\d+/);
+
+  if (!match) return 1;
+
+  const days = Number(match[0]);
+
+  return days > 0 ? days : 1;
+}
+
+function addDaysToDate(dateString, daysToAdd) {
+  const date = new Date(`${dateString}T00:00:00`);
+  date.setDate(date.getDate() + daysToAdd);
+
+  return date.toISOString().split("T")[0];
+}
+
+function getBookingDates(startDate, durationText) {
+  const totalDays = getDurationDays(durationText);
+  const dates = [];
+
+  for (let i = 0; i < totalDays; i++) {
+    dates.push(addDaysToDate(startDate, i));
+  }
+
+  return dates;
+}
+
+function formatDateList(dates) {
+  return dates.join(", ");
+}
+
 function formatPrice(trip) {
   const price = Number(trip.price || 0);
 
@@ -282,7 +319,7 @@ if (bookingForm) {
     const originalBtnText = submitBtn.textContent;
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
+    submitBtn.textContent = "Checking availability...";
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -307,7 +344,7 @@ if (bookingForm) {
       return;
     }
 
-    const selectedDate = new Date(date);
+    const selectedDate = new Date(`${date}T00:00:00`);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -319,32 +356,48 @@ if (bookingForm) {
     }
 
     try {
-      const slotId = normalizeSlotId(selectedTrip.id, date);
-      const slotRef = doc(db, "bookingSlots", slotId);
-      const slotSnap = await getDoc(slotRef);
+      const bookingDates = getBookingDates(date, selectedTrip.duration);
 
-      if (slotSnap.exists()) {
-        showPopup(
-          "Date Unavailable",
-          "This package is already booked for the selected date. Please choose another date."
-        );
-        submitBtn.disabled = false;
-        submitBtn.textContent = originalBtnText;
-        return;
+      for (const bookingDate of bookingDates) {
+        const slotId = normalizeSlotId(selectedTrip.id, bookingDate);
+        const slotRef = doc(db, "bookingSlots", slotId);
+        const slotSnap = await getDoc(slotRef);
+
+        if (slotSnap.exists()) {
+          showPopup(
+            "Date Unavailable",
+            `This package cannot be booked from ${date} because ${bookingDate} is already reserved.\n\nReserved dates checked:\n${formatDateList(bookingDates)}`
+          );
+
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+          return;
+        }
       }
+
+      submitBtn.textContent = "Submitting...";
 
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
 
-      await setDoc(slotRef, {
-        tripId: selectedTrip.id,
-        package: selectedTrip.title || "",
-        date,
-        userId: currentUser.uid,
-        bookingId,
-        status: "Reserved",
-        createdAt: serverTimestamp()
-      });
+      for (const bookingDate of bookingDates) {
+        const slotId = normalizeSlotId(selectedTrip.id, bookingDate);
+        const slotRef = doc(db, "bookingSlots", slotId);
+
+        await setDoc(slotRef, {
+          tripId: selectedTrip.id,
+          package: selectedTrip.title || "",
+          date: bookingDate,
+          startDate: date,
+          reservedDates: bookingDates,
+          duration: selectedTrip.duration || "",
+          durationDays: bookingDates.length,
+          userId: currentUser.uid,
+          bookingId,
+          status: "Reserved",
+          createdAt: serverTimestamp()
+        });
+      }
 
       const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
@@ -368,7 +421,13 @@ if (bookingForm) {
         email,
         phone,
         people,
+
         date,
+        startDate: date,
+        reservedDates: bookingDates,
+        duration: selectedTrip.duration || "",
+        durationDays: bookingDates.length,
+
         package: selectedTrip.title || "",
 
         pricePerPerson: basePrice,
@@ -392,7 +451,7 @@ if (bookingForm) {
 
       showPopup(
         "Booking Submitted ✅",
-        "Your booking and payment proof have been submitted.\n\nAdmin will validate your payment and confirm your booking.",
+        `Your booking and payment proof have been submitted.\n\nReserved dates:\n${formatDateList(bookingDates)}\n\nAdmin will validate your payment and confirm your booking.`,
         "index.html"
       );
 
