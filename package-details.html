@@ -8,7 +8,7 @@
 
   <meta
     name="description"
-    content="View full package details, gallery, inclusions, vehicle options and booking information for Mauritius private tours."
+    content="View full package details, photos, inclusions, vehicles and book Mauritius private tours directly."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -17,7 +17,6 @@
 
 <header class="site-header">
   <div class="nav-container">
-
     <h1 class="logo">Mautour Holidays</h1>
 
     <nav class="nav" id="nav">
@@ -33,14 +32,12 @@
       <span></span>
       <span></span>
     </div>
-
   </div>
 </header>
 
 <main class="package-details-page">
 
   <section class="container">
-
     <div class="breadcrumb">
       <a href="index.html">Home</a>
       <span>›</span>
@@ -48,7 +45,6 @@
       <span>›</span>
       <span id="breadcrumbPackage">Package</span>
     </div>
-
   </section>
 
   <section class="container package-details-container">
@@ -58,18 +54,11 @@
       <p>Please wait while we load package details.</p>
     </div>
 
-    <div
-      id="packageDetailsContent"
-      class="package-details-content"
-      style="display:none;"
-    >
-
-      <!-- LEFT -->
+    <div id="packageDetailsContent" class="package-details-content" style="display:none;">
 
       <div class="package-main-column">
 
         <div class="package-gallery-wrapper">
-
           <img
             id="mainPackageImage"
             src="assets/ile.jpg"
@@ -80,34 +69,18 @@
           <div class="photo-count">
             📸 <span id="photoCount">1</span> Photos
           </div>
-
         </div>
 
-        <div
-          id="packageThumbnailGrid"
-          class="package-thumbnail-grid"
-        ></div>
+        <div id="packageThumbnailGrid" class="package-thumbnail-grid"></div>
 
         <div class="package-overview-card">
+          <span id="packageCategory" class="section-label">Package</span>
 
-          <span
-            id="packageCategory"
-            class="section-label"
-          >
-            Package
-          </span>
+          <h1 id="packageTitle">Luxury Mauritius Package</h1>
 
-          <h1 id="packageTitle">
-            Luxury Mauritius Package
-          </h1>
-
-          <p
-            id="packageDescription"
-            class="package-details-description"
-          ></p>
+          <p id="packageDescription" class="package-details-description"></p>
 
           <div class="package-highlights">
-
             <div class="highlight-box">
               🕒
               <strong>Duration</strong>
@@ -117,153 +90,98 @@
             <div class="highlight-box">
               💰
               <strong>Price</strong>
-              <span id="packagePrice">
-                Custom Quote
-              </span>
+              <span id="packagePrice">Custom Quote</span>
             </div>
 
             <div class="highlight-box">
               🚘
               <strong>Vehicles</strong>
-              <span>
-                Multiple Options
-              </span>
+              <span>Multiple Options</span>
             </div>
 
             <div class="highlight-box">
               ⭐
               <strong>Private Tour</strong>
-              <span>
-                Premium Experience
-              </span>
+              <span>Premium Experience</span>
             </div>
-
           </div>
-
         </div>
 
         <div class="package-details-block">
-
           <h3>What's Included</h3>
-
-          <ul
-            id="packageIncludes"
-            class="package-includes"
-          ></ul>
-
+          <ul id="packageIncludes" class="package-includes"></ul>
         </div>
 
         <div class="package-details-block">
-
           <h3>Full Package Details</h3>
-
           <p id="packageFullDetails"></p>
-
         </div>
 
       </div>
 
-      <!-- RIGHT -->
-
       <div class="package-booking-column">
-
         <div class="booking-side-card">
 
           <div class="side-price">
-
-            <small>Starting From</small>
-
-            <h2 id="sidePackagePrice">
-              Custom Quote
-            </h2>
-
+            <small>Estimated Total</small>
+            <h2 id="sidePackagePrice">Custom Quote</h2>
           </div>
 
-          <a
-            id="bookPackageBtn"
-            href="booking.html"
-            class="btn full-width-btn"
-          >
-            Book This Package
-          </a>
+          <form id="packageBookingForm" class="package-booking-form">
 
-          <a
-            id="packageWhatsappBtn"
-            href="#"
-            target="_blank"
-            class="btn-outline full-width-btn"
-          >
-            Ask on WhatsApp
-          </a>
+            <input type="text" id="name" placeholder="Full Name" required />
+            <input type="email" id="email" placeholder="Email Address" required />
+            <input type="text" id="phone" placeholder="WhatsApp / Phone Number" required />
+            <input type="number" id="people" placeholder="Number of People" min="1" required />
+            <input type="date" id="date" required />
 
-          <div class="booking-benefits">
+            <div class="vehicle-selection-box">
+              <h4>Choose Vehicle</h4>
+              <p>Select your preferred private vehicle.</p>
 
-            <p>✓ Private Tour</p>
-            <p>✓ Flexible Pickup</p>
-            <p>✓ Local Guide Available</p>
-            <p>✓ WhatsApp Assistance</p>
+              <div id="packageVehiclesGrid" class="vehicle-options-list">
+                <div class="vehicle-empty">Loading vehicles...</div>
+              </div>
+            </div>
 
-          </div>
+            <div class="booking-total-box">
+              <span>Total Estimate</span>
+              <strong id="bookingEstimatedTotal">Custom Quote</strong>
+              <small>Final confirmation will be reviewed by admin.</small>
+            </div>
+
+            <label class="upload-label" for="paymentProof">
+              Upload Payment Proof
+            </label>
+
+            <input type="file" id="paymentProof" accept="image/*,.pdf" required />
+
+            <button type="submit" class="btn full-width-btn">
+              Submit Booking
+            </button>
+
+            <a id="packageWhatsappBtn" href="#" target="_blank" class="btn-outline full-width-btn">
+              Ask on WhatsApp
+            </a>
+
+          </form>
 
         </div>
-
       </div>
 
-    </div>
-
-  </section>
-
-  <!-- VEHICLES -->
-
-  <section class="container">
-
-    <span class="section-label center-label">
-      Vehicle Options
-    </span>
-
-    <h2>
-      Choose Your Preferred Vehicle
-    </h2>
-
-    <p class="center section-subtitle">
-      Select the vehicle that best fits your group size and comfort level.
-    </p>
-
-    <div
-      id="packageVehiclesGrid"
-      class="vehicle-page-grid"
-    >
-      <div class="loading-card">
-        <h3>Loading Vehicles...</h3>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- RELATED PACKAGES -->
-
-  <section class="container">
-
-    <span class="section-label center-label">
-      You May Also Like
-    </span>
-
-    <h2>
-      Similar Experiences
-    </h2>
-
-    <div
-      id="relatedPackagesGrid"
-      class="experience-grid"
-    >
-      <div class="loading-card">
-        <h3>Loading Related Packages...</h3>
-      </div>
     </div>
 
   </section>
 
 </main>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">OK</button>
+  </div>
+</div>
 
 <a
   class="whatsapp-float"
@@ -274,10 +192,7 @@
 </a>
 
 <footer class="footer">
-  <p>
-    © 2026 Mautour Holidays.
-    All Rights Reserved.
-  </p>
+  <p>© 2026 Mautour Holidays. All Rights Reserved.</p>
 </footer>
 
 <script src="js/main.js"></script>
