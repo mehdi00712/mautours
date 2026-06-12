@@ -223,12 +223,31 @@
   <span class="section-label center-label">Guest Reviews</span>
   <h2>What Our Guests Say</h2>
 
-  <div id="homeReviewsGrid" class="service-grid">
-    <div class="service-card clickable-card" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-      ⭐⭐⭐⭐⭐
-      <h3>Ahmed, UAE</h3>
-      <p>Very smooth private tour experience. Everything was arranged through WhatsApp.</p>
-      <span class="card-action">Contact Us →</span>
+  <div id="homeReviewsGrid">
+    <div class="review-slider">
+      <div class="review-slide active">
+        <div class="review-stars">★★★★★</div>
+        <h3>Ahmed, UAE</h3>
+        <p>Very smooth private tour experience. Everything was arranged through WhatsApp.</p>
+      </div>
+
+      <div class="review-slide">
+        <div class="review-stars">★★★★★</div>
+        <h3>Fatima, Saudi Arabia</h3>
+        <p>The team was very helpful and the private transfer was comfortable.</p>
+      </div>
+
+      <div class="review-slide">
+        <div class="review-stars">★★★★★</div>
+        <h3>Khalid, Qatar</h3>
+        <p>Professional service, clean vehicle and beautiful Mauritius experience.</p>
+      </div>
+
+      <div class="review-dots">
+        <button class="review-dot active" type="button" data-review="0"></button>
+        <button class="review-dot" type="button" data-review="1"></button>
+        <button class="review-dot" type="button" data-review="2"></button>
+      </div>
     </div>
   </div>
 </section>
@@ -287,6 +306,36 @@
       contactWhatsapp.href = heroWhatsapp.href;
     }
   });
+
+  const reviewSlides = document.querySelectorAll(".review-slide");
+  const reviewDots = document.querySelectorAll(".review-dot");
+  let currentReview = 0;
+
+  function showReview(index) {
+    reviewSlides.forEach((slide) => slide.classList.remove("active"));
+    reviewDots.forEach((dot) => dot.classList.remove("active"));
+
+    currentReview = index;
+
+    if (reviewSlides[currentReview]) {
+      reviewSlides[currentReview].classList.add("active");
+    }
+
+    if (reviewDots[currentReview]) {
+      reviewDots[currentReview].classList.add("active");
+    }
+  }
+
+  reviewDots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      showReview(Number(dot.dataset.review));
+    });
+  });
+
+  setInterval(() => {
+    const nextReview = currentReview + 1 >= reviewSlides.length ? 0 : currentReview + 1;
+    showReview(nextReview);
+  }, 5000);
 </script>
 
 </body>
