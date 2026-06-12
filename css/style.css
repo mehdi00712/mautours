@@ -1948,3 +1948,141 @@ h2::after {
     font-size: 0.85rem;
   }
 }
+
+.breadcrumb {
+  margin-top: 120px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.breadcrumb a {
+  color: var(--darkblue);
+  text-decoration: none;
+}
+
+.package-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.package-booking-column {
+  position: sticky;
+  top: 100px;
+}
+
+.package-gallery-wrapper {
+  position: relative;
+}
+
+.photo-count {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  background: rgba(7, 24, 39, 0.85);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.package-overview-card,
+.booking-side-card,
+.package-details-block {
+  background: white;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.package-overview-card h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: var(--darkblue);
+  margin-bottom: 14px;
+}
+
+.package-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.highlight-box {
+  background: var(--sand);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.highlight-box strong {
+  display: block;
+  color: var(--darkblue);
+  margin-top: 8px;
+}
+
+.highlight-box span {
+  color: var(--gold);
+  font-weight: 900;
+}
+
+.booking-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.side-price {
+  text-align: center;
+  background: var(--sand);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.side-price small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.side-price h2 {
+  margin: 0;
+  color: var(--gold);
+}
+
+.side-price h2::after {
+  display: none;
+}
+
+.package-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.package-booking-form input {
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+.full-width-btn {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .package-booking-column {
+    position: static;
+  }
+
+  .package-highlights {
+    grid-template-columns: 1fr;
+  }
+
+  .breadcrumb {
+    margin-top: 95px;
+  }
+}
