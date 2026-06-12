@@ -1,13 +1,13 @@
 // js/firebase-config.js
 
-// ✅ This file ONLY exports the configuration object
+// This file ONLY exports the Firebase configuration object.
 // Do NOT call initializeApp() here.
 
 export const firebaseConfig = {
   apiKey: "AIzaSyC2jf5v9p8kVXP3weiPvHm8piHDbP6XaRw",
   authDomain: "mautours-60318.firebaseapp.com",
   projectId: "mautours-60318",
-  storageBucket: "mautours-60318.appspot.com",
+  storageBucket: "mautours-60318.firebasestorage.app",
   messagingSenderId: "1009871171111",
   appId: "1:1009871171111:web:d4369386c1a958aa18a802",
   measurementId: "G-882H9VPLJT"
