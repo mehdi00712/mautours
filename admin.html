@@ -36,7 +36,7 @@
       <span class="section-label center-label">Admin Panel</span>
       <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Manage bookings, packages, vehicles, homepage, gallery and business settings.
+        Manage bookings, packages, package galleries, vehicles, homepage and business settings.
       </p>
     </div>
 
@@ -83,7 +83,7 @@
 
       <div class="admin-note">
         <strong>How it works:</strong>
-        Customers choose a package and vehicle, upload payment proof, then you approve or reject the booking.
+        Customers view package details, choose a vehicle, upload payment proof, then you approve or reject the booking.
       </div>
     </div>
 
@@ -122,9 +122,7 @@
     <div id="vehiclesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Vehicle Fleet Manager</h3>
-        <p>
-          Add vehicles customers can view and select before booking.
-        </p>
+        <p>Add vehicles customers can view and select before booking.</p>
       </div>
 
       <form id="vehicleForm" class="media-upload-form friendly-form">
@@ -188,7 +186,7 @@
     <div id="packagesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Package Manager</h3>
-        <p>Add packages, images, prices and duration.</p>
+        <p>Add packages, full package details, main image and multiple gallery pictures.</p>
       </div>
 
       <form id="tripForm" class="media-upload-form friendly-form">
@@ -218,14 +216,19 @@
         </div>
 
         <div class="form-group">
-          <label>What Customers Will See</label>
-          <textarea id="tripDescription" placeholder="Describe this package clearly for customers." required></textarea>
+          <label>Short Description</label>
+          <textarea id="tripDescription" placeholder="Short summary shown on package cards." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Full Package Details</label>
+          <textarea id="tripFullDetails" placeholder="Write the full package details customers will see on the package details page."></textarea>
+          <small>Example: itinerary, pickup details, stops, activity notes, what to expect.</small>
         </div>
 
         <div class="form-group">
           <label>Duration</label>
           <input type="text" id="tripDuration" placeholder="Example: 1 day, 3 days, Full day" required />
-          <small>Example: 1 day, 3 days, Full day.</small>
         </div>
 
         <div class="form-group">
@@ -254,8 +257,15 @@
         </label>
 
         <div class="form-group">
-          <label>Package Image</label>
+          <label>Main Package Image</label>
           <input type="file" id="tripImage" accept="image/*" />
+          <small>This is the main image used on package cards.</small>
+        </div>
+
+        <div class="form-group">
+          <label>More Package Pictures</label>
+          <input type="file" id="tripGalleryImages" accept="image/*" multiple />
+          <small>You can select more than one image for the package details gallery.</small>
         </div>
 
         <button type="submit" class="btn">Save Package</button>
