@@ -21,8 +21,8 @@
     <nav class="nav" id="nav">
       <a href="index.html" class="active">Home</a>
       <a href="booking.html">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
       <a href="#why">Why Us</a>
-      <a href="#vehicles-section">Vehicles</a>
       <a href="#reviews">Reviews</a>
       <a href="#contact">Contact</a>
       <a href="login.html">Sign In</a>
@@ -67,17 +67,17 @@
 </section>
 
 <section class="mobile-stats">
-  <div>
+  <div onclick="document.getElementById('reviews').scrollIntoView({behavior:'smooth'})">
     <strong id="statClients">500+</strong>
     <span>Happy Clients</span>
   </div>
 
-  <div>
+  <div onclick="document.getElementById('packages-preview').scrollIntoView({behavior:'smooth'})">
     <strong id="statExperiences">9+</strong>
     <span>Premium Experiences</span>
   </div>
 
-  <div>
+  <div onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
     <strong>24/7</strong>
     <span>WhatsApp Support</span>
   </div>
@@ -88,43 +88,31 @@
   <h2>Private, Comfortable and Built for GCC Travellers</h2>
 
   <div class="service-grid">
-    <div
-      class="service-card clickable-card"
-      onclick="document.getElementById('packages-preview').scrollIntoView({behavior:'smooth'})"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
       🏝️
       <h3>Local Experts</h3>
-      <p>View our selected packages and carefully planned Mauritius experiences.</p>
+      <p>Explore our hand-picked Mauritius packages and island experiences.</p>
       <span class="card-action">View Packages →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="document.getElementById('vehicles-section').scrollIntoView({behavior:'smooth'})"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='vehicles.html'">
       🚘
       <h3>Private Transfers</h3>
-      <p>Choose the vehicle that fits your comfort, group size and travel style.</p>
+      <p>Choose from standard cars, SUVs, minibuses and luxury vehicles.</p>
       <span class="card-action">View Vehicles →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="window.open(document.getElementById('heroWhatsappBtn').href,'_blank')"
-    >
+    <div class="service-card clickable-card" onclick="window.open(document.getElementById('heroWhatsappBtn').href,'_blank')">
       ✨
       <h3>Tailor-Made Experiences</h3>
       <p>Need a custom trip? Message us and we will plan it for you.</p>
       <span class="card-action">Plan on WhatsApp →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})"
-    >
+    <div class="service-card clickable-card" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
       💬
       <h3>24/7 Support</h3>
-      <p>Contact our team for assistance before and during your trip.</p>
+      <p>Contact our team for help before and during your trip.</p>
       <span class="card-action">Contact Us →</span>
     </div>
   </div>
@@ -134,11 +122,19 @@
   <span class="section-label center-label">Featured Packages</span>
   <h2>Choose Your Mauritius Experience</h2>
 
+  <p class="center section-subtitle">
+    Click a package to view full details, photos, inclusions and available vehicles.
+  </p>
+
   <div id="homeTripsGrid" class="experience-grid">
     <div class="loading-card">
       <h3>Loading Featured Packages...</h3>
       <p>Please wait while we load selected packages.</p>
     </div>
+  </div>
+
+  <div class="center" style="margin-top: 2rem;">
+    <a href="booking.html" class="btn">View All Packages</a>
   </div>
 </section>
 
@@ -151,40 +147,28 @@
   </p>
 
   <div class="service-grid">
-    <div
-      class="service-card clickable-card"
-      onclick="window.location.href='vehicles.html?type=standard'"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='vehicles.html?type=standard'">
       🚗
       <h3>Standard Cars</h3>
       <p>Comfortable options for couples, solo travellers or small groups.</p>
       <span class="card-action">View Standard Cars →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="window.location.href='vehicles.html?type=suv'"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='vehicles.html?type=suv'">
       🚙
       <h3>SUV Vehicles</h3>
       <p>Spacious and comfortable vehicles for families and premium trips.</p>
       <span class="card-action">View SUVs →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="window.location.href='vehicles.html?type=minibus'"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='vehicles.html?type=minibus'">
       🚐
       <h3>Minibus</h3>
       <p>Ideal for larger families, groups and island tours.</p>
       <span class="card-action">View Minibus Options →</span>
     </div>
 
-    <div
-      class="service-card clickable-card"
-      onclick="window.location.href='vehicles.html?type=luxury'"
-    >
+    <div class="service-card clickable-card" onclick="window.location.href='vehicles.html?type=luxury'">
       ✨
       <h3>Luxury Vehicles</h3>
       <p>Premium vehicles for VIP travellers, business trips and honeymoons.</p>
@@ -199,22 +183,25 @@
     <h2>Activities We Arrange</h2>
 
     <div id="homeExperiencesGrid" class="service-grid">
-      <div class="service-card">
+      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
         🌈
         <h3>23 Colours Nature Park</h3>
         <p>Zipline, quad biking, Nepalese bridge, waterfall zipline and more.</p>
+        <span class="card-action">See Packages →</span>
       </div>
 
-      <div class="service-card">
+      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
         🐬
         <h3>Dolphins & Whale Watching</h3>
         <p>Boat trips with dolphin watching and optional swimming experience.</p>
+        <span class="card-action">See Packages →</span>
       </div>
 
-      <div class="service-card">
+      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
         🦁
         <h3>Casela Safari Park</h3>
         <p>Safari, giraffe, zebra, wild cat interaction and walk with lions by advance booking.</p>
+        <span class="card-action">See Packages →</span>
       </div>
     </div>
   </div>
@@ -237,10 +224,11 @@
   <h2>What Our Guests Say</h2>
 
   <div id="homeReviewsGrid" class="service-grid">
-    <div class="service-card">
+    <div class="service-card clickable-card" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
       ⭐⭐⭐⭐⭐
       <h3>Ahmed, UAE</h3>
       <p>Very smooth private tour experience. Everything was arranged through WhatsApp.</p>
+      <span class="card-action">Contact Us →</span>
     </div>
   </div>
 </section>
@@ -251,9 +239,15 @@
     <h2>Book Your Luxury Mauritius Experience Today</h2>
     <p>Choose your package, select your vehicle, and start planning your private Mauritius trip.</p>
 
-    <a id="ctaWhatsappBtn" href="#" target="_blank" class="btn">
-      Book on WhatsApp
-    </a>
+    <div class="hero-actions">
+      <a id="ctaWhatsappBtn" href="#" target="_blank" class="btn">
+        Book on WhatsApp
+      </a>
+
+      <a href="booking.html" class="btn-outline hero-outline">
+        View Packages
+      </a>
+    </div>
   </div>
 </section>
 
@@ -267,6 +261,10 @@
     <p><strong>Mobile:</strong> <span id="contactMobile">+230 5254 2792</span></p>
     <p><strong>Serving:</strong> <span id="contactRegions">UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼</span></p>
   </div>
+
+  <div class="center" style="margin-top: 2rem;">
+    <a id="contactWhatsappBtn" href="#" target="_blank" class="btn">Message on WhatsApp</a>
+  </div>
 </section>
 
 <a id="floatingWhatsappBtn" class="whatsapp-float" href="#" target="_blank">
@@ -279,5 +277,17 @@
 
 <script src="js/main.js"></script>
 <script type="module" src="js/home.js"></script>
+
+<script>
+  window.addEventListener("load", () => {
+    const heroWhatsapp = document.getElementById("heroWhatsappBtn");
+    const contactWhatsapp = document.getElementById("contactWhatsappBtn");
+
+    if (heroWhatsapp && contactWhatsapp) {
+      contactWhatsapp.href = heroWhatsapp.href;
+    }
+  });
+</script>
+
 </body>
 </html>
