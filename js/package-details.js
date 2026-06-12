@@ -6,32 +6,83 @@ import {
   doc,
   getDoc,
   collection,
-  getDocs
+  getDocs,
+  setDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
 const params = new URLSearchParams(window.location.search);
 const packageId = params.get("id");
+
+let currentUser = null;
+let currentPackage = null;
+let selectedVehicle = null;
+let allVehicles = [];
 
 const packageLoading = document.getElementById("packageLoading");
 const packageDetailsContent = document.getElementById("packageDetailsContent");
 
 const mainPackageImage = document.getElementById("mainPackageImage");
 const packageThumbnailGrid = document.getElementById("packageThumbnailGrid");
+const photoCount = document.getElementById("photoCount");
 
 const packageCategory = document.getElementById("packageCategory");
 const packageTitle = document.getElementById("packageTitle");
 const packageDescription = document.getElementById("packageDescription");
 const packageDuration = document.getElementById("packageDuration");
 const packagePrice = document.getElementById("packagePrice");
+const sidePackagePrice = document.getElementById("sidePackagePrice");
 const packageIncludes = document.getElementById("packageIncludes");
 const packageFullDetails = document.getElementById("packageFullDetails");
+const breadcrumbPackage = document.getElementById("breadcrumbPackage");
 
-const bookPackageBtn = document.getElementById("bookPackageBtn");
-const packageWhatsappBtn = document.getElementById("packageWhatsappBtn");
 const packageVehiclesGrid = document.getElementById("packageVehiclesGrid");
+const packageWhatsappBtn = document.getElementById("packageWhatsappBtn");
+const packageBookingForm = document.getElementById("packageBookingForm");
+const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
+
+const popup = document.getElementById("popup");
+const popupTitle = document.getElementById("popupTitle");
+const popupMessage = document.getElementById("popupMessage");
+const popupBtn = document.getElementById("popupBtn");
+
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+});
+
+function showPopup(title, message, redirect = null) {
+  if (!popup || !popupTitle || !popupMessage || !popupBtn) {
+    alert(`${title}\n\n${message}`);
+    if (redirect) window.location.href = redirect;
+    return;
+  }
+
+  popupTitle.textContent = title;
+  popupMessage.textContent = message;
+  popup.classList.add("show");
+
+  popupBtn.onclick = () => {
+    popup.classList.remove("show");
+    if (redirect) window.location.href = redirect;
+  };
+}
 
 function escapeHtml(value) {
   return String(value || "")
@@ -45,13 +96,8 @@ function escapeHtml(value) {
 function formatPrice(data) {
   const price = Number(data.price || 0);
 
-  if (price <= 0 || data.priceType === "Custom Quote") {
-    return "Custom Quote";
-  }
-
-  if (data.priceType === "Fixed") {
-    return `Rs ${price.toLocaleString()}`;
-  }
+  if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
+  if (data.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
 
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
@@ -66,19 +112,28 @@ function showError(message) {
   }
 }
 
-function setMainImage(url) {
-  if (!mainPackageImage || !url) return;
-  mainPackageImage.src = url;
+function updateEstimatedTotal() {
+  const people = Number(document.getElementById("people")?.value || 1);
+  const safePeople = people > 0 ? people : 1;
+
+  const vehiclePrice = Number(selectedVehicle?.price || 0);
+  const basePrice = Number(currentPackage?.price || 0);
+
+  let total = 0;
+
+  if (vehiclePrice > 0) total = vehiclePrice * safePeople;
+  else if (basePrice > 0) total = basePrice * safePeople;
+
+  const totalText = total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
+
+  if (bookingEstimatedTotal) bookingEstimatedTotal.textContent = totalText;
+  if (sidePackagePrice) sidePackagePrice.textContent = totalText;
 }
 
 function renderGallery(packageData) {
-  if (!packageThumbnailGrid) return;
-
   const images = [];
 
-  if (packageData.imageUrl) {
-    images.push(packageData.imageUrl);
-  }
+  if (packageData.imageUrl) images.push(packageData.imageUrl);
 
   if (Array.isArray(packageData.galleryImages)) {
     packageData.galleryImages.forEach((url) => {
@@ -86,13 +141,11 @@ function renderGallery(packageData) {
     });
   }
 
-  if (images.length === 0) {
-    setMainImage("assets/ile.jpg");
-    packageThumbnailGrid.innerHTML = "";
-    return;
-  }
+  if (images.length === 0) images.push("assets/ile.jpg");
 
-  setMainImage(images[0]);
+  if (photoCount) photoCount.textContent = images.length;
+  if (mainPackageImage) mainPackageImage.src = images[0];
+
   packageThumbnailGrid.innerHTML = "";
 
   images.forEach((url, index) => {
@@ -100,12 +153,10 @@ function renderGallery(packageData) {
     btn.type = "button";
     btn.className = `package-thumb ${index === 0 ? "active" : ""}`;
 
-    btn.innerHTML = `
-      <img src="${escapeHtml(url)}" alt="Package picture ${index + 1}">
-    `;
+    btn.innerHTML = `<img src="${escapeHtml(url)}" alt="Package photo ${index + 1}">`;
 
     btn.addEventListener("click", () => {
-      setMainImage(url);
+      mainPackageImage.src = url;
 
       document.querySelectorAll(".package-thumb").forEach((thumb) => {
         thumb.classList.remove("active");
@@ -119,8 +170,6 @@ function renderGallery(packageData) {
 }
 
 function renderIncludes(includes) {
-  if (!packageIncludes) return;
-
   if (!Array.isArray(includes) || includes.length === 0) {
     packageIncludes.innerHTML = `<li>Custom itinerary planning</li>`;
     return;
@@ -131,82 +180,84 @@ function renderIncludes(includes) {
     .join("");
 }
 
-async function loadVehicles() {
-  if (!packageVehiclesGrid) return;
+function selectVehicle(vehicle, card) {
+  selectedVehicle = vehicle;
 
+  document.querySelectorAll(".vehicle-option-card").forEach((item) => {
+    item.classList.remove("selected");
+  });
+
+  card.classList.add("selected");
+  updateEstimatedTotal();
+}
+
+async function loadVehicles() {
   try {
     const snapshot = await getDocs(collection(db, "vehicles"));
 
-    const vehicles = [];
+    allVehicles = [];
 
     snapshot.forEach((docSnap) => {
       const vehicle = docSnap.data();
 
       if (vehicle.active === false) return;
 
-      vehicles.push({
+      allVehicles.push({
         id: docSnap.id,
         ...vehicle
       });
     });
 
-    if (vehicles.length === 0) {
+    if (allVehicles.length === 0) {
       packageVehiclesGrid.innerHTML = `
-        <div class="loading-card">
-          <h3>No Vehicles Added Yet</h3>
-          <p>Vehicles will appear here once added by admin.</p>
-        </div>
+        <div class="vehicle-empty">No vehicles available yet.</div>
       `;
+      updateEstimatedTotal();
       return;
     }
 
     packageVehiclesGrid.innerHTML = "";
 
-    vehicles.forEach((vehicle) => {
+    allVehicles.forEach((vehicle, index) => {
       const price = Number(vehicle.price || 0);
       const capacity = Number(vehicle.capacity || 0);
 
-      const card = document.createElement("div");
-      card.className = "vehicle-public-card";
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "vehicle-option-card";
 
       card.innerHTML = `
         ${
           vehicle.imageUrl
             ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
-            : `<div class="vehicle-public-placeholder">🚘</div>`
+            : `<div class="vehicle-placeholder">🚘</div>`
         }
 
-        <div class="vehicle-public-info">
+        <div class="vehicle-option-info">
+          <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
           <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
-          <h3>${escapeHtml(vehicle.name || "Vehicle")}</h3>
-          <p>${escapeHtml(vehicle.description || "Comfortable private vehicle for your trip.")}</p>
-
-          <ul>
-            ${capacity > 0 ? `<li>✓ Up to ${capacity} passengers</li>` : ""}
-            <li>✓ Air Conditioning</li>
-            <li>✓ Private Transfer</li>
-            <li>✓ Professional Driver</li>
-          </ul>
-
-          <strong>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</strong>
-
-          <a class="btn" href="booking.html?package=${encodeURIComponent(packageId)}&vehicle=${encodeURIComponent(vehicle.name || "")}">
-            Select Vehicle
-          </a>
+          ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
+          ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
+          <b>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</b>
         </div>
       `;
 
+      card.addEventListener("click", () => {
+        selectVehicle(vehicle, card);
+      });
+
       packageVehiclesGrid.appendChild(card);
+
+      if (index === 0) {
+        selectVehicle(vehicle, card);
+      }
     });
 
   } catch (error) {
     console.error("Load Vehicles Error:", error);
 
     packageVehiclesGrid.innerHTML = `
-      <div class="loading-card">
-        <h3>Could Not Load Vehicles</h3>
-        <p>${escapeHtml(error.message)}</p>
-      </div>
+      <div class="vehicle-empty">Could not load vehicles.</div>
     `;
   }
 }
@@ -232,13 +283,20 @@ async function loadPackageDetails() {
       return;
     }
 
+    currentPackage = {
+      id: snap.id,
+      ...data
+    };
+
     document.title = `${data.title || "Package Details"} | Mautour Holidays`;
 
+    if (breadcrumbPackage) breadcrumbPackage.textContent = data.title || "Package";
     if (packageCategory) packageCategory.textContent = data.category || "Package";
     if (packageTitle) packageTitle.textContent = data.title || "Package Details";
     if (packageDescription) packageDescription.textContent = data.description || "";
     if (packageDuration) packageDuration.textContent = data.duration || "-";
     if (packagePrice) packagePrice.textContent = formatPrice(data);
+    if (sidePackagePrice) sidePackagePrice.textContent = formatPrice(data);
 
     if (packageFullDetails) {
       packageFullDetails.textContent =
@@ -249,10 +307,6 @@ async function loadPackageDetails() {
     renderIncludes(data.includes);
     renderGallery(data);
 
-    if (bookPackageBtn) {
-      bookPackageBtn.href = `booking.html?package=${encodeURIComponent(packageId)}`;
-    }
-
     if (packageWhatsappBtn) {
       const message = encodeURIComponent(
         `Hi, I want to know more about this package: ${data.title || "Mauritius Package"} 🇲🇺`
@@ -261,8 +315,10 @@ async function loadPackageDetails() {
       packageWhatsappBtn.href = `https://wa.me/23059066404?text=${message}`;
     }
 
-    if (packageLoading) packageLoading.style.display = "none";
-    if (packageDetailsContent) packageDetailsContent.style.display = "grid";
+    packageLoading.style.display = "none";
+    packageDetailsContent.style.display = "grid";
+
+    updateEstimatedTotal();
 
   } catch (error) {
     console.error("Load Package Details Error:", error);
@@ -270,5 +326,150 @@ async function loadPackageDetails() {
   }
 }
 
-loadPackageDetails();
-loadVehicles();
+if (document.getElementById("people")) {
+  document.getElementById("people").addEventListener("input", updateEstimatedTotal);
+}
+
+if (packageBookingForm) {
+  packageBookingForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      showPopup(
+        "Login Required",
+        "Please sign in before making a booking.",
+        `login.html?redirect=package-details.html?id=${packageId}`
+      );
+      return;
+    }
+
+    if (!currentPackage) {
+      showPopup("Package Error", "Package details are not loaded yet.");
+      return;
+    }
+
+    if (!selectedVehicle && allVehicles.length > 0) {
+      showPopup("Vehicle Required", "Please choose a vehicle before booking.");
+      return;
+    }
+
+    const submitBtn = packageBookingForm.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.textContent;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const people = Number(document.getElementById("people").value);
+    const date = document.getElementById("date").value.trim();
+    const proofFile = document.getElementById("paymentProof").files[0];
+
+    if (!name || !email || !phone || !people || !date || !proofFile) {
+      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      return;
+    }
+
+    if (people < 1) {
+      showPopup("Invalid Number", "Please enter at least 1 person.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      return;
+    }
+
+    const selectedDate = new Date(`${date}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      showPopup("Invalid Date", "Please select today or a future date.");
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+      return;
+    }
+
+    try {
+      const bookingRef = doc(collection(db, "bookings"));
+      const bookingId = bookingRef.id;
+
+      const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+      const storageRef = ref(
+        storage,
+        `payment_proofs/${currentUser.uid}/${bookingId}_${safeFileName}`
+      );
+
+      const uploadResult = await uploadBytes(storageRef, proofFile);
+      const paymentProofUrl = await getDownloadURL(uploadResult.ref);
+
+      const vehiclePrice = Number(selectedVehicle?.price || 0);
+      const basePrice = Number(currentPackage.price || 0);
+
+      const pricePerPerson = vehiclePrice > 0 ? vehiclePrice : basePrice;
+      const totalPrice = pricePerPerson > 0 ? pricePerPerson * people : 0;
+
+      await setDoc(bookingRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email || "",
+
+        tripId: currentPackage.id,
+        package: currentPackage.title || "",
+
+        name,
+        email,
+        phone,
+        people,
+        date,
+        startDate: date,
+        duration: currentPackage.duration || "",
+
+        vehicleId: selectedVehicle?.id || "",
+        vehicleName: selectedVehicle?.name || "",
+        vehicleCategory: selectedVehicle?.category || "",
+        vehiclePrice,
+        vehicleCapacity: Number(selectedVehicle?.capacity || 0),
+        vehicleImageUrl: selectedVehicle?.imageUrl || "",
+
+        pricePerPerson,
+        totalPrice,
+        priceType: currentPackage.priceType || "Custom Quote",
+
+        paymentMethod: "Bank Transfer",
+        paymentStatus: "Proof Uploaded",
+        paymentProofUrl,
+
+        adminDecision: "Pending",
+        bookingStatus: "Awaiting Admin Validation",
+
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      packageBookingForm.reset();
+      selectedVehicle = null;
+
+      showPopup(
+        "Booking Submitted ✅",
+        "Your booking and payment proof have been submitted. Admin will validate your booking.",
+        "index.html"
+      );
+
+    } catch (error) {
+      console.error("Booking Error:", error);
+      showPopup("Booking Error", error.message || "There was an error submitting your booking.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+  });
+}
+
+async function init() {
+  await loadPackageDetails();
+  await loadVehicles();
+}
+
+init();
