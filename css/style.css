@@ -2106,3 +2106,257 @@ section:nth-of-type(even) {
   font-size: 1.2rem;
   margin-bottom: 18px;
 }
+
+/* ========================================
+   PACKAGE DETAILS PAGE
+======================================== */
+
+.package-details-page {
+  padding: 40px 0;
+}
+
+.package-details-container {
+  margin-top: 30px;
+}
+
+.package-details-content {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.package-details-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.package-main-image {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.12);
+}
+
+.package-thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(100px,1fr));
+  gap: 12px;
+}
+
+.package-thumb {
+  border: 2px solid transparent;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: white;
+  transition: .25s ease;
+}
+
+.package-thumb:hover {
+  transform: translateY(-3px);
+}
+
+.package-thumb.active {
+  border-color: #0ea5e9;
+}
+
+.package-thumb img {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+}
+
+.package-details-info {
+  background: white;
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 10px 35px rgba(0,0,0,.08);
+}
+
+.package-details-info h1 {
+  font-size: 2.2rem;
+  margin-bottom: 15px;
+  color: #071827;
+}
+
+.package-details-description {
+  color: #64748b;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.package-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.package-info-grid div {
+  background: #f8fafc;
+  padding: 18px;
+  border-radius: 16px;
+}
+
+.package-info-grid strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #071827;
+}
+
+.package-info-grid span {
+  color: #0ea5e9;
+  font-weight: 700;
+}
+
+.package-details-block {
+  margin-bottom: 30px;
+}
+
+.package-details-block h3 {
+  margin-bottom: 12px;
+  color: #071827;
+}
+
+.package-includes {
+  padding-left: 20px;
+}
+
+.package-includes li {
+  margin-bottom: 10px;
+  color: #475569;
+}
+
+.package-details-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.package-details-actions .btn,
+.package-details-actions .btn-outline {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
+/* ========================================
+   VEHICLE SECTION
+======================================== */
+
+.vehicle-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.vehicle-public-card {
+  background: white;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0,0,0,.08);
+  transition: .3s ease;
+}
+
+.vehicle-public-card:hover {
+  transform: translateY(-6px);
+}
+
+.vehicle-public-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+}
+
+.vehicle-public-placeholder {
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  background: #f8fafc;
+}
+
+.vehicle-public-info {
+  padding: 24px;
+}
+
+.vehicle-public-info span {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: .85rem;
+  margin-bottom: 12px;
+}
+
+.vehicle-public-info h3 {
+  margin-bottom: 10px;
+  color: #071827;
+}
+
+.vehicle-public-info p {
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.vehicle-public-info ul {
+  margin: 15px 0;
+  padding-left: 20px;
+}
+
+.vehicle-public-info li {
+  margin-bottom: 8px;
+  color: #475569;
+}
+
+.vehicle-public-info strong {
+  display: block;
+  font-size: 1.2rem;
+  color: #0ea5e9;
+  margin-bottom: 18px;
+}
+
+.vehicle-public-info .btn {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 900px) {
+
+  .package-details-content {
+    grid-template-columns: 1fr;
+  }
+
+  .package-main-image {
+    height: 300px;
+  }
+
+  .package-details-info h1 {
+    font-size: 1.8rem;
+  }
+
+  .package-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .package-details-actions {
+    flex-direction: column;
+  }
+
+  .package-details-actions .btn,
+  .package-details-actions .btn-outline {
+    width: 100%;
+  }
+}
