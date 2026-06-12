@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mautour Holidays | Package Details</title>
+  <meta
+    name="description"
+    content="View full package details, photos, inclusions, vehicles and booking information for Mauritius private tours."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautour Holidays</h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
+      <a href="login.html">Sign In</a>
+      <a href="admin.html">Dashboard</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<main class="package-details-page">
+
+  <section class="container package-details-container">
+
+    <div id="packageLoading" class="loading-card">
+      <h3>Loading Package...</h3>
+      <p>Please wait while we load the package details.</p>
+    </div>
+
+    <div id="packageDetailsContent" class="package-details-content" style="display: none;">
+
+      <div class="package-details-gallery">
+        <img
+          id="mainPackageImage"
+          src="assets/ile.jpg"
+          alt="Package Image"
+          class="package-main-image"
+        />
+
+        <div id="packageThumbnailGrid" class="package-thumbnail-grid"></div>
+      </div>
+
+      <div class="package-details-info">
+        <span id="packageCategory" class="section-label">Package</span>
+
+        <h1 id="packageTitle">Package Title</h1>
+
+        <p id="packageDescription" class="package-details-description"></p>
+
+        <div class="package-info-grid">
+          <div>
+            <strong>Duration</strong>
+            <span id="packageDuration">-</span>
+          </div>
+
+          <div>
+            <strong>Price</strong>
+            <span id="packagePrice">Custom Quote</span>
+          </div>
+        </div>
+
+        <div class="package-details-block">
+          <h3>What Is Included</h3>
+          <ul id="packageIncludes" class="package-includes"></ul>
+        </div>
+
+        <div class="package-details-block">
+          <h3>Full Package Details</h3>
+          <p id="packageFullDetails"></p>
+        </div>
+
+        <div class="package-details-actions">
+          <a id="bookPackageBtn" href="booking.html" class="btn">
+            Book This Package
+          </a>
+
+          <a
+            id="packageWhatsappBtn"
+            href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20this%20package%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
+            target="_blank"
+            class="btn-outline"
+          >
+            Ask on WhatsApp
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="container">
+    <span class="section-label center-label">Vehicles</span>
+    <h2>Available Vehicle Options</h2>
+
+    <div id="packageVehiclesGrid" class="vehicle-page-grid">
+      <div class="loading-card">
+        <h3>Loading Vehicles...</h3>
+        <p>Please wait...</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<a
+  class="whatsapp-float"
+  href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
+  target="_blank"
+>
+  WhatsApp
+</a>
+
+<footer class="footer">
+  <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/package-details.js"></script>
+</body>
+</html>
