@@ -70,8 +70,11 @@ function setText(id, value) {
 function setMessage(id, message, isError = false) {
   const el = document.getElementById(id);
   if (!el) return;
+
   el.textContent = message;
   el.style.color = isError ? "#dc2626" : "#071827";
+  el.style.fontWeight = "700";
+  el.style.marginTop = "14px";
 }
 
 function escapeHtml(value) {
@@ -99,6 +102,11 @@ function formatPrice(data) {
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
 
+function clearFileInput(id) {
+  const input = document.getElementById(id);
+  if (input) input.value = "";
+}
+
 async function uploadFile(path, file) {
   if (!file) return "";
 
@@ -111,7 +119,9 @@ async function uploadFile(path, file) {
     return await getDownloadURL(uploadResult.ref);
   } catch (error) {
     console.error("Upload failed:", error);
-    throw new Error("Image upload failed. Check Firebase Storage rules.");
+    throw new Error(
+      "Image upload failed. Check Firebase Storage rules, storageBucket in firebase-config.js, and authorized domain."
+    );
   }
 }
 
@@ -120,6 +130,8 @@ async function uploadFile(path, file) {
 ========================= */
 
 onAuthStateChanged(auth, async (user) => {
+  console.log("CURRENT UID:", user?.uid || "No user");
+
   if (!user) {
     showPopup("Login Required", "Please log in first.", "login.html");
     return;
@@ -127,7 +139,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (!adminUIDs.includes(user.uid)) {
     await signOut(auth);
-    showPopup("Access Denied", "Admin privileges required.", "index.html");
+    showPopup("Access Denied", `Admin privileges required.\n\nYour UID is:\n${user.uid}`, "index.html");
     return;
   }
 
@@ -150,6 +162,8 @@ if (websiteSettingsForm) {
     e.preventDefault();
 
     try {
+      setMessage("settingsMessage", "Saving website settings...");
+
       await setDoc(doc(db, "siteContent", "settings"), {
         businessName: document.getElementById("businessName")?.value.trim() || "",
         whatsappNumber: document.getElementById("whatsappNumber")?.value.trim() || "",
@@ -215,6 +229,7 @@ if (homeContentForm) {
 
       await setDoc(doc(db, "siteContent", "homepage"), payload, { merge: true });
 
+      clearFileInput("homeHeroImage");
       setMessage("homeContentMessage", "Homepage saved successfully.");
       showPopup("Saved", "Homepage content has been updated.");
     } catch (error) {
@@ -286,7 +301,7 @@ if (vehicleForm) {
       }
 
       if (imageFile) {
-        payload.imageUrl = await uploadFile(`fleet_vehicles/${vehicleRef.id}`, imageFile);
+        payload.imageUrl = await uploadFile(`vehicle_images/${vehicleRef.id}`, imageFile);
       }
 
       await setDoc(vehicleRef, payload, { merge: true });
@@ -387,8 +402,11 @@ async function loadVehicles() {
     bindVehicleButtons(snapshot);
   } catch (error) {
     console.error("Load Vehicles Error:", error);
+
     adminVehiclesList.innerHTML = `
-      <p style="color:red;">Failed to load vehicles: ${escapeHtml(error.message)}</p>
+      <p style="color:red;">
+        Failed to load vehicles: ${escapeHtml(error.message)}
+      </p>
     `;
   }
 }
@@ -427,7 +445,11 @@ function bindVehicleButtons(snapshot) {
           updatedAt: serverTimestamp()
         });
 
-        showPopup("Vehicle Updated", currentlyActive ? "Vehicle hidden from customers." : "Vehicle visible to customers.");
+        showPopup(
+          "Vehicle Updated",
+          currentlyActive ? "Vehicle hidden from customers." : "Vehicle visible to customers."
+        );
+
         loadVehicles();
       } catch (error) {
         showPopup("Vehicle Error", error.message || "Could not update vehicle.");
@@ -487,6 +509,10 @@ if (tripForm) {
 
       if (!payload.title || !payload.category || !payload.description || !payload.duration) {
         throw new Error("Please fill in all required package fields.");
+      }
+
+      if (payload.price < 0) {
+        throw new Error("Package price cannot be negative.");
       }
 
       if (!tripId) {
@@ -592,7 +618,12 @@ async function loadTrips() {
     bindTripButtons(snapshot);
   } catch (error) {
     console.error("Load Packages Error:", error);
-    adminTripsList.innerHTML = `<p style="color:red;">Failed to load packages: ${escapeHtml(error.message)}</p>`;
+
+    adminTripsList.innerHTML = `
+      <p style="color:red;">
+        Failed to load packages: ${escapeHtml(error.message)}
+      </p>
+    `;
   }
 }
 
@@ -716,6 +747,7 @@ if (galleryForm) {
       });
 
       galleryForm.reset();
+
       setMessage("galleryMessage", "Gallery image uploaded.");
       showPopup("Gallery Saved", "Gallery image uploaded successfully.");
       loadGalleryImages();
@@ -774,7 +806,12 @@ async function loadGalleryImages() {
     bindGalleryButtons();
   } catch (error) {
     console.error("Load Gallery Error:", error);
-    galleryImagesList.innerHTML = `<p style="color:red;">Failed to load gallery images: ${escapeHtml(error.message)}</p>`;
+
+    galleryImagesList.innerHTML = `
+      <p style="color:red;">
+        Failed to load gallery images: ${escapeHtml(error.message)}
+      </p>
+    `;
   }
 }
 
@@ -907,7 +944,14 @@ async function loadBookings() {
     bindBookingButtons();
   } catch (error) {
     console.error("Bookings Error:", error);
-    tableBody.innerHTML = `<tr><td colspan="11" style="color:red;">Error: ${escapeHtml(error.message)}</td></tr>`;
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="11" style="color:red;">
+          Error: ${escapeHtml(error.message)}
+        </td>
+      </tr>
+    `;
   }
 }
 
