@@ -18,9 +18,7 @@ function $(id) {
 
 function setText(id, value) {
   const el = $(id);
-  if (el && value) {
-    el.textContent = value;
-  }
+  if (el && value) el.textContent = value;
 }
 
 function escapeHtml(value) {
@@ -53,25 +51,63 @@ function getDocTime(data) {
 function formatPrice(trip) {
   const price = Number(trip.price || 0);
 
-  if (price <= 0 || trip.priceType === "Custom Quote") {
-    return "Custom Quote";
-  }
-
-  if (trip.priceType === "Fixed") {
-    return `Rs ${price.toLocaleString()}`;
-  }
+  if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
+  if (trip.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
 
   return `${trip.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
 
 function setWhatsappButtons(link) {
-  const heroBtn = $("heroWhatsappBtn");
-  const ctaBtn = $("ctaWhatsappBtn");
-  const floatingBtn = $("floatingWhatsappBtn");
+  const ids = [
+    "heroWhatsappBtn",
+    "ctaWhatsappBtn",
+    "floatingWhatsappBtn",
+    "contactWhatsappBtn"
+  ];
 
-  if (heroBtn) heroBtn.href = link;
-  if (ctaBtn) ctaBtn.href = link;
-  if (floatingBtn) floatingBtn.href = link;
+  ids.forEach((id) => {
+    const el = $(id);
+    if (el) el.href = link;
+  });
+}
+
+function startReviewSlider() {
+  const slides = document.querySelectorAll(".review-slide");
+  const dots = document.querySelectorAll(".review-dot");
+
+  if (slides.length === 0) return;
+
+  let currentReview = 0;
+  let timer = null;
+
+  function showReview(index) {
+    slides.forEach((slide) => slide.classList.remove("active"));
+    dots.forEach((dot) => dot.classList.remove("active"));
+
+    currentReview = index;
+
+    if (slides[currentReview]) slides[currentReview].classList.add("active");
+    if (dots[currentReview]) dots[currentReview].classList.add("active");
+  }
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      const index = Number(dot.dataset.review || 0);
+      showReview(index);
+
+      if (timer) clearInterval(timer);
+
+      timer = setInterval(() => {
+        const next = currentReview + 1 >= slides.length ? 0 : currentReview + 1;
+        showReview(next);
+      }, 5000);
+    });
+  });
+
+  timer = setInterval(() => {
+    const next = currentReview + 1 >= slides.length ? 0 : currentReview + 1;
+    showReview(next);
+  }, 5000);
 }
 
 async function loadSettings() {
@@ -88,12 +124,20 @@ async function loadSettings() {
     setText("siteBusinessName", data.businessName || "Mautour Holidays");
     setText("footerBusinessName", data.businessName || "Mautour Holidays");
     setText("contactEmail", data.businessEmail || "mautourholidays@gmail.com");
-    setText("contactPhone", data.whatsappNumber ? `+${data.whatsappNumber}` : "+230 5906 6404");
-    setText("contactMobile", data.mobileNumber ? `+${data.mobileNumber}` : "+230 5254 2792");
-    setText("contactRegions", data.servedRegions || "UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼");
+    setText(
+      "contactPhone",
+      data.whatsappNumber ? `+${data.whatsappNumber}` : "+230 5906 6404"
+    );
+    setText(
+      "contactMobile",
+      data.mobileNumber ? `+${data.mobileNumber}` : "+230 5254 2792"
+    );
+    setText(
+      "contactRegions",
+      data.servedRegions || "UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼"
+    );
 
     setWhatsappButtons(whatsappLink(data.whatsappNumber || "23059066404"));
-
   } catch (error) {
     console.error("Load settings error:", error);
     setWhatsappButtons(whatsappLink("23059066404"));
@@ -103,7 +147,6 @@ async function loadSettings() {
 async function loadHomepageContent() {
   try {
     const snap = await getDoc(doc(db, "siteContent", "homepage"));
-
     if (!snap.exists()) return;
 
     const data = snap.data();
@@ -115,6 +158,7 @@ async function loadHomepageContent() {
     if (data.ctaText) {
       setText("heroWhatsappBtn", data.ctaText);
       setText("ctaWhatsappBtn", data.ctaText);
+      setText("contactWhatsappBtn", data.ctaText);
     }
 
     if (data.heroImageUrl) {
@@ -128,12 +172,8 @@ async function loadHomepageContent() {
       }
 
       const video = $("heroVideo");
-
-      if (video) {
-        video.style.display = "none";
-      }
+      if (video) video.style.display = "none";
     }
-
   } catch (error) {
     console.error("Load homepage error:", error);
   }
@@ -152,16 +192,6 @@ async function loadFeaturedTrips() {
 
   try {
     const snapshot = await getDocs(collection(db, "trips"));
-
-    if (snapshot.empty) {
-      grid.innerHTML = `
-        <div class="loading-card">
-          <h3>No Featured Packages Yet</h3>
-          <p>Add trips from the admin dashboard and tick “Show on Featured Packages”.</p>
-        </div>
-      `;
-      return;
-    }
 
     const trips = [];
 
@@ -185,7 +215,7 @@ async function loadFeaturedTrips() {
       grid.innerHTML = `
         <div class="loading-card">
           <h3>No Featured Packages Selected</h3>
-          <p>Go to Admin → Trip Manager and tick “Show on Featured Packages” for the packages you want here.</p>
+          <p>Go to Admin → Packages and tick “Show this package on homepage Featured Packages”.</p>
         </div>
       `;
       return;
@@ -194,8 +224,12 @@ async function loadFeaturedTrips() {
     grid.innerHTML = "";
 
     featuredTrips.forEach((trip) => {
+      const galleryCount = Array.isArray(trip.galleryImages)
+        ? trip.galleryImages.length
+        : 0;
+
       grid.innerHTML += `
-        <div class="experience-card">
+        <div class="experience-card clickable-card" onclick="window.location.href='package-details.html?id=${trip.id}'">
           <img
             src="${escapeHtml(trip.imageUrl || "assets/ile.jpg")}"
             alt="${escapeHtml(trip.title || "Mauritius package")}"
@@ -204,19 +238,26 @@ async function loadFeaturedTrips() {
 
           <div>
             <span>${escapeHtml(trip.category || "Package")}</span>
-
             <h3>${escapeHtml(trip.title || "Luxury Experience")}</h3>
 
             <p>${escapeHtml(trip.description || "")}</p>
 
-            <p><strong>${escapeHtml(formatPrice(trip))}</strong></p>
+            <p>
+              <strong>${escapeHtml(formatPrice(trip))}</strong>
+            </p>
 
-            <a href="booking.html" class="card-link">View Package →</a>
+            <p>
+              ${trip.duration ? `Duration: ${escapeHtml(trip.duration)}` : ""}
+              ${galleryCount > 0 ? ` • ${galleryCount + 1} photos` : ""}
+            </p>
+
+            <a href="package-details.html?id=${trip.id}" class="card-link">
+              View Details →
+            </a>
           </div>
         </div>
       `;
     });
-
   } catch (error) {
     console.error("Load featured trips error:", error);
 
@@ -243,16 +284,6 @@ async function loadGallery() {
   try {
     const snapshot = await getDocs(collection(db, "gallery"));
 
-    if (snapshot.empty) {
-      grid.innerHTML = `
-        <div class="loading-card">
-          <h3>No Gallery Images Yet</h3>
-          <p>Upload gallery images from the admin dashboard.</p>
-        </div>
-      `;
-      return;
-    }
-
     const images = [];
 
     snapshot.forEach((docSnap) => {
@@ -273,8 +304,8 @@ async function loadGallery() {
     if (latestImages.length === 0) {
       grid.innerHTML = `
         <div class="loading-card">
-          <h3>No Active Gallery Images</h3>
-          <p>Gallery images are currently disabled.</p>
+          <h3>No Gallery Images Yet</h3>
+          <p>Upload gallery images from the admin dashboard.</p>
         </div>
       `;
       return;
@@ -284,7 +315,7 @@ async function loadGallery() {
 
     latestImages.forEach((item) => {
       grid.innerHTML += `
-        <div class="experience-card">
+        <div class="experience-card clickable-card" onclick="window.location.href='booking.html'">
           <img
             src="${escapeHtml(item.imageUrl || "assets/ile.jpg")}"
             alt="${escapeHtml(item.title || "Mauritius")}"
@@ -293,7 +324,6 @@ async function loadGallery() {
         </div>
       `;
     });
-
   } catch (error) {
     console.error("Load gallery error:", error);
 
@@ -312,8 +342,6 @@ async function loadExperiences() {
 
   try {
     const snapshot = await getDocs(collection(db, "experiences"));
-
-    if (snapshot.empty) return;
 
     const experiences = [];
 
@@ -338,16 +366,17 @@ async function loadExperiences() {
 
     latestExperiences.forEach((exp) => {
       grid.innerHTML += `
-        <div class="service-card">
+        <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
           ${escapeHtml(exp.icon || "✨")}
 
           <h3>${escapeHtml(exp.title || "")}</h3>
 
           <p>${escapeHtml(exp.description || "")}</p>
+
+          <span class="card-action">See Packages →</span>
         </div>
       `;
     });
-
   } catch (error) {
     console.error("Load experiences error:", error);
   }
@@ -359,8 +388,6 @@ async function loadTestimonials() {
 
   try {
     const snapshot = await getDocs(collection(db, "testimonials"));
-
-    if (snapshot.empty) return;
 
     const testimonials = [];
 
@@ -377,31 +404,46 @@ async function loadTestimonials() {
 
     testimonials.sort((a, b) => getDocTime(b) - getDocTime(a));
 
-    const latestTestimonials = testimonials.slice(0, 3);
+    const latestTestimonials = testimonials.slice(0, 5);
 
-    if (latestTestimonials.length === 0) return;
+    if (latestTestimonials.length === 0) {
+      startReviewSlider();
+      return;
+    }
 
-    grid.innerHTML = "";
+    const slides = latestTestimonials
+      .map((review, index) => {
+        const rating = Math.max(1, Math.min(5, Number(review.rating || 5)));
+        const stars = "★".repeat(rating);
 
-    latestTestimonials.forEach((review) => {
-      const rating = Math.max(1, Math.min(5, Number(review.rating || 5)));
-      const stars = "⭐".repeat(rating);
+        return `
+          <div class="review-slide ${index === 0 ? "active" : ""}">
+            <div class="review-stars">${stars}</div>
+            <h3>${escapeHtml(review.name || "Guest")}</h3>
+            <p>${escapeHtml(review.country || "")}</p>
+            <p>${escapeHtml(review.review || "")}</p>
+          </div>
+        `;
+      })
+      .join("");
 
-      grid.innerHTML += `
-        <div class="service-card">
-          ${stars}
+    const dots = latestTestimonials
+      .map((_, index) => {
+        return `<button class="review-dot ${index === 0 ? "active" : ""}" type="button" data-review="${index}"></button>`;
+      })
+      .join("");
 
-          <h3>${escapeHtml(review.name || "Guest")}</h3>
+    grid.innerHTML = `
+      <div class="review-slider">
+        ${slides}
+        <div class="review-dots">${dots}</div>
+      </div>
+    `;
 
-          <p>${escapeHtml(review.country || "")}</p>
-
-          <p>${escapeHtml(review.review || "")}</p>
-        </div>
-      `;
-    });
-
+    startReviewSlider();
   } catch (error) {
     console.error("Load testimonials error:", error);
+    startReviewSlider();
   }
 }
 
