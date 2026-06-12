@@ -30,27 +30,20 @@ const storage = getStorage(app);
 let currentUser = null;
 let selectedTrip = null;
 let selectedVehicle = null;
+let allVehicles = [];
 
 const dynamicTrips = document.getElementById("dynamicTrips");
-
 const modal = document.getElementById("bookingModal");
 const closeModal = document.getElementById("closeModal");
 const bookingForm = document.getElementById("bookingForm");
 const selectedPackageInput = document.getElementById("selectedPackage");
-
 const vehicleOptionsList = document.getElementById("vehicleOptionsList");
-const selectedVehicleNameInput = document.getElementById("selectedVehicleName");
-const selectedVehiclePriceInput = document.getElementById("selectedVehiclePrice");
-const selectedVehicleCapacityInput = document.getElementById("selectedVehicleCapacity");
-const selectedVehicleImageUrlInput = document.getElementById("selectedVehicleImageUrl");
 const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
-
-const vehicleFilter = new URLSearchParams(window.location.search).get("vehicle");
 
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
@@ -82,52 +75,8 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function getDurationDays(durationText) {
-  const text = String(durationText || "").toLowerCase();
-
-  if (text.includes("half")) return 1;
-  if (text.includes("full")) return 1;
-
-  const match = text.match(/\d+/);
-  if (!match) return 1;
-
-  const days = Number(match[0]);
-  return days > 0 ? days : 1;
-}
-
-function addDaysToDate(dateString, daysToAdd) {
-  const date = new Date(`${dateString}T00:00:00`);
-  date.setDate(date.getDate() + daysToAdd);
-  return date.toISOString().split("T")[0];
-}
-
-function getBookingDates(startDate, durationText) {
-  const totalDays = getDurationDays(durationText);
-  const dates = [];
-
-  for (let i = 0; i < totalDays; i++) {
-    dates.push(addDaysToDate(startDate, i));
-  }
-
-  return dates;
-}
-
-function formatDateList(dates) {
-  return dates.join(", ");
-}
-
 function formatPrice(trip) {
   const price = Number(trip.price || 0);
-
-  if (Array.isArray(trip.vehicles) && trip.vehicles.length > 0) {
-    const prices = trip.vehicles
-      .map((vehicle) => Number(vehicle.price || 0))
-      .filter((priceValue) => priceValue > 0);
-
-    if (prices.length > 0) {
-      return `From Rs ${Math.min(...prices).toLocaleString()}`;
-    }
-  }
 
   if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
   if (trip.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
@@ -136,7 +85,7 @@ function formatPrice(trip) {
 }
 
 function formatIncludes(includes) {
-  if (!Array.isArray(includes) || includes.length === 0) return "";
+  if (!Array.isArray(includes)) return "";
 
   return includes
     .filter((item) => String(item || "").trim())
@@ -156,6 +105,35 @@ function getTripTime(trip) {
   return 0;
 }
 
+function getDurationDays(durationText) {
+  const text = String(durationText || "").toLowerCase();
+
+  if (text.includes("half")) return 1;
+  if (text.includes("full")) return 1;
+
+  const match = text.match(/\d+/);
+  if (!match) return 1;
+
+  return Math.max(Number(match[0]), 1);
+}
+
+function addDaysToDate(dateString, daysToAdd) {
+  const date = new Date(`${dateString}T00:00:00`);
+  date.setDate(date.getDate() + daysToAdd);
+  return date.toISOString().split("T")[0];
+}
+
+function getBookingDates(startDate, durationText) {
+  const totalDays = getDurationDays(durationText);
+  const dates = [];
+
+  for (let i = 0; i < totalDays; i++) {
+    dates.push(addDaysToDate(startDate, i));
+  }
+
+  return dates;
+}
+
 function lockBodyScroll() {
   document.body.style.overflow = "hidden";
 }
@@ -170,8 +148,7 @@ function closeBookingModal() {
 }
 
 function getPeopleCount() {
-  const peopleInput = document.getElementById("people");
-  const people = Number(peopleInput?.value || 1);
+  const people = Number(document.getElementById("people")?.value || 1);
   return people > 0 ? people : 1;
 }
 
@@ -184,67 +161,51 @@ function updateEstimatedTotal() {
 
   let total = 0;
 
-  if (selectedVehicle && vehiclePrice > 0) {
-    total = vehiclePrice * people;
-  } else if (basePrice > 0) {
-    total = basePrice * people;
-  }
+  if (vehiclePrice > 0) total = vehiclePrice * people;
+  else if (basePrice > 0) total = basePrice * people;
 
   bookingEstimatedTotal.textContent =
     total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
 }
 
-function setSelectedVehicle(vehicle, vehicleCard = null) {
+function setSelectedVehicle(vehicle, card = null) {
   selectedVehicle = vehicle;
 
-  if (selectedVehicleNameInput) selectedVehicleNameInput.value = vehicle.name || "";
-  if (selectedVehiclePriceInput) selectedVehiclePriceInput.value = Number(vehicle.price || 0);
-  if (selectedVehicleCapacityInput) selectedVehicleCapacityInput.value = Number(vehicle.capacity || 0);
-  if (selectedVehicleImageUrlInput) selectedVehicleImageUrlInput.value = vehicle.imageUrl || "";
-
-  document.querySelectorAll(".vehicle-option-card").forEach((card) => {
-    card.classList.remove("selected");
+  document.querySelectorAll(".vehicle-option-card").forEach((item) => {
+    item.classList.remove("selected");
   });
 
-  if (vehicleCard) vehicleCard.classList.add("selected");
+  if (card) card.classList.add("selected");
 
   updateEstimatedTotal();
 }
 
-function renderVehicleOptions(trip) {
+function renderVehicleOptions() {
   if (!vehicleOptionsList) return;
 
   selectedVehicle = null;
 
-  if (selectedVehicleNameInput) selectedVehicleNameInput.value = "";
-  if (selectedVehiclePriceInput) selectedVehiclePriceInput.value = "";
-  if (selectedVehicleCapacityInput) selectedVehicleCapacityInput.value = "";
-  if (selectedVehicleImageUrlInput) selectedVehicleImageUrlInput.value = "";
+  const visibleVehicles = allVehicles.filter((vehicle) => vehicle.active !== false);
 
-  const vehicles = Array.isArray(trip.vehicles)
-    ? trip.vehicles.filter((vehicle) => vehicle && vehicle.name)
-    : [];
-
-  if (vehicles.length === 0) {
+  if (visibleVehicles.length === 0) {
     vehicleOptionsList.innerHTML = `
       <div class="vehicle-empty">
-        No vehicle options were added for this package.
+        No vehicles available yet.
       </div>
     `;
-
     updateEstimatedTotal();
     return;
   }
 
   vehicleOptionsList.innerHTML = "";
 
-  vehicles.forEach((vehicle, index) => {
+  visibleVehicles.forEach((vehicle, index) => {
+    const price = Number(vehicle.price || 0);
+    const capacity = Number(vehicle.capacity || 0);
+
     const card = document.createElement("button");
     card.type = "button";
     card.className = "vehicle-option-card";
-
-    const price = Number(vehicle.price || 0);
-    const capacity = Number(vehicle.capacity || 0);
 
     card.innerHTML = `
       ${
@@ -255,7 +216,8 @@ function renderVehicleOptions(trip) {
 
       <div class="vehicle-option-info">
         <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
-        ${capacity > 0 ? `<span>${capacity} passengers</span>` : ""}
+        <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
+        ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
         ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
         <b>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</b>
       </div>
@@ -273,19 +235,26 @@ function renderVehicleOptions(trip) {
   });
 }
 
-function tripMatchesVehicleFilter(trip) {
-  if (!vehicleFilter) return true;
+async function loadVehicles() {
+  try {
+    const snapshot = await getDocs(collection(db, "vehicles"));
 
-  const filter = vehicleFilter.toLowerCase();
+    allVehicles = [];
 
-  if (!Array.isArray(trip.vehicles)) return false;
+    snapshot.forEach((docSnap) => {
+      const vehicle = docSnap.data();
 
-  return trip.vehicles.some((vehicle) => {
-    const name = String(vehicle.name || "").toLowerCase();
-    const desc = String(vehicle.description || "").toLowerCase();
+      if (vehicle.active === false) return;
 
-    return name.includes(filter) || desc.includes(filter);
-  });
+      allVehicles.push({
+        id: docSnap.id,
+        ...vehicle
+      });
+    });
+  } catch (error) {
+    console.error("Load Vehicles Error:", error);
+    allVehicles = [];
+  }
 }
 
 async function loadTrips() {
@@ -294,7 +263,7 @@ async function loadTrips() {
   dynamicTrips.innerHTML = `
     <div class="loading-card">
       <h3>Loading Experiences...</h3>
-      <p>Please wait while we load the latest tours and packages.</p>
+      <p>Please wait while we load the latest packages.</p>
     </div>
   `;
 
@@ -305,7 +274,7 @@ async function loadTrips() {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
           <h3>No Packages Available</h3>
-          <p>The admin has not added any trips yet.</p>
+          <p>The admin has not added any packages yet.</p>
         </div>
       `;
       return;
@@ -317,7 +286,6 @@ async function loadTrips() {
       const trip = docSnap.data();
 
       if (trip.active === false) return;
-      if (!tripMatchesVehicleFilter(trip)) return;
 
       trips.push({
         id: docSnap.id,
@@ -330,9 +298,8 @@ async function loadTrips() {
     if (trips.length === 0) {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
-          <h3>No Matching Packages</h3>
-          <p>No packages found for this vehicle type. Try another vehicle or view all packages.</p>
-          <a href="booking.html" class="btn">View All Packages</a>
+          <h3>No Active Packages</h3>
+          <p>No packages are currently visible to customers.</p>
         </div>
       `;
       return;
@@ -341,40 +308,41 @@ async function loadTrips() {
     dynamicTrips.innerHTML = "";
 
     trips.forEach((trip) => {
-      const title = escapeHtml(trip.title || "Untitled Trip");
+      const title = escapeHtml(trip.title || "Untitled Package");
       const category = escapeHtml(trip.category || "Package");
       const description = escapeHtml(trip.description || "");
       const duration = escapeHtml(trip.duration || "");
       const imageUrl = escapeHtml(trip.imageUrl || "assets/ile.jpg");
       const includes = formatIncludes(trip.includes);
       const priceText = escapeHtml(formatPrice(trip));
-
-      const vehicleCount = Array.isArray(trip.vehicles) ? trip.vehicles.length : 0;
+      const galleryCount = Array.isArray(trip.galleryImages) ? trip.galleryImages.length : 0;
 
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
 
       card.innerHTML = `
         <img src="${imageUrl}" alt="${title}" loading="lazy">
+
         <span>${category}</span>
         <h3>${title}</h3>
         <p>${description}</p>
 
-        ${duration ? `<p><strong class="duration-label">Duration:</strong> ${duration}</p>` : ""}
-
-        ${
-          vehicleCount > 0
-            ? `<p><strong>Vehicles:</strong> ${vehicleCount} option${vehicleCount > 1 ? "s" : ""}</p>`
-            : ""
-        }
+        ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ""}
+        ${galleryCount > 0 ? `<p><strong>Pictures:</strong> ${galleryCount + 1} photos</p>` : ""}
 
         ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
 
         <strong>${priceText}</strong>
 
-        <button class="btn book-btn" data-id="${trip.id}">
-          Book Package
-        </button>
+        <div class="package-card-actions">
+          <a class="btn" href="package-details.html?id=${trip.id}">
+            View Details
+          </a>
+
+          <button class="btn-outline book-btn" data-id="${trip.id}">
+            Quick Book
+          </button>
+        </div>
       `;
 
       dynamicTrips.appendChild(card);
@@ -390,7 +358,7 @@ async function loadTrips() {
     dynamicTrips.innerHTML = `
       <div class="loading-card">
         <h3>Could Not Load Packages</h3>
-        <p>${escapeHtml(error.message || "Please try again later or contact us on WhatsApp.")}</p>
+        <p>${escapeHtml(error.message || "Please try again later.")}</p>
       </div>
     `;
   }
@@ -413,7 +381,7 @@ function openBookingModal(trip) {
     selectedPackageInput.value = trip.title || "";
   }
 
-  renderVehicleOptions(trip);
+  renderVehicleOptions();
   updateEstimatedTotal();
 
   if (modal) {
@@ -454,11 +422,7 @@ if (bookingForm) {
       return;
     }
 
-    const vehicles = Array.isArray(selectedTrip.vehicles)
-      ? selectedTrip.vehicles.filter((vehicle) => vehicle && vehicle.name)
-      : [];
-
-    if (vehicles.length > 0 && !selectedVehicle) {
+    if (!selectedVehicle && allVehicles.length > 0) {
       showPopup("Vehicle Required", "Please choose a vehicle before submitting your booking.");
       return;
     }
@@ -542,7 +506,9 @@ if (bookingForm) {
 
         package: selectedTrip.title || "",
 
+        vehicleId: selectedVehicle?.id || "",
         vehicleName: selectedVehicle?.name || "",
+        vehicleCategory: selectedVehicle?.category || "",
         vehiclePrice,
         vehicleCapacity: Number(selectedVehicle?.capacity || 0),
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
@@ -570,7 +536,7 @@ if (bookingForm) {
 
       showPopup(
         "Booking Submitted ✅",
-        `Your booking and payment proof have been submitted.\n\nRequested dates:\n${formatDateList(bookingDates)}\n\nAdmin will validate your payment and confirm your booking.`,
+        "Your booking and payment proof have been submitted. Admin will validate your payment and confirm your booking.",
         "index.html"
       );
 
@@ -595,4 +561,9 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-loadTrips();
+async function init() {
+  await loadVehicles();
+  await loadTrips();
+}
+
+init();
