@@ -125,6 +125,19 @@ async function uploadFile(path, file) {
   }
 }
 
+async function uploadMultipleFiles(path, files) {
+  if (!files || files.length === 0) return [];
+
+  const uploads = [];
+
+  for (const file of files) {
+    const url = await uploadFile(path, file);
+    if (url) uploads.push(url);
+  }
+
+  return uploads;
+}
+
 /* =========================
    AUTH
 ========================= */
@@ -486,6 +499,7 @@ if (tripForm) {
 
     const tripId = document.getElementById("tripId")?.value.trim();
     const imageFile = document.getElementById("tripImage")?.files[0];
+    const galleryFiles = document.getElementById("tripGalleryImages")?.files || [];
 
     try {
       setMessage("tripMessage", "Saving package...");
@@ -498,6 +512,7 @@ if (tripForm) {
         title: document.getElementById("tripTitle")?.value.trim() || "",
         category: document.getElementById("tripCategory")?.value || "",
         description: document.getElementById("tripDescription")?.value.trim() || "",
+        fullDetails: document.getElementById("tripFullDetails")?.value.trim() || "",
         duration: document.getElementById("tripDuration")?.value.trim() || "",
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
@@ -523,6 +538,24 @@ if (tripForm) {
         payload.imageUrl = await uploadFile(`trip_images/${tripRef.id}`, imageFile);
       }
 
+      if (galleryFiles.length > 0) {
+        const newGalleryImages = await uploadMultipleFiles(
+          `trip_gallery_images/${tripRef.id}`,
+          galleryFiles
+        );
+
+        if (tripId) {
+          const oldSnap = await getDoc(tripRef);
+          const oldImages = oldSnap.exists() && Array.isArray(oldSnap.data().galleryImages)
+            ? oldSnap.data().galleryImages
+            : [];
+
+          payload.galleryImages = [...oldImages, ...newGalleryImages];
+        } else {
+          payload.galleryImages = newGalleryImages;
+        }
+      }
+
       await setDoc(tripRef, payload, { merge: true });
 
       tripForm.reset();
@@ -531,6 +564,9 @@ if (tripForm) {
       if (document.getElementById("tripFeatured")) {
         document.getElementById("tripFeatured").checked = false;
       }
+
+      clearFileInput("tripImage");
+      clearFileInput("tripGalleryImages");
 
       setMessage("tripMessage", "Package saved successfully.");
       showPopup("Package Saved", "The package has been saved.");
@@ -555,6 +591,9 @@ if (resetTripForm) {
       document.getElementById("tripFeatured").checked = false;
     }
 
+    clearFileInput("tripImage");
+    clearFileInput("tripGalleryImages");
+
     setMessage("tripMessage", "Package form cleared.");
   });
 }
@@ -578,6 +617,7 @@ async function loadTrips() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const tripId = docSnap.id;
+      const galleryCount = Array.isArray(data.galleryImages) ? data.galleryImages.length : 0;
 
       const featuredBadge = data.featured
         ? `<p><strong>Featured:</strong> Yes, shown on homepage</p>`
@@ -592,6 +632,7 @@ async function loadTrips() {
         <p><strong>Duration:</strong> ${escapeHtml(data.duration || "-")}</p>
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
+        <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
         ${featuredBadge}
 
         ${
@@ -607,6 +648,9 @@ async function loadTrips() {
           </button>
           <button class="toggle-featured-trip-btn" data-id="${tripId}" data-featured="${data.featured === true}">
             ${data.featured ? "Remove Featured" : "Make Featured"}
+          </button>
+          <button class="clear-trip-gallery-btn" data-id="${tripId}">
+            Clear Extra Pictures
           </button>
           <button class="delete-trip-btn" data-id="${tripId}">Delete</button>
         </div>
@@ -639,6 +683,7 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripTitle").value = data.title || "";
       document.getElementById("tripCategory").value = data.category || "";
       document.getElementById("tripDescription").value = data.description || "";
+      document.getElementById("tripFullDetails").value = data.fullDetails || "";
       document.getElementById("tripDuration").value = data.duration || "";
       document.getElementById("tripPrice").value = data.price || 0;
       document.getElementById("tripPriceType").value = data.priceType || "Custom Quote";
@@ -650,7 +695,7 @@ function bindTripButtons(snapshot) {
         document.getElementById("tripFeatured").checked = data.featured === true;
       }
 
-      setMessage("tripMessage", "Editing package. Make changes and click Save Package.");
+      setMessage("tripMessage", "Editing package. Add more pictures if needed, then click Save Package.");
       document.getElementById("tripForm")?.scrollIntoView({ behavior: "smooth" });
     });
   });
@@ -693,6 +738,24 @@ function bindTripButtons(snapshot) {
         loadTrips();
       } catch (error) {
         showPopup("Featured Error", error.message || "Could not update featured status.");
+      }
+    });
+  });
+
+  document.querySelectorAll(".clear-trip-gallery-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Remove all extra pictures from this package?")) return;
+
+      try {
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          galleryImages: [],
+          updatedAt: serverTimestamp()
+        });
+
+        showPopup("Gallery Cleared", "Extra package pictures were removed.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Gallery Error", error.message || "Could not clear extra pictures.");
       }
     });
   });
