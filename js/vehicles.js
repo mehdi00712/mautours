@@ -33,120 +33,226 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function normalize(value) {
-  return String(value || "").toLowerCase().trim();
-}
-
 function vehicleMatchesType(vehicle) {
   if (!selectedType) return true;
 
-  const text = `${vehicle.name || ""} ${vehicle.category || ""} ${vehicle.description || ""}`.toLowerCase();
+  const text =
+    `${vehicle.name || ""} ${vehicle.category || ""} ${vehicle.description || ""}`
+      .toLowerCase();
 
   const keywords = {
-    standard: ["standard", "car", "sedan", "vitz", "axio", "fit", "note"],
-    suv: ["suv", "4x4", "rav4", "xtrail", "tucson", "sportage", "family"],
-    minibus: ["minibus", "mini bus", "van", "h1", "hiace", "serena", "coaster", "bus"],
-    luxury: ["luxury", "vip", "premium", "bmw", "mercedes", "audi", "range rover"]
+    standard: ["standard", "car", "sedan", "vitz", "fit", "axio", "note"],
+    suv: ["suv", "4x4", "rav4", "xtrail", "tucson", "sportage"],
+    minibus: ["minibus", "van", "hiace", "h1", "bus", "coaster"],
+    luxury: ["luxury", "vip", "premium", "bmw", "audi", "mercedes", "range rover"]
   };
 
-  const words = keywords[selectedType] || [selectedType];
-
-  return words.some((word) => text.includes(word));
+  return (keywords[selectedType] || []).some(word =>
+    text.includes(word)
+  );
 }
 
-function getVehiclePrice(vehicle) {
-  const price = Number(vehicle.price || 0);
-  return price > 0 ? `From Rs ${price.toLocaleString()}` : "Custom Quote";
+function formatPrice(price) {
+  const p = Number(price || 0);
+
+  if (p <= 0) return "Custom Quote";
+
+  return `Rs ${p.toLocaleString()}`;
+}
+
+function openRentalModal(vehicle) {
+  const modal = document.getElementById("vehicleRentalModal");
+
+  document.getElementById("selectedVehicleName").textContent =
+    vehicle.name || "Vehicle";
+
+  document.getElementById("selectedVehicleCategory").textContent =
+    vehicle.category || "-";
+
+  document.getElementById("selectedVehiclePrice").textContent =
+    formatPrice(vehicle.price);
+
+  modal.classList.add("show");
+
+  window.selectedRentalVehicle = vehicle;
+}
+
+function renderVehicleCard(vehicle) {
+  const card = document.createElement("div");
+
+  card.className = "vehicle-public-card";
+
+  card.innerHTML = `
+    ${
+      vehicle.imageUrl
+        ? `
+        <img
+          src="${escapeHtml(vehicle.imageUrl)}"
+          alt="${escapeHtml(vehicle.name)}"
+        >
+      `
+        : `
+        <div class="vehicle-public-placeholder">
+          🚘
+        </div>
+      `
+    }
+
+    <div class="vehicle-public-info">
+
+      <span class="vehicle-category">
+        ${escapeHtml(vehicle.category || "Vehicle")}
+      </span>
+
+      <h3>
+        ${escapeHtml(vehicle.name || "Vehicle")}
+      </h3>
+
+      <p>
+        ${
+          escapeHtml(
+            vehicle.description ||
+            "Comfortable private vehicle for Mauritius travel."
+          )
+        }
+      </p>
+
+      <ul class="vehicle-features">
+        ${
+          vehicle.capacity
+            ? `<li>✓ Up to ${vehicle.capacity} passengers</li>`
+            : ""
+        }
+
+        <li>✓ Air Conditioning</li>
+        <li>✓ Professional Driver</li>
+        <li>✓ Island Wide Service</li>
+      </ul>
+
+      <strong class="vehicle-price">
+        ${formatPrice(vehicle.price)}
+      </strong>
+
+      <div class="vehicle-buttons">
+
+        <button
+          class="btn vehicle-rent-btn"
+          data-id="${vehicle.id}"
+        >
+          Rent This Vehicle
+        </button>
+
+        <button
+          class="btn-outline vehicle-view-btn"
+          data-id="${vehicle.id}"
+        >
+          View Details
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  card.querySelector(".vehicle-rent-btn")
+    .addEventListener("click", () => {
+      openRentalModal(vehicle);
+    });
+
+  card.querySelector(".vehicle-view-btn")
+    .addEventListener("click", () => {
+
+      const msg =
+`
+Vehicle: ${vehicle.name || ""}
+
+Category: ${vehicle.category || ""}
+
+Capacity: ${vehicle.capacity || "-"}
+
+Price: ${formatPrice(vehicle.price)}
+
+${vehicle.description || ""}
+`;
+
+      alert(msg);
+    });
+
+  return card;
 }
 
 async function loadVehicles() {
+
   if (!vehiclesGrid) return;
 
   if (selectedType && categoryNames[selectedType]) {
-    vehiclePageTitle.textContent = categoryNames[selectedType];
-    vehicleCategoryLabel.textContent = categoryNames[selectedType];
+    vehiclePageTitle.textContent =
+      categoryNames[selectedType];
+
+    vehicleCategoryLabel.textContent =
+      categoryNames[selectedType];
   }
 
   try {
-    const snapshot = await getDocs(collection(db, "vehicles"));
+
+    const snapshot =
+      await getDocs(collection(db, "vehicles"));
 
     if (snapshot.empty) {
+
       vehiclesGrid.innerHTML = `
         <div class="loading-card">
           <h3>No Vehicles Added Yet</h3>
           <p>Add vehicles from the admin dashboard.</p>
         </div>
       `;
+
       return;
     }
 
     const vehicles = [];
 
     snapshot.forEach((docSnap) => {
+
       const vehicle = docSnap.data();
 
       if (vehicle.active === false) return;
+
       if (!vehicleMatchesType(vehicle)) return;
 
       vehicles.push({
         id: docSnap.id,
         ...vehicle
       });
+
     });
 
-    if (vehicles.length === 0) {
+    if (!vehicles.length) {
+
       vehiclesGrid.innerHTML = `
         <div class="loading-card">
           <h3>No Vehicles Found</h3>
-          <p>No vehicles found for this category.</p>
-          <a href="vehicles.html" class="btn">View All Vehicles</a>
+          <p>No vehicles found in this category.</p>
+          <a href="vehicles.html" class="btn">
+            View All Vehicles
+          </a>
         </div>
       `;
+
       return;
     }
 
     vehiclesGrid.innerHTML = "";
 
-    vehicles.forEach((vehicle) => {
-      const card = document.createElement("div");
-      card.className = "vehicle-public-card";
-
-      card.innerHTML = `
-        ${
-          vehicle.imageUrl
-            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
-            : `<div class="vehicle-public-placeholder">🚘</div>`
-        }
-
-        <div class="vehicle-public-info">
-          <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
-          <h3>${escapeHtml(vehicle.name || "Vehicle")}</h3>
-
-          <p>${escapeHtml(vehicle.description || "Comfortable private vehicle for your Mauritius trip.")}</p>
-
-          <ul>
-            ${vehicle.capacity ? `<li>✓ Up to ${escapeHtml(vehicle.capacity)} passengers</li>` : ""}
-            <li>✓ Air Conditioning</li>
-            <li>✓ Private Transfer</li>
-            <li>✓ Professional Driver</li>
-          </ul>
-
-          <strong>${getVehiclePrice(vehicle)}</strong>
-
-          <a
-            class="btn"
-            href="booking.html?vehicle=${encodeURIComponent(vehicle.name || "")}"
-          >
-            Select Vehicle
-          </a>
-        </div>
-      `;
-
-      vehiclesGrid.appendChild(card);
+    vehicles.forEach(vehicle => {
+      vehiclesGrid.appendChild(
+        renderVehicleCard(vehicle)
+      );
     });
 
   } catch (error) {
-    console.error("Load vehicles error:", error);
+
+    console.error(error);
 
     vehiclesGrid.innerHTML = `
       <div class="loading-card">
@@ -155,6 +261,17 @@ async function loadVehicles() {
       </div>
     `;
   }
+}
+
+const closeBtn =
+  document.getElementById("closeVehicleRentalModal");
+
+if (closeBtn) {
+  closeBtn.addEventListener("click", () => {
+    document
+      .getElementById("vehicleRentalModal")
+      .classList.remove("show");
+  });
 }
 
 loadVehicles();
