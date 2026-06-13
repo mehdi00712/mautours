@@ -2086,3 +2086,92 @@ h2::after {
     margin-top: 95px;
   }
 }
+
+/* =========================
+   VEHICLE RENTAL PAGE
+========================= */
+
+.vehicle-page-intro {
+  padding-top: 110px;
+}
+
+.vehicle-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.vehicle-buttons .btn,
+.vehicle-buttons .btn-outline {
+  flex: 1;
+  min-width: 150px;
+}
+
+.vehicle-category {
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--gold) !important;
+  padding: 7px 13px;
+  border-radius: 999px;
+}
+
+.vehicle-features {
+  list-style: none;
+  padding-left: 0 !important;
+  margin: 18px 0;
+}
+
+.vehicle-features li {
+  margin-bottom: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.vehicle-price {
+  color: var(--gold);
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+#vehicleRentalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#vehicleRentalForm input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+#vehicleRentalForm input:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.14);
+}
+
+#vehicleRentalModal .bank-box {
+  margin-bottom: 16px;
+}
+
+#rentalEstimatedTotal {
+  color: var(--gold);
+}
+
+@media (max-width: 768px) {
+  .vehicle-buttons {
+    flex-direction: column;
+  }
+
+  .vehicle-buttons .btn,
+  .vehicle-buttons .btn-outline {
+    width: 100%;
+  }
+
+  .vehicle-page-intro {
+    padding-top: 95px;
+  }
+}
