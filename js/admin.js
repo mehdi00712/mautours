@@ -390,7 +390,7 @@ async function loadVehicles() {
         <h4>${escapeHtml(data.name || "Unnamed Vehicle")}</h4>
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
-        <p><strong>Price:</strong> Rs ${Number(data.price || 0).toLocaleString()}</p>
+        <p><strong>Rental Price:</strong> Rs ${Number(data.price || 0).toLocaleString()} / day</p>
         <p><strong>Status:</strong> ${data.active === false ? "Hidden" : "Visible"}</p>
         <p>${escapeHtml(data.description || "")}</p>
 
@@ -913,7 +913,7 @@ function bindGalleryButtons() {
 }
 
 /* =========================
-   BOOKINGS
+   BOOKINGS + VEHICLE RENTALS
 ========================= */
 
 async function loadBookings() {
@@ -956,6 +956,26 @@ async function loadBookings() {
         pendingBookings++;
       }
 
+      const isRental = data.bookingType === "vehicle_rental";
+
+      const typeText = isRental ? "Vehicle Rental" : "Package Booking";
+
+      const packageText = isRental
+        ? "Vehicle Rental Only"
+        : data.package || "-";
+
+      const vehicleText = data.vehicleName
+        ? `${data.vehicleName} / Rs ${Number(data.vehiclePrice || 0).toLocaleString()}`
+        : "-";
+
+      const dateText = isRental
+        ? `${data.pickupDate || "-"} → ${data.returnDate || "-"}`
+        : data.date || data.startDate || "-";
+
+      const peopleText = isRental
+        ? data.passengers || data.people || "-"
+        : data.people || "-";
+
       const total =
         data.totalPrice && data.totalPrice > 0
           ? `Rs ${Number(data.totalPrice).toLocaleString()}`
@@ -965,20 +985,16 @@ async function loadBookings() {
         ? `<a href="${escapeHtml(data.paymentProofUrl)}" target="_blank" class="proof-link">View Proof</a>`
         : "No Proof";
 
-      const vehicleText = data.vehicleName
-        ? `${data.vehicleName} / Rs ${Number(data.vehiclePrice || 0).toLocaleString()}`
-        : "-";
-
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${escapeHtml(data.name || "-")}</td>
+        <td>${escapeHtml(data.name || "-")}<br><small>${escapeHtml(typeText)}</small></td>
         <td>${escapeHtml(data.phone || "-")}</td>
         <td>${escapeHtml(data.email || "-")}</td>
-        <td>${escapeHtml(data.package || "-")}</td>
+        <td>${escapeHtml(packageText)}</td>
         <td>${escapeHtml(vehicleText)}</td>
-        <td>${escapeHtml(data.date || data.startDate || "-")}</td>
-        <td>${escapeHtml(data.people || "-")}</td>
+        <td>${escapeHtml(dateText)}</td>
+        <td>${escapeHtml(peopleText)}</td>
         <td><strong>${total}</strong></td>
         <td>${proofLink}</td>
         <td>${escapeHtml(data.bookingStatus || "Pending")}</td>
