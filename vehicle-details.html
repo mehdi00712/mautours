@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Vehicle Details | Mautour Holidays</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautour Holidays</h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="vehicles.html" class="active">Vehicles</a>
+      <a href="login.html">Sign In</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<section class="container vehicle-details-page">
+
+  <div id="vehicleLoading" class="loading-card">
+    <h3>Loading Vehicle...</h3>
+    <p>Please wait...</p>
+  </div>
+
+  <div id="vehicleContent" style="display:none">
+
+    <div class="vehicle-details-layout">
+
+      <div class="vehicle-gallery">
+
+        <img
+          id="mainVehicleImage"
+          class="vehicle-main-image"
+          src=""
+          alt="Vehicle"
+        >
+
+        <div
+          id="vehicleThumbnailGrid"
+          class="vehicle-thumbnail-grid"
+        ></div>
+
+      </div>
+
+      <div class="vehicle-details-info">
+
+        <span
+          id="vehicleCategory"
+          class="section-label"
+        >
+          Vehicle
+        </span>
+
+        <h1 id="vehicleName">
+          Vehicle Name
+        </h1>
+
+        <p id="vehicleDescription"></p>
+
+        <div class="vehicle-stats">
+
+          <div class="stat-box">
+            <strong>Passengers</strong>
+            <span id="vehicleCapacity"></span>
+          </div>
+
+          <div class="stat-box">
+            <strong>Rental Price</strong>
+            <span id="vehiclePrice"></span>
+          </div>
+
+        </div>
+
+        <div class="package-details-block">
+
+          <h3>Included</h3>
+
+          <ul class="vehicle-features-list">
+            <li>✓ Professional Driver</li>
+            <li>✓ Air Conditioning</li>
+            <li>✓ Island Wide Service</li>
+            <li>✓ Private Vehicle</li>
+          </ul>
+
+        </div>
+
+        <button
+          id="rentVehicleBtn"
+          class="btn"
+        >
+          Rent This Vehicle
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/vehicle-details.js"></script>
+
+</body>
+</html>
