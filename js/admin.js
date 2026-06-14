@@ -102,6 +102,11 @@ function formatPrice(data) {
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
 
+function formatMoney(value) {
+  const amount = Number(value || 0);
+  return amount > 0 ? `Rs ${amount.toLocaleString()}` : "Custom Quote";
+}
+
 function clearFileInput(id) {
   const input = document.getElementById(id);
   if (input) input.value = "";
