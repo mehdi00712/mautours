@@ -45,8 +45,8 @@
     <h2>Rent a Private Vehicle in Mauritius</h2>
 
     <p>
-      Choose a vehicle, select your rental dates, upload your payment proof,
-      and our team will validate your rental request.
+      Choose your vehicle, view all car photos, select your rental dates,
+      upload your payment proof, and our team will validate your request.
     </p>
 
     <div class="hero-actions">
@@ -63,6 +63,7 @@
 
   <p class="center section-subtitle">
     Rent a private vehicle for airport transfers, day trips, family travel or luxury journeys.
+    Click “View Details” to see all car pictures and angles.
   </p>
 </section>
 
@@ -113,7 +114,13 @@
       <input type="email" id="rentalEmail" placeholder="Email Address" required />
       <input type="text" id="rentalPhone" placeholder="WhatsApp / Phone Number" required />
 
-      <input type="number" id="rentalPassengers" placeholder="Number of Passengers" min="1" required />
+      <input
+        type="number"
+        id="rentalPassengers"
+        placeholder="Number of Passengers"
+        min="1"
+        required
+      />
 
       <label class="upload-label" for="rentalPickupDate">Pickup Date</label>
       <input type="date" id="rentalPickupDate" required />
@@ -121,18 +128,28 @@
       <label class="upload-label" for="rentalReturnDate">Return Date</label>
       <input type="date" id="rentalReturnDate" required />
 
-      <input type="text" id="rentalPickupLocation" placeholder="Pickup Location e.g. Airport / Hotel" required />
+      <input
+        type="text"
+        id="rentalPickupLocation"
+        placeholder="Pickup Location e.g. Airport / Hotel"
+        required
+      />
 
       <div class="booking-total-box">
         <span>Estimated Rental Total</span>
         <strong id="rentalEstimatedTotal">Custom Quote</strong>
-        <small>Calculated from vehicle price and rental days. Final confirmation is reviewed by admin.</small>
+        <small>
+          Calculated from vehicle price and rental days.
+          Final confirmation is reviewed by admin.
+        </small>
       </div>
 
       <label class="upload-label" for="rentalPaymentProof">Upload Payment Proof</label>
       <input type="file" id="rentalPaymentProof" accept="image/*,.pdf" required />
 
-      <button type="submit" class="btn">Submit Vehicle Rental</button>
+      <button type="submit" class="btn">
+        Submit Vehicle Rental
+      </button>
     </form>
   </div>
 </div>
