@@ -102,11 +102,6 @@ function formatPrice(data) {
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
 
-function formatMoney(value) {
-  const amount = Number(value || 0);
-  return amount > 0 ? `Rs ${amount.toLocaleString()}` : "Custom Quote";
-}
-
 function clearFileInput(id) {
   const input = document.getElementById(id);
   if (input) input.value = "";
@@ -119,15 +114,8 @@ async function uploadFile(path, file) {
   const fullPath = `${path}/${Date.now()}_${safeName}`;
   const storageRef = ref(storage, fullPath);
 
-  try {
-    const uploadResult = await uploadBytes(storageRef, file);
-    return await getDownloadURL(uploadResult.ref);
-  } catch (error) {
-    console.error("Upload failed:", error);
-    throw new Error(
-      "Image upload failed. Check Firebase Storage rules, storageBucket in firebase-config.js, and authorized domain."
-    );
-  }
+  const uploadResult = await uploadBytes(storageRef, file);
+  return await getDownloadURL(uploadResult.ref);
 }
 
 async function uploadMultipleFiles(path, files) {
@@ -143,13 +131,7 @@ async function uploadMultipleFiles(path, files) {
   return uploads;
 }
 
-/* =========================
-   AUTH
-========================= */
-
 onAuthStateChanged(auth, async (user) => {
-  console.log("CURRENT UID:", user?.uid || "No user");
-
   if (!user) {
     showPopup("Login Required", "Please log in first.", "login.html");
     return;
@@ -169,9 +151,7 @@ onAuthStateChanged(auth, async (user) => {
   loadBookings();
 });
 
-/* =========================
-   WEBSITE SETTINGS
-========================= */
+/* WEBSITE SETTINGS */
 
 const websiteSettingsForm = document.getElementById("websiteSettingsForm");
 
@@ -194,7 +174,6 @@ if (websiteSettingsForm) {
       setMessage("settingsMessage", "Website settings saved successfully.");
       showPopup("Saved", "Website settings have been updated.");
     } catch (error) {
-      console.error("Settings Error:", error);
       setMessage("settingsMessage", error.message || "Failed to save website settings.", true);
       showPopup("Settings Error", error.message || "Failed to save website settings.");
     }
@@ -208,19 +187,17 @@ async function loadWebsiteSettings() {
 
     const data = snap.data();
 
-    if (document.getElementById("businessName")) document.getElementById("businessName").value = data.businessName || "";
-    if (document.getElementById("whatsappNumber")) document.getElementById("whatsappNumber").value = data.whatsappNumber || "";
-    if (document.getElementById("mobileNumber")) document.getElementById("mobileNumber").value = data.mobileNumber || "";
-    if (document.getElementById("businessEmail")) document.getElementById("businessEmail").value = data.businessEmail || "";
-    if (document.getElementById("servedRegions")) document.getElementById("servedRegions").value = data.servedRegions || "";
+    document.getElementById("businessName").value = data.businessName || "";
+    document.getElementById("whatsappNumber").value = data.whatsappNumber || "";
+    document.getElementById("mobileNumber").value = data.mobileNumber || "";
+    document.getElementById("businessEmail").value = data.businessEmail || "";
+    document.getElementById("servedRegions").value = data.servedRegions || "";
   } catch (error) {
     console.error("Load Settings Error:", error);
   }
 }
 
-/* =========================
-   HOMEPAGE MANAGER
-========================= */
+/* HOMEPAGE */
 
 const homeContentForm = document.getElementById("homeContentForm");
 
@@ -251,7 +228,6 @@ if (homeContentForm) {
       setMessage("homeContentMessage", "Homepage saved successfully.");
       showPopup("Saved", "Homepage content has been updated.");
     } catch (error) {
-      console.error("Homepage Error:", error);
       setMessage("homeContentMessage", error.message || "Failed to save homepage.", true);
       showPopup("Homepage Error", error.message || "Failed to save homepage.");
     }
@@ -265,18 +241,16 @@ async function loadHomepageContent() {
 
     const data = snap.data();
 
-    if (document.getElementById("homeHeroTitle")) document.getElementById("homeHeroTitle").value = data.heroTitle || "";
-    if (document.getElementById("homeHeroSubtitle")) document.getElementById("homeHeroSubtitle").value = data.heroSubtitle || "";
-    if (document.getElementById("homeBadge")) document.getElementById("homeBadge").value = data.heroBadge || "";
-    if (document.getElementById("homeCtaText")) document.getElementById("homeCtaText").value = data.ctaText || "";
+    document.getElementById("homeHeroTitle").value = data.heroTitle || "";
+    document.getElementById("homeHeroSubtitle").value = data.heroSubtitle || "";
+    document.getElementById("homeBadge").value = data.heroBadge || "";
+    document.getElementById("homeCtaText").value = data.ctaText || "";
   } catch (error) {
     console.error("Load Homepage Error:", error);
   }
 }
 
-/* =========================
-   VEHICLE FLEET MANAGER
-========================= */
+/* VEHICLES */
 
 const vehicleForm = document.getElementById("vehicleForm");
 const resetVehicleForm = document.getElementById("resetVehicleForm");
@@ -288,6 +262,7 @@ if (vehicleForm) {
 
     const vehicleId = document.getElementById("vehicleId")?.value.trim();
     const imageFile = document.getElementById("vehicleImage")?.files[0];
+    const galleryFiles = document.getElementById("vehicleGalleryImages")?.files || [];
 
     try {
       setMessage("vehicleMessage", "Saving vehicle...");
@@ -310,10 +285,6 @@ if (vehicleForm) {
         throw new Error("Please enter vehicle name, category and passenger capacity.");
       }
 
-      if (payload.price < 0) {
-        throw new Error("Vehicle price cannot be negative.");
-      }
-
       if (!vehicleId) {
         payload.createdAt = serverTimestamp();
       }
@@ -322,20 +293,38 @@ if (vehicleForm) {
         payload.imageUrl = await uploadFile(`vehicle_images/${vehicleRef.id}`, imageFile);
       }
 
+      if (galleryFiles.length > 0) {
+        const newGalleryImages = await uploadMultipleFiles(
+          `vehicle_gallery_images/${vehicleRef.id}`,
+          galleryFiles
+        );
+
+        if (vehicleId) {
+          const oldSnap = await getDoc(vehicleRef);
+          const oldImages =
+            oldSnap.exists() && Array.isArray(oldSnap.data().vehicleGalleryImages)
+              ? oldSnap.data().vehicleGalleryImages
+              : [];
+
+          payload.vehicleGalleryImages = [...oldImages, ...newGalleryImages];
+        } else {
+          payload.vehicleGalleryImages = newGalleryImages;
+        }
+      }
+
       await setDoc(vehicleRef, payload, { merge: true });
 
       vehicleForm.reset();
       document.getElementById("vehicleId").value = "";
+      document.getElementById("vehicleActive").checked = true;
 
-      if (document.getElementById("vehicleActive")) {
-        document.getElementById("vehicleActive").checked = true;
-      }
+      clearFileInput("vehicleImage");
+      clearFileInput("vehicleGalleryImages");
 
       setMessage("vehicleMessage", "Vehicle saved successfully.");
-      showPopup("Vehicle Saved", "The vehicle has been saved.");
+      showPopup("Vehicle Saved", "Vehicle saved with pictures.");
       loadVehicles();
     } catch (error) {
-      console.error("Vehicle Save Error:", error);
       setMessage("vehicleMessage", error.message || "Failed to save vehicle.", true);
       showPopup("Vehicle Error", error.message || "Failed to save vehicle.");
     }
@@ -345,15 +334,10 @@ if (vehicleForm) {
 if (resetVehicleForm) {
   resetVehicleForm.addEventListener("click", () => {
     vehicleForm.reset();
-
-    if (document.getElementById("vehicleId")) {
-      document.getElementById("vehicleId").value = "";
-    }
-
-    if (document.getElementById("vehicleActive")) {
-      document.getElementById("vehicleActive").checked = true;
-    }
-
+    document.getElementById("vehicleId").value = "";
+    document.getElementById("vehicleActive").checked = true;
+    clearFileInput("vehicleImage");
+    clearFileInput("vehicleGalleryImages");
     setMessage("vehicleMessage", "Vehicle form cleared.");
   });
 }
@@ -361,24 +345,14 @@ if (resetVehicleForm) {
 async function loadVehicles() {
   if (!adminVehiclesList) return;
 
-  adminVehiclesList.innerHTML = `
-    <div class="loading-card">
-      <h3>Loading Vehicles...</h3>
-      <p>Please wait...</p>
-    </div>
-  `;
+  adminVehiclesList.innerHTML = `<p>Loading vehicles...</p>`;
 
   try {
     const q = query(collection(db, "vehicles"), orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
-      adminVehiclesList.innerHTML = `
-        <div class="loading-card">
-          <h3>No Vehicles Added Yet</h3>
-          <p>Add your first vehicle using the form above.</p>
-        </div>
-      `;
+      adminVehiclesList.innerHTML = `<p>No vehicles added yet.</p>`;
       return;
     }
 
@@ -387,6 +361,9 @@ async function loadVehicles() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const vehicleId = docSnap.id;
+      const galleryCount = Array.isArray(data.vehicleGalleryImages)
+        ? data.vehicleGalleryImages.length
+        : 0;
 
       const card = document.createElement("div");
       card.className = "admin-trip-card";
@@ -397,6 +374,7 @@ async function loadVehicles() {
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
         <p><strong>Rental Price:</strong> Rs ${Number(data.price || 0).toLocaleString()} / day</p>
         <p><strong>Status:</strong> ${data.active === false ? "Hidden" : "Visible"}</p>
+        <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
         <p>${escapeHtml(data.description || "")}</p>
 
         ${
@@ -410,6 +388,7 @@ async function loadVehicles() {
           <button class="toggle-vehicle-btn" data-id="${vehicleId}" data-active="${data.active !== false}">
             ${data.active === false ? "Show" : "Hide"}
           </button>
+          <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">Clear Extra Pictures</button>
           <button class="delete-vehicle-btn" data-id="${vehicleId}">Delete</button>
         </div>
       `;
@@ -419,13 +398,7 @@ async function loadVehicles() {
 
     bindVehicleButtons(snapshot);
   } catch (error) {
-    console.error("Load Vehicles Error:", error);
-
-    adminVehiclesList.innerHTML = `
-      <p style="color:red;">
-        Failed to load vehicles: ${escapeHtml(error.message)}
-      </p>
-    `;
+    adminVehiclesList.innerHTML = `<p style="color:red;">Failed to load vehicles: ${escapeHtml(error.message)}</p>`;
   }
 }
 
@@ -443,35 +416,38 @@ function bindVehicleButtons(snapshot) {
       document.getElementById("vehicleCapacity").value = data.capacity || 0;
       document.getElementById("vehiclePrice").value = data.price || 0;
       document.getElementById("vehicleDescription").value = data.description || "";
+      document.getElementById("vehicleActive").checked = data.active !== false;
 
-      if (document.getElementById("vehicleActive")) {
-        document.getElementById("vehicleActive").checked = data.active !== false;
-      }
-
-      setMessage("vehicleMessage", "Editing vehicle. Make changes and click Save Vehicle.");
-      document.getElementById("vehicleForm")?.scrollIntoView({ behavior: "smooth" });
+      setMessage("vehicleMessage", "Editing vehicle. Add more pictures if needed, then click Save Vehicle.");
+      vehicleForm.scrollIntoView({ behavior: "smooth" });
     });
   });
 
   document.querySelectorAll(".toggle-vehicle-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      try {
-        const currentlyActive = btn.dataset.active === "true";
+      const active = btn.dataset.active === "true";
 
-        await updateDoc(doc(db, "vehicles", btn.dataset.id), {
-          active: !currentlyActive,
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "vehicles", btn.dataset.id), {
+        active: !active,
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup(
-          "Vehicle Updated",
-          currentlyActive ? "Vehicle hidden from customers." : "Vehicle visible to customers."
-        );
+      showPopup("Vehicle Updated", active ? "Vehicle hidden." : "Vehicle visible.");
+      loadVehicles();
+    });
+  });
 
-        loadVehicles();
-      } catch (error) {
-        showPopup("Vehicle Error", error.message || "Could not update vehicle.");
-      }
+  document.querySelectorAll(".clear-vehicle-gallery-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Remove all extra pictures from this vehicle?")) return;
+
+      await updateDoc(doc(db, "vehicles", btn.dataset.id), {
+        vehicleGalleryImages: [],
+        updatedAt: serverTimestamp()
+      });
+
+      showPopup("Gallery Cleared", "Extra vehicle pictures removed.");
+      loadVehicles();
     });
   });
 
@@ -479,20 +455,14 @@ function bindVehicleButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this vehicle permanently?")) return;
 
-      try {
-        await deleteDoc(doc(db, "vehicles", btn.dataset.id));
-        showPopup("Vehicle Deleted", "The vehicle has been removed.");
-        loadVehicles();
-      } catch (error) {
-        showPopup("Delete Error", error.message || "Could not delete vehicle.");
-      }
+      await deleteDoc(doc(db, "vehicles", btn.dataset.id));
+      showPopup("Vehicle Deleted", "Vehicle removed.");
+      loadVehicles();
     });
   });
 }
 
-/* =========================
-   PACKAGE MANAGER
-========================= */
+/* PACKAGES */
 
 const tripForm = document.getElementById("tripForm");
 const resetTripForm = document.getElementById("resetTripForm");
@@ -531,10 +501,6 @@ if (tripForm) {
         throw new Error("Please fill in all required package fields.");
       }
 
-      if (payload.price < 0) {
-        throw new Error("Package price cannot be negative.");
-      }
-
       if (!tripId) {
         payload.createdAt = serverTimestamp();
       }
@@ -551,9 +517,10 @@ if (tripForm) {
 
         if (tripId) {
           const oldSnap = await getDoc(tripRef);
-          const oldImages = oldSnap.exists() && Array.isArray(oldSnap.data().galleryImages)
-            ? oldSnap.data().galleryImages
-            : [];
+          const oldImages =
+            oldSnap.exists() && Array.isArray(oldSnap.data().galleryImages)
+              ? oldSnap.data().galleryImages
+              : [];
 
           payload.galleryImages = [...oldImages, ...newGalleryImages];
         } else {
@@ -565,19 +532,15 @@ if (tripForm) {
 
       tripForm.reset();
       document.getElementById("tripId").value = "";
-
-      if (document.getElementById("tripFeatured")) {
-        document.getElementById("tripFeatured").checked = false;
-      }
+      document.getElementById("tripFeatured").checked = false;
 
       clearFileInput("tripImage");
       clearFileInput("tripGalleryImages");
 
       setMessage("tripMessage", "Package saved successfully.");
-      showPopup("Package Saved", "The package has been saved.");
+      showPopup("Package Saved", "Package saved.");
       loadTrips();
     } catch (error) {
-      console.error("Package Save Error:", error);
       setMessage("tripMessage", error.message || "Failed to save package.", true);
       showPopup("Package Error", error.message || "Failed to save package.");
     }
@@ -587,18 +550,10 @@ if (tripForm) {
 if (resetTripForm) {
   resetTripForm.addEventListener("click", () => {
     tripForm.reset();
-
-    if (document.getElementById("tripId")) {
-      document.getElementById("tripId").value = "";
-    }
-
-    if (document.getElementById("tripFeatured")) {
-      document.getElementById("tripFeatured").checked = false;
-    }
-
+    document.getElementById("tripId").value = "";
+    document.getElementById("tripFeatured").checked = false;
     clearFileInput("tripImage");
     clearFileInput("tripGalleryImages");
-
     setMessage("tripMessage", "Package form cleared.");
   });
 }
@@ -624,10 +579,6 @@ async function loadTrips() {
       const tripId = docSnap.id;
       const galleryCount = Array.isArray(data.galleryImages) ? data.galleryImages.length : 0;
 
-      const featuredBadge = data.featured
-        ? `<p><strong>Featured:</strong> Yes, shown on homepage</p>`
-        : `<p><strong>Featured:</strong> No</p>`;
-
       const card = document.createElement("div");
       card.className = "admin-trip-card";
 
@@ -637,8 +588,8 @@ async function loadTrips() {
         <p><strong>Duration:</strong> ${escapeHtml(data.duration || "-")}</p>
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
+        <p><strong>Featured:</strong> ${data.featured ? "Yes" : "No"}</p>
         <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
-        ${featuredBadge}
 
         ${
           data.imageUrl
@@ -654,9 +605,7 @@ async function loadTrips() {
           <button class="toggle-featured-trip-btn" data-id="${tripId}" data-featured="${data.featured === true}">
             ${data.featured ? "Remove Featured" : "Make Featured"}
           </button>
-          <button class="clear-trip-gallery-btn" data-id="${tripId}">
-            Clear Extra Pictures
-          </button>
+          <button class="clear-trip-gallery-btn" data-id="${tripId}">Clear Extra Pictures</button>
           <button class="delete-trip-btn" data-id="${tripId}">Delete</button>
         </div>
       `;
@@ -666,13 +615,7 @@ async function loadTrips() {
 
     bindTripButtons(snapshot);
   } catch (error) {
-    console.error("Load Packages Error:", error);
-
-    adminTripsList.innerHTML = `
-      <p style="color:red;">
-        Failed to load packages: ${escapeHtml(error.message)}
-      </p>
-    `;
+    adminTripsList.innerHTML = `<p style="color:red;">Failed to load packages: ${escapeHtml(error.message)}</p>`;
   }
 }
 
@@ -695,55 +638,38 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripIncludes").value = Array.isArray(data.includes)
         ? data.includes.join("\n")
         : "";
-
-      if (document.getElementById("tripFeatured")) {
-        document.getElementById("tripFeatured").checked = data.featured === true;
-      }
+      document.getElementById("tripFeatured").checked = data.featured === true;
 
       setMessage("tripMessage", "Editing package. Add more pictures if needed, then click Save Package.");
-      document.getElementById("tripForm")?.scrollIntoView({ behavior: "smooth" });
+      tripForm.scrollIntoView({ behavior: "smooth" });
     });
   });
 
   document.querySelectorAll(".toggle-trip-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      try {
-        const currentlyActive = btn.dataset.active === "true";
+      const active = btn.dataset.active === "true";
 
-        await updateDoc(doc(db, "trips", btn.dataset.id), {
-          active: !currentlyActive,
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "trips", btn.dataset.id), {
+        active: !active,
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup("Package Updated", currentlyActive ? "Package disabled." : "Package enabled.");
-        loadTrips();
-      } catch (error) {
-        showPopup("Package Error", error.message || "Could not update package.");
-      }
+      showPopup("Package Updated", active ? "Package disabled." : "Package enabled.");
+      loadTrips();
     });
   });
 
   document.querySelectorAll(".toggle-featured-trip-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      try {
-        const currentlyFeatured = btn.dataset.featured === "true";
+      const featured = btn.dataset.featured === "true";
 
-        await updateDoc(doc(db, "trips", btn.dataset.id), {
-          featured: !currentlyFeatured,
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "trips", btn.dataset.id), {
+        featured: !featured,
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup(
-          "Featured Updated",
-          currentlyFeatured
-            ? "This package was removed from Featured Packages."
-            : "This package is now shown on Featured Packages."
-        );
-
-        loadTrips();
-      } catch (error) {
-        showPopup("Featured Error", error.message || "Could not update featured status.");
-      }
+      showPopup("Featured Updated", featured ? "Removed from homepage." : "Shown on homepage.");
+      loadTrips();
     });
   });
 
@@ -751,17 +677,13 @@ function bindTripButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Remove all extra pictures from this package?")) return;
 
-      try {
-        await updateDoc(doc(db, "trips", btn.dataset.id), {
-          galleryImages: [],
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "trips", btn.dataset.id), {
+        galleryImages: [],
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup("Gallery Cleared", "Extra package pictures were removed.");
-        loadTrips();
-      } catch (error) {
-        showPopup("Gallery Error", error.message || "Could not clear extra pictures.");
-      }
+      showPopup("Gallery Cleared", "Extra package pictures removed.");
+      loadTrips();
     });
   });
 
@@ -769,20 +691,14 @@ function bindTripButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this package permanently?")) return;
 
-      try {
-        await deleteDoc(doc(db, "trips", btn.dataset.id));
-        showPopup("Package Deleted", "The package has been removed.");
-        loadTrips();
-      } catch (error) {
-        showPopup("Delete Error", error.message || "Could not delete package.");
-      }
+      await deleteDoc(doc(db, "trips", btn.dataset.id));
+      showPopup("Package Deleted", "Package removed.");
+      loadTrips();
     });
   });
 }
 
-/* =========================
-   GALLERY MANAGER
-========================= */
+/* GALLERY */
 
 const galleryForm = document.getElementById("galleryForm");
 const galleryImagesList = document.getElementById("galleryImagesList");
@@ -820,7 +736,6 @@ if (galleryForm) {
       showPopup("Gallery Saved", "Gallery image uploaded successfully.");
       loadGalleryImages();
     } catch (error) {
-      console.error("Gallery Upload Error:", error);
       setMessage("galleryMessage", error.message || "Failed to upload gallery image.", true);
       showPopup("Gallery Error", error.message || "Failed to upload gallery image.");
     }
@@ -873,32 +788,22 @@ async function loadGalleryImages() {
 
     bindGalleryButtons();
   } catch (error) {
-    console.error("Load Gallery Error:", error);
-
-    galleryImagesList.innerHTML = `
-      <p style="color:red;">
-        Failed to load gallery images: ${escapeHtml(error.message)}
-      </p>
-    `;
+    galleryImagesList.innerHTML = `<p style="color:red;">Failed to load gallery images: ${escapeHtml(error.message)}</p>`;
   }
 }
 
 function bindGalleryButtons() {
   document.querySelectorAll(".toggle-gallery-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      try {
-        const active = btn.dataset.active === "true";
+      const active = btn.dataset.active === "true";
 
-        await updateDoc(doc(db, "gallery", btn.dataset.id), {
-          active: !active,
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "gallery", btn.dataset.id), {
+        active: !active,
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
-        loadGalleryImages();
-      } catch (error) {
-        showPopup("Gallery Error", error.message || "Could not update gallery image.");
-      }
+      showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
+      loadGalleryImages();
     });
   });
 
@@ -906,20 +811,14 @@ function bindGalleryButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this gallery image?")) return;
 
-      try {
-        await deleteDoc(doc(db, "gallery", btn.dataset.id));
-        showPopup("Image Deleted", "Gallery image removed.");
-        loadGalleryImages();
-      } catch (error) {
-        showPopup("Delete Error", error.message || "Could not delete gallery image.");
-      }
+      await deleteDoc(doc(db, "gallery", btn.dataset.id));
+      showPopup("Image Deleted", "Gallery image removed.");
+      loadGalleryImages();
     });
   });
 }
 
-/* =========================
-   BOOKINGS + VEHICLE RENTALS
-========================= */
+/* BOOKINGS */
 
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
@@ -962,20 +861,17 @@ async function loadBookings() {
       }
 
       const isRental = data.bookingType === "vehicle_rental";
-
       const typeText = isRental ? "Vehicle Rental" : "Package Booking";
 
-      const packageText = isRental
-        ? "Vehicle Rental Only"
-        : data.package || "-";
+      const packageText = isRental ? "Vehicle Rental Only" : data.package || "-";
 
       const vehicleText = data.vehicleName
         ? `${data.vehicleName} / Rs ${Number(data.vehiclePrice || 0).toLocaleString()}`
         : "-";
 
       const dateText = isRental
-        ? `${data.pickupDate || "-"} → ${data.returnDate || "-"}`
-        : data.date || data.startDate || "-";
+        ? data.rentalPeriod || `${data.pickupDate || "-"} → ${data.returnDate || "-"}`
+        : data.bookingPeriod || `${data.startDate || data.date || "-"} → ${data.endDate || "-"}`;
 
       const peopleText = isRental
         ? data.passengers || data.people || "-"
@@ -1013,12 +909,10 @@ async function loadBookings() {
       tableBody.appendChild(row);
     });
 
-    if (revenueValue) revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+    revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
 
-    if (revenueFill) {
-      const cappedRevenue = Math.min(totalRevenue, 200000);
-      revenueFill.style.width = `${(cappedRevenue / 200000) * 100}%`;
-    }
+    const cappedRevenue = Math.min(totalRevenue, 200000);
+    revenueFill.style.width = `${(cappedRevenue / 200000) * 100}%`;
 
     setText("totalBookingsValue", totalBookings);
     setText("pendingBookingsValue", pendingBookings);
@@ -1027,34 +921,22 @@ async function loadBookings() {
 
     bindBookingButtons();
   } catch (error) {
-    console.error("Bookings Error:", error);
-
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="11" style="color:red;">
-          Error: ${escapeHtml(error.message)}
-        </td>
-      </tr>
-    `;
+    tableBody.innerHTML = `<tr><td colspan="11" style="color:red;">Error: ${escapeHtml(error.message)}</td></tr>`;
   }
 }
 
 function bindBookingButtons() {
   document.querySelectorAll(".approve-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      try {
-        await updateDoc(doc(db, "bookings", btn.dataset.id), {
-          bookingStatus: "Confirmed",
-          paymentStatus: "Verified",
-          adminDecision: "Approved",
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "bookings", btn.dataset.id), {
+        bookingStatus: "Confirmed",
+        paymentStatus: "Verified",
+        adminDecision: "Approved",
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup("Booking Approved", "The booking has been confirmed.");
-        loadBookings();
-      } catch (error) {
-        showPopup("Approve Error", error.message || "Could not approve booking.");
-      }
+      showPopup("Booking Approved", "The booking has been confirmed.");
+      loadBookings();
     });
   });
 
@@ -1062,20 +944,16 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       const reason = prompt("Enter rejection reason:");
 
-      try {
-        await updateDoc(doc(db, "bookings", btn.dataset.id), {
-          bookingStatus: "Rejected",
-          paymentStatus: "Rejected",
-          adminDecision: "Rejected",
-          rejectionReason: reason || "No reason provided",
-          updatedAt: serverTimestamp()
-        });
+      await updateDoc(doc(db, "bookings", btn.dataset.id), {
+        bookingStatus: "Rejected",
+        paymentStatus: "Rejected",
+        adminDecision: "Rejected",
+        rejectionReason: reason || "No reason provided",
+        updatedAt: serverTimestamp()
+      });
 
-        showPopup("Booking Rejected", "The booking has been rejected.");
-        loadBookings();
-      } catch (error) {
-        showPopup("Reject Error", error.message || "Could not reject booking.");
-      }
+      showPopup("Booking Rejected", "The booking has been rejected.");
+      loadBookings();
     });
   });
 
@@ -1083,20 +961,12 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this booking?")) return;
 
-      try {
-        await deleteDoc(doc(db, "bookings", btn.dataset.id));
-        showPopup("Booking Deleted", "The booking has been removed.");
-        loadBookings();
-      } catch (error) {
-        showPopup("Delete Error", error.message || "Could not delete booking.");
-      }
+      await deleteDoc(doc(db, "bookings", btn.dataset.id));
+      showPopup("Booking Deleted", "The booking has been removed.");
+      loadBookings();
     });
   });
 }
-
-/* =========================
-   LOGOUT
-========================= */
 
 if (logoutBtn) {
   logoutBtn.addEventListener("click", async () => {
