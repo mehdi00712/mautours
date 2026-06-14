@@ -117,8 +117,7 @@ function getRentalDays(fromDate, toDate) {
 
   if (end < start) return 0;
 
-  const diff = end.getTime() - start.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+  return Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 }
 
 function updateRentalTotal() {
@@ -174,7 +173,7 @@ function renderVehicleCard(vehicle) {
   card.innerHTML = `
     ${
       vehicle.imageUrl
-        ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
+        ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
         : `<div class="vehicle-public-placeholder">🚘</div>`
     }
 
@@ -206,13 +205,7 @@ function renderVehicleCard(vehicle) {
   });
 
   card.querySelector(".vehicle-view-btn").addEventListener("click", () => {
-    alert(
-      `Vehicle: ${vehicle.name || ""}\n\n` +
-      `Category: ${vehicle.category || ""}\n\n` +
-      `Capacity: ${vehicle.capacity || "-"}\n\n` +
-      `Price: ${formatPrice(vehicle.price)} / day\n\n` +
-      `${vehicle.description || ""}`
-    );
+    window.location.href = `vehicle-details.html?id=${encodeURIComponent(vehicle.id)}`;
   });
 
   return card;
@@ -396,6 +389,7 @@ if (rentalForm) {
         returnDate,
         rentalDays,
         pickupLocation,
+        rentalPeriod: `${pickupDate} → ${returnDate}`,
 
         vehicleId: selectedRentalVehicle.id || "",
         vehicleName: selectedRentalVehicle.name || "",
@@ -403,6 +397,9 @@ if (rentalForm) {
         vehiclePrice: dailyPrice,
         vehicleCapacity: Number(selectedRentalVehicle.capacity || 0),
         vehicleImageUrl: selectedRentalVehicle.imageUrl || "",
+        vehicleGalleryImages: Array.isArray(selectedRentalVehicle.vehicleGalleryImages)
+          ? selectedRentalVehicle.vehicleGalleryImages
+          : [],
         vehicleDescription: selectedRentalVehicle.description || "",
 
         package: "Vehicle Rental Only",
