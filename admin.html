@@ -122,7 +122,7 @@
     <div id="vehiclesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Vehicle Fleet Manager</h3>
-        <p>Add vehicles customers can view and select before booking.</p>
+        <p>Add vehicles customers can view, rent and see with multiple pictures.</p>
       </div>
 
       <form id="vehicleForm" class="media-upload-form friendly-form">
@@ -146,12 +146,12 @@
 
         <div class="form-group">
           <label>Passenger Capacity</label>
-          <input type="number" id="vehicleCapacity" placeholder="Example: 5" required />
+          <input type="number" id="vehicleCapacity" placeholder="Example: 5" min="1" required />
         </div>
 
         <div class="form-group">
-          <label>Price</label>
-          <input type="number" id="vehiclePrice" placeholder="Example: 4500" required />
+          <label>Rental Price Per Day</label>
+          <input type="number" id="vehiclePrice" placeholder="Example: 4500" min="0" required />
         </div>
 
         <div class="form-group">
@@ -160,8 +160,15 @@
         </div>
 
         <div class="form-group">
-          <label>Vehicle Image</label>
+          <label>Main Vehicle Image</label>
           <input type="file" id="vehicleImage" accept="image/*" />
+          <small>This is the main image shown on vehicle cards.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Extra Vehicle Pictures</label>
+          <input type="file" id="vehicleGalleryImages" accept="image/*" multiple />
+          <small>Upload side view, rear view, interior, seats, luggage space, etc.</small>
         </div>
 
         <label class="admin-check-row">
@@ -233,7 +240,7 @@
 
         <div class="form-group">
           <label>Base Price</label>
-          <input type="number" id="tripPrice" placeholder="Use 0 if price is custom" required />
+          <input type="number" id="tripPrice" placeholder="Use 0 if price is custom" min="0" required />
         </div>
 
         <div class="form-group">
