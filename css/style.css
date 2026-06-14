@@ -10,6 +10,7 @@
   --text: #1f2937;
   --muted: #6b7280;
   --line: #e5e7eb;
+  --soft-bg: #f8fafc;
 
   --shadow: 0 18px 45px rgba(7, 24, 39, 0.12);
   --shadow-soft: 0 12px 32px rgba(7, 24, 39, 0.08);
@@ -105,9 +106,7 @@ h2::after {
   margin-right: auto;
 }
 
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .site-header {
   background: var(--darkblue);
@@ -205,9 +204,7 @@ h2::after {
   transform: rotate(-45deg) translateY(-8px);
 }
 
-/* =========================
-   HERO
-========================= */
+/* HERO */
 
 .hero {
   position: relative;
@@ -286,9 +283,7 @@ h2::after {
   min-height: 72vh;
 }
 
-/* =========================
-   BUTTONS
-========================= */
+/* BUTTONS */
 
 .btn,
 .btn-outline {
@@ -336,9 +331,12 @@ h2::after {
   border-color: var(--gold);
 }
 
-/* =========================
-   STATS
-========================= */
+.full-width-btn {
+  width: 100%;
+  margin-top: 12px;
+}
+
+/* STATS */
 
 .mobile-stats {
   width: min(1000px, 92%);
@@ -377,9 +375,7 @@ h2::after {
   font-weight: 800;
 }
 
-/* =========================
-   GRIDS / CARDS
-========================= */
+/* GRIDS / CARDS */
 
 .category-grid,
 .service-grid,
@@ -500,9 +496,7 @@ h2::after {
   background: var(--sand);
 }
 
-/* =========================
-   HOMEPAGE PREMIUM SECTIONS
-========================= */
+/* HOMEPAGE */
 
 #why,
 #packages-preview,
@@ -529,9 +523,7 @@ h2::after {
   grid-column: 1 / -1;
 }
 
-/* =========================
-   BOOKING / PACKAGE CARDS
-========================= */
+/* BOOKING / PACKAGE CARDS */
 
 .booking-intro {
   padding-bottom: 1rem;
@@ -608,9 +600,7 @@ h2::after {
   text-align: center;
 }
 
-/* =========================
-   REVIEWS SLIDER
-========================= */
+/* REVIEWS */
 
 #reviews {
   text-align: center;
@@ -683,7 +673,6 @@ h2::after {
   background: var(--gold);
 }
 
-/* fallback when Firebase loads review cards */
 #homeReviewsGrid .service-card {
   max-width: 560px;
   min-height: auto;
@@ -691,9 +680,11 @@ h2::after {
   margin: 0 auto;
 }
 
-/* =========================
-   VEHICLE CARDS
-========================= */
+/* VEHICLE LISTING PAGE */
+
+.vehicle-page-intro {
+  padding-top: 110px;
+}
 
 .vehicle-category-tabs {
   display: flex;
@@ -755,11 +746,15 @@ h2::after {
   padding: 24px;
 }
 
-.vehicle-public-info span {
+.vehicle-public-info span,
+.vehicle-category {
   display: inline-block;
-  color: var(--gold);
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--gold) !important;
+  padding: 7px 13px;
+  border-radius: 999px;
   font-weight: 900;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .vehicle-public-info h3 {
@@ -772,27 +767,43 @@ h2::after {
   line-height: 1.6;
 }
 
-.vehicle-public-info ul {
+.vehicle-public-info ul,
+.vehicle-features {
   margin: 18px 0;
   padding-left: 0;
   list-style: none;
 }
 
-.vehicle-public-info li {
+.vehicle-public-info li,
+.vehicle-features li {
   margin-bottom: 8px;
   color: var(--text);
+  font-weight: 600;
 }
 
-.vehicle-public-info strong {
+.vehicle-public-info strong,
+.vehicle-price {
   display: block;
   color: var(--gold);
   font-size: 1.2rem;
+  font-weight: 900;
   margin-bottom: 18px;
 }
 
-/* =========================
-   MODAL / POPUP
-========================= */
+.vehicle-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.vehicle-buttons .btn,
+.vehicle-buttons .btn-outline {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* MODAL / POPUP */
 
 .modal,
 .popup {
@@ -854,7 +865,8 @@ h2::after {
 .login-box input,
 .media-upload-form input,
 .media-upload-form select,
-.media-upload-form textarea {
+.media-upload-form textarea,
+.vehicle-details-rental-form input {
   padding: 0.95rem 1rem;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -870,7 +882,8 @@ h2::after {
 .login-box input:focus,
 .media-upload-form input:focus,
 .media-upload-form select:focus,
-.media-upload-form textarea:focus {
+.media-upload-form textarea:focus,
+.vehicle-details-rental-form input:focus {
   border-color: var(--gold);
   box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.14);
 }
@@ -924,14 +937,14 @@ h2::after {
 }
 
 .upload-label {
+  display: block;
   text-align: left;
   color: var(--darkblue);
   font-weight: 900;
+  margin-top: 4px;
 }
 
-/* =========================
-   VEHICLE SELECTION IN BOOKING
-========================= */
+/* BOOKING VEHICLE SELECTION */
 
 .vehicle-selection-box {
   margin: 20px 0;
@@ -1030,10 +1043,10 @@ h2::after {
 
 .booking-total-box {
   margin: 20px 0;
-  padding: 18px;
+  padding: 22px;
   background: var(--darkblue);
   color: var(--white);
-  border-radius: 16px;
+  border-radius: 20px;
   text-align: left;
 }
 
@@ -1041,25 +1054,25 @@ h2::after {
   display: block;
   font-size: 0.9rem;
   opacity: 0.8;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .booking-total-box strong {
   display: block;
   margin-top: 5px;
-  font-size: 2rem;
+  font-size: clamp(1.7rem, 6vw, 2.4rem);
   color: var(--gold);
 }
 
 .booking-total-box small {
   display: block;
   margin-top: 8px;
-  opacity: 0.75;
+  opacity: 0.78;
   line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
 }
 
-/* =========================
-   LOGIN
-========================= */
+/* LOGIN */
 
 .login-page {
   min-height: 100vh;
@@ -1195,9 +1208,7 @@ h2::after {
   font-size: 0.95rem;
 }
 
-/* =========================
-   ADMIN
-========================= */
+/* ADMIN */
 
 .admin-main {
   padding-top: 105px;
@@ -1355,6 +1366,7 @@ h2::after {
 .edit-vehicle-btn,
 .toggle-vehicle-btn,
 .delete-vehicle-btn,
+.clear-vehicle-gallery-btn,
 .approve-btn,
 .reject-btn,
 .delete-btn {
@@ -1376,7 +1388,8 @@ h2::after {
 .toggle-trip-btn,
 .toggle-vehicle-btn,
 .toggle-featured-trip-btn,
-.clear-trip-gallery-btn {
+.clear-trip-gallery-btn,
+.clear-vehicle-gallery-btn {
   background: var(--gold);
   color: var(--darkblue);
 }
@@ -1514,9 +1527,7 @@ h2::after {
   background: var(--gold);
 }
 
-/* =========================
-   PACKAGE DETAILS PAGE
-========================= */
+/* PACKAGE DETAILS */
 
 .package-details-page {
   padding: 120px 0 40px;
@@ -1642,9 +1653,313 @@ h2::after {
   text-align: center;
 }
 
-/* =========================
-   CONTACT / CTA / FOOTER
-========================= */
+.breadcrumb {
+  margin-top: 105px;
+  margin-bottom: 25px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.breadcrumb a {
+  color: var(--darkblue);
+  text-decoration: none;
+}
+
+.package-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.package-booking-column {
+  position: sticky;
+  top: 100px;
+}
+
+.package-gallery-wrapper {
+  position: relative;
+}
+
+.photo-count {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  background: rgba(7, 24, 39, 0.88);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 800;
+  z-index: 5;
+}
+
+.package-overview-card,
+.booking-side-card,
+.package-details-block {
+  background: white;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.package-overview-card h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: var(--darkblue);
+  margin-bottom: 14px;
+}
+
+.package-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.highlight-box {
+  background: var(--sand);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.highlight-box strong {
+  display: block;
+  color: var(--darkblue);
+  margin-top: 8px;
+}
+
+.highlight-box span {
+  color: var(--gold);
+  font-weight: 900;
+}
+
+.booking-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.side-price {
+  text-align: center;
+  background: var(--sand);
+  border-radius: 18px;
+  padding: 20px;
+}
+
+.side-price small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.side-price h2 {
+  margin: 0;
+  color: var(--gold);
+}
+
+.side-price h2::after {
+  display: none;
+}
+
+.package-booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.package-booking-form input {
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+/* VEHICLE DETAILS PAGE - FIXED */
+
+.vehicle-details-page {
+  padding-top: 0;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #ffffff 100%);
+}
+
+.vehicle-details-top {
+  padding-top: 0;
+}
+
+.vehicle-details-layout {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 30px;
+  align-items: start;
+  margin-top: 0;
+}
+
+.vehicle-media-card,
+.vehicle-details-info-card,
+.vehicle-rental-card {
+  background: #ffffff;
+  border: 1px solid rgba(7, 24, 39, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 18px 42px rgba(7, 24, 39, 0.08);
+}
+
+.vehicle-media-card {
+  padding: 16px;
+}
+
+.vehicle-main-image-wrap {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--sand);
+}
+
+.vehicle-main-image {
+  width: 100%;
+  height: 440px;
+  object-fit: cover;
+  display: block;
+  border-radius: 22px;
+}
+
+.vehicle-thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.vehicle-thumb-btn {
+  border: 2px solid transparent;
+  background: #ffffff;
+  cursor: pointer;
+  border-radius: 15px;
+  padding: 0;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.vehicle-thumb-btn:hover,
+.vehicle-thumb-btn.active {
+  border-color: var(--gold);
+  transform: translateY(-2px);
+}
+
+.vehicle-thumb-btn img {
+  width: 100%;
+  height: 78px;
+  object-fit: cover;
+  display: block;
+}
+
+.vehicle-details-info-card {
+  padding: 30px;
+  position: sticky;
+  top: 95px;
+}
+
+.vehicle-details-info-card h1 {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  color: var(--darkblue);
+  margin-bottom: 8px;
+}
+
+.vehicle-detail-description {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-bottom: 22px;
+  line-height: 1.75;
+}
+
+.vehicle-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.vehicle-detail-stats div {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 1px solid var(--line);
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.vehicle-detail-stats strong {
+  display: block;
+  color: var(--darkblue);
+  font-size: 0.88rem;
+  margin-bottom: 8px;
+}
+
+.vehicle-detail-stats span {
+  color: var(--gold);
+  font-weight: 900;
+  font-size: 1.05rem;
+  line-height: 1.4;
+}
+
+.vehicle-details-block {
+  background: var(--soft-bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 22px;
+  margin: 24px 0;
+}
+
+.vehicle-details-block h3 {
+  color: var(--darkblue);
+  margin-bottom: 12px;
+}
+
+.vehicle-features-list {
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.vehicle-features-list li {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.vehicle-rental-card {
+  max-width: 780px;
+  margin: 40px auto 0;
+  padding: 34px;
+}
+
+.vehicle-details-rental-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.vehicle-details-rental-form .upload-label,
+.vehicle-details-rental-form .booking-total-box,
+.vehicle-details-rental-form button,
+.vehicle-details-rental-form input[type="file"] {
+  grid-column: 1 / -1;
+}
+
+.vehicle-details-rental-form input {
+  min-height: 52px;
+}
+
+.vehicle-details-rental-form input[type="file"] {
+  padding: 14px;
+  background: #ffffff;
+}
+
+.vehicle-details-rental-form button {
+  min-height: 56px;
+}
+
+/* CONTACT / CTA / FOOTER */
 
 .contact-info {
   border-radius: var(--radius);
@@ -1718,9 +2033,7 @@ h2::after {
   color: var(--white);
 }
 
-/* =========================
-   ANIMATIONS
-========================= */
+/* ANIMATIONS */
 
 @keyframes slideUp {
   from {
@@ -1750,35 +2063,37 @@ h2::after {
   transform: translateY(0);
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+/* RESPONSIVE */
 
-@media (max-width: 900px) {
-  .login-hero,
-  .package-details-content {
+@media (max-width: 1000px) {
+  .vehicle-details-layout,
+  .package-details-content,
+  .login-hero {
     grid-template-columns: 1fr;
+  }
+
+  .vehicle-details-info-card {
+    position: static;
+  }
+
+  .vehicle-main-image {
+    height: 380px;
   }
 
   .admin-status-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .package-main-image {
-    height: 300px;
+  .package-booking-column {
+    position: static;
   }
 
-  .package-info-grid {
+  .package-highlights {
     grid-template-columns: 1fr;
   }
 
-  .package-details-actions {
-    flex-direction: column;
-  }
-
-  .package-details-actions .btn,
-  .package-details-actions .btn-outline {
-    width: 100%;
+  .breadcrumb {
+    margin-top: 95px;
   }
 }
 
@@ -1906,6 +2221,105 @@ h2::after {
     width: 95%;
     max-height: 92vh;
   }
+
+  .vehicle-page-intro {
+    padding-top: 95px;
+  }
+
+  .vehicle-buttons {
+    flex-direction: column;
+  }
+
+  .vehicle-buttons .btn,
+  .vehicle-buttons .btn-outline {
+    width: 100%;
+  }
+
+  .vehicle-details-top {
+    width: 100%;
+  }
+
+  .breadcrumb {
+    width: 92%;
+    margin: 92px auto 18px;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+  }
+
+  .vehicle-media-card,
+  .vehicle-details-info-card,
+  .vehicle-rental-card {
+    border-radius: 24px;
+  }
+
+  .vehicle-media-card {
+    padding: 10px;
+  }
+
+  .vehicle-main-image {
+    height: 285px;
+    border-radius: 20px;
+  }
+
+  .vehicle-main-image-wrap {
+    border-radius: 20px;
+  }
+
+  .vehicle-thumbnail-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+  }
+
+  .vehicle-thumb-btn img {
+    height: 64px;
+  }
+
+  .photo-count {
+    right: 12px;
+    bottom: 12px;
+    font-size: 0.82rem;
+    padding: 8px 12px;
+  }
+
+  .vehicle-details-info-card {
+    padding: 22px;
+  }
+
+  .vehicle-details-info-card h1 {
+    font-size: 2.35rem;
+  }
+
+  .vehicle-detail-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .vehicle-detail-stats div {
+    padding: 16px;
+  }
+
+  .vehicle-details-block {
+    padding: 18px;
+  }
+
+  .vehicle-rental-card {
+    width: 92%;
+    padding: 24px 18px;
+    margin-top: 30px;
+  }
+
+  .vehicle-details-rental-form {
+    grid-template-columns: 1fr;
+  }
+
+  .vehicle-details-rental-form input {
+    font-size: 16px;
+    min-height: 52px;
+  }
+
+  .booking-total-box {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1947,290 +2361,32 @@ h2::after {
     padding: 0.75rem 0.95rem;
     font-size: 0.85rem;
   }
-}
 
-.breadcrumb {
-  margin-top: 120px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.breadcrumb a {
-  color: var(--darkblue);
-  text-decoration: none;
-}
-
-.package-main-column {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.package-booking-column {
-  position: sticky;
-  top: 100px;
-}
-
-.package-gallery-wrapper {
-  position: relative;
-}
-
-.photo-count {
-  position: absolute;
-  right: 18px;
-  bottom: 18px;
-  background: rgba(7, 24, 39, 0.85);
-  color: white;
-  padding: 10px 16px;
-  border-radius: 999px;
-  font-weight: 800;
-}
-
-.package-overview-card,
-.booking-side-card,
-.package-details-block {
-  background: white;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-soft);
-  border-radius: 24px;
-  padding: 28px;
-}
-
-.package-overview-card h1 {
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  color: var(--darkblue);
-  margin-bottom: 14px;
-}
-
-.package-highlights {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
-  margin-top: 24px;
-}
-
-.highlight-box {
-  background: var(--sand);
-  border-radius: 18px;
-  padding: 18px;
-}
-
-.highlight-box strong {
-  display: block;
-  color: var(--darkblue);
-  margin-top: 8px;
-}
-
-.highlight-box span {
-  color: var(--gold);
-  font-weight: 900;
-}
-
-.booking-side-card {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.side-price {
-  text-align: center;
-  background: var(--sand);
-  border-radius: 18px;
-  padding: 20px;
-}
-
-.side-price small {
-  color: var(--muted);
-  font-weight: 800;
-}
-
-.side-price h2 {
-  margin: 0;
-  color: var(--gold);
-}
-
-.side-price h2::after {
-  display: none;
-}
-
-.package-booking-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.package-booking-form input {
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  font-size: 1rem;
-}
-
-.full-width-btn {
-  width: 100%;
-}
-
-@media (max-width: 900px) {
-  .package-booking-column {
-    position: static;
+  .vehicle-details-layout {
+    gap: 18px;
   }
 
-  .package-highlights {
-    grid-template-columns: 1fr;
+  .vehicle-main-image {
+    height: 255px;
   }
 
-  .breadcrumb {
-    margin-top: 95px;
-  }
-}
-
-/* =========================
-   VEHICLE RENTAL PAGE
-========================= */
-
-.vehicle-page-intro {
-  padding-top: 110px;
-}
-
-.vehicle-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 18px;
-  flex-wrap: wrap;
-}
-
-.vehicle-buttons .btn,
-.vehicle-buttons .btn-outline {
-  flex: 1;
-  min-width: 150px;
-}
-
-.vehicle-category {
-  background: rgba(201, 162, 39, 0.14);
-  color: var(--gold) !important;
-  padding: 7px 13px;
-  border-radius: 999px;
-}
-
-.vehicle-features {
-  list-style: none;
-  padding-left: 0 !important;
-  margin: 18px 0;
-}
-
-.vehicle-features li {
-  margin-bottom: 8px;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.vehicle-price {
-  color: var(--gold);
-  font-size: 1.25rem;
-  font-weight: 900;
-}
-
-#vehicleRentalForm {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-#vehicleRentalForm input {
-  width: 100%;
-  padding: 0.95rem 1rem;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  font-size: 1rem;
-}
-
-#vehicleRentalForm input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.14);
-}
-
-#vehicleRentalModal .bank-box {
-  margin-bottom: 16px;
-}
-
-#rentalEstimatedTotal {
-  color: var(--gold);
-}
-
-@media (max-width: 768px) {
-  .vehicle-buttons {
-    flex-direction: column;
+  .vehicle-thumbnail-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  .vehicle-buttons .btn,
-  .vehicle-buttons .btn-outline {
-    width: 100%;
+  .vehicle-thumb-btn img {
+    height: 62px;
   }
 
-  .vehicle-page-intro {
-    padding-top: 95px;
+  .vehicle-details-info-card h1 {
+    font-size: 2rem;
   }
-}
 
-.vehicle-details-layout{
-  display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:40px;
-  align-items:start;
-}
+  .vehicle-detail-description {
+    font-size: 0.96rem;
+  }
 
-.vehicle-main-image{
-  width:100%;
-  height:550px;
-  object-fit:cover;
-  border-radius:24px;
-}
-
-.vehicle-thumbnail-grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:10px;
-  margin-top:15px;
-}
-
-.vehicle-thumb-btn{
-  border:none;
-  background:none;
-  cursor:pointer;
-}
-
-.vehicle-thumb-btn img{
-  width:100%;
-  height:90px;
-  object-fit:cover;
-  border-radius:12px;
-}
-
-.vehicle-details-info-card{
-  background:#fff;
-  padding:30px;
-  border-radius:24px;
-  box-shadow:0 15px 40px rgba(0,0,0,.08);
-}
-
-.vehicle-detail-stats{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-  margin:25px 0;
-}
-
-.vehicle-detail-stats div{
-  background:#f8f8f8;
-  padding:18px;
-  border-radius:14px;
-}
-
-.full-width-btn{
-  width:100%;
-  margin-top:12px;
+  .vehicle-rental-card h2 {
+    font-size: 2rem;
+  }
 }
