@@ -102,6 +102,27 @@ function formatPrice(data) {
   return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
 }
 
+function getDurationDays(durationText) {
+  if (!durationText) return 1;
+
+  const text = String(durationText).toLowerCase();
+
+  if (text.includes("half")) return 1;
+  if (text.includes("full")) return 1;
+
+  const match = text.match(/(\d+)/);
+
+  if (!match) return 1;
+
+  return Math.max(Number(match[1]), 1);
+}
+
+function calculateEndDate(startDate, durationDays) {
+  const date = new Date(`${startDate}T00:00:00`);
+  date.setDate(date.getDate() + durationDays - 1);
+  return date.toISOString().split("T")[0];
+}
+
 function showError(message) {
   if (packageLoading) {
     packageLoading.innerHTML = `
@@ -146,6 +167,8 @@ function renderGallery(packageData) {
   if (photoCount) photoCount.textContent = images.length;
   if (mainPackageImage) mainPackageImage.src = images[0];
 
+  if (!packageThumbnailGrid) return;
+
   packageThumbnailGrid.innerHTML = "";
 
   images.forEach((url, index) => {
@@ -170,6 +193,8 @@ function renderGallery(packageData) {
 }
 
 function renderIncludes(includes) {
+  if (!packageIncludes) return;
+
   if (!Array.isArray(includes) || includes.length === 0) {
     packageIncludes.innerHTML = `<li>Custom itinerary planning</li>`;
     return;
@@ -192,6 +217,8 @@ function selectVehicle(vehicle, card) {
 }
 
 async function loadVehicles() {
+  if (!packageVehiclesGrid) return;
+
   try {
     const snapshot = await getDocs(collection(db, "vehicles"));
 
@@ -315,8 +342,8 @@ async function loadPackageDetails() {
       packageWhatsappBtn.href = `https://wa.me/23059066404?text=${message}`;
     }
 
-    packageLoading.style.display = "none";
-    packageDetailsContent.style.display = "grid";
+    if (packageLoading) packageLoading.style.display = "none";
+    if (packageDetailsContent) packageDetailsContent.style.display = "grid";
 
     updateEstimatedTotal();
 
@@ -326,9 +353,7 @@ async function loadPackageDetails() {
   }
 }
 
-if (document.getElementById("people")) {
-  document.getElementById("people").addEventListener("input", updateEstimatedTotal);
-}
+document.getElementById("people")?.addEventListener("input", updateEstimatedTotal);
 
 if (packageBookingForm) {
   packageBookingForm.addEventListener("submit", async (e) => {
@@ -363,10 +388,10 @@ if (packageBookingForm) {
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const people = Number(document.getElementById("people").value);
-    const date = document.getElementById("date").value.trim();
+    const startDate = document.getElementById("date").value.trim();
     const proofFile = document.getElementById("paymentProof").files[0];
 
-    if (!name || !email || !phone || !people || !date || !proofFile) {
+    if (!name || !email || !phone || !people || !startDate || !proofFile) {
       showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
@@ -380,7 +405,7 @@ if (packageBookingForm) {
       return;
     }
 
-    const selectedDate = new Date(`${date}T00:00:00`);
+    const selectedDate = new Date(`${startDate}T00:00:00`);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -392,6 +417,9 @@ if (packageBookingForm) {
     }
 
     try {
+      const durationDays = getDurationDays(currentPackage.duration);
+      const endDate = calculateEndDate(startDate, durationDays);
+
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
 
@@ -412,6 +440,8 @@ if (packageBookingForm) {
       const totalPrice = pricePerPerson > 0 ? pricePerPerson * people : 0;
 
       await setDoc(bookingRef, {
+        bookingType: "package_booking",
+
         userId: currentUser.uid,
         userEmail: currentUser.email || "",
 
@@ -422,9 +452,13 @@ if (packageBookingForm) {
         email,
         phone,
         people,
-        date,
-        startDate: date,
+
+        date: startDate,
+        startDate,
+        endDate,
         duration: currentPackage.duration || "",
+        durationDays,
+        bookingPeriod: `${startDate} → ${endDate}`,
 
         vehicleId: selectedVehicle?.id || "",
         vehicleName: selectedVehicle?.name || "",
