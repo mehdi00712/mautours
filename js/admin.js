@@ -139,7 +139,11 @@ onAuthStateChanged(auth, async (user) => {
 
   if (!adminUIDs.includes(user.uid)) {
     await signOut(auth);
-    showPopup("Access Denied", `Admin privileges required.\n\nYour UID is:\n${user.uid}`, "index.html");
+    showPopup(
+      "Access Denied",
+      `Admin privileges required.\n\nYour UID is:\n${user.uid}`,
+      "index.html"
+    );
     return;
   }
 
@@ -151,7 +155,9 @@ onAuthStateChanged(auth, async (user) => {
   loadBookings();
 });
 
-/* WEBSITE SETTINGS */
+/* =========================
+   WEBSITE SETTINGS
+========================= */
 
 const websiteSettingsForm = document.getElementById("websiteSettingsForm");
 
@@ -162,14 +168,18 @@ if (websiteSettingsForm) {
     try {
       setMessage("settingsMessage", "Saving website settings...");
 
-      await setDoc(doc(db, "siteContent", "settings"), {
-        businessName: document.getElementById("businessName")?.value.trim() || "",
-        whatsappNumber: document.getElementById("whatsappNumber")?.value.trim() || "",
-        mobileNumber: document.getElementById("mobileNumber")?.value.trim() || "",
-        businessEmail: document.getElementById("businessEmail")?.value.trim() || "",
-        servedRegions: document.getElementById("servedRegions")?.value.trim() || "",
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      await setDoc(
+        doc(db, "siteContent", "settings"),
+        {
+          businessName: document.getElementById("businessName")?.value.trim() || "",
+          whatsappNumber: document.getElementById("whatsappNumber")?.value.trim() || "",
+          mobileNumber: document.getElementById("mobileNumber")?.value.trim() || "",
+          businessEmail: document.getElementById("businessEmail")?.value.trim() || "",
+          servedRegions: document.getElementById("servedRegions")?.value.trim() || "",
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
 
       setMessage("settingsMessage", "Website settings saved successfully.");
       showPopup("Saved", "Website settings have been updated.");
@@ -187,17 +197,33 @@ async function loadWebsiteSettings() {
 
     const data = snap.data();
 
-    document.getElementById("businessName").value = data.businessName || "";
-    document.getElementById("whatsappNumber").value = data.whatsappNumber || "";
-    document.getElementById("mobileNumber").value = data.mobileNumber || "";
-    document.getElementById("businessEmail").value = data.businessEmail || "";
-    document.getElementById("servedRegions").value = data.servedRegions || "";
+    if (document.getElementById("businessName")) {
+      document.getElementById("businessName").value = data.businessName || "";
+    }
+
+    if (document.getElementById("whatsappNumber")) {
+      document.getElementById("whatsappNumber").value = data.whatsappNumber || "";
+    }
+
+    if (document.getElementById("mobileNumber")) {
+      document.getElementById("mobileNumber").value = data.mobileNumber || "";
+    }
+
+    if (document.getElementById("businessEmail")) {
+      document.getElementById("businessEmail").value = data.businessEmail || "";
+    }
+
+    if (document.getElementById("servedRegions")) {
+      document.getElementById("servedRegions").value = data.servedRegions || "";
+    }
   } catch (error) {
     console.error("Load Settings Error:", error);
   }
 }
 
-/* HOMEPAGE */
+/* =========================
+   HOMEPAGE
+========================= */
 
 const homeContentForm = document.getElementById("homeContentForm");
 
@@ -241,16 +267,29 @@ async function loadHomepageContent() {
 
     const data = snap.data();
 
-    document.getElementById("homeHeroTitle").value = data.heroTitle || "";
-    document.getElementById("homeHeroSubtitle").value = data.heroSubtitle || "";
-    document.getElementById("homeBadge").value = data.heroBadge || "";
-    document.getElementById("homeCtaText").value = data.ctaText || "";
+    if (document.getElementById("homeHeroTitle")) {
+      document.getElementById("homeHeroTitle").value = data.heroTitle || "";
+    }
+
+    if (document.getElementById("homeHeroSubtitle")) {
+      document.getElementById("homeHeroSubtitle").value = data.heroSubtitle || "";
+    }
+
+    if (document.getElementById("homeBadge")) {
+      document.getElementById("homeBadge").value = data.heroBadge || "";
+    }
+
+    if (document.getElementById("homeCtaText")) {
+      document.getElementById("homeCtaText").value = data.ctaText || "";
+    }
   } catch (error) {
     console.error("Load Homepage Error:", error);
   }
 }
 
-/* VEHICLES */
+/* =========================
+   VEHICLES
+========================= */
 
 const vehicleForm = document.getElementById("vehicleForm");
 const resetVehicleForm = document.getElementById("resetVehicleForm");
@@ -285,6 +324,10 @@ if (vehicleForm) {
         throw new Error("Please enter vehicle name, category and passenger capacity.");
       }
 
+      if (payload.price < 0) {
+        throw new Error("Vehicle price cannot be negative.");
+      }
+
       if (!vehicleId) {
         payload.createdAt = serverTimestamp();
       }
@@ -301,6 +344,7 @@ if (vehicleForm) {
 
         if (vehicleId) {
           const oldSnap = await getDoc(vehicleRef);
+
           const oldImages =
             oldSnap.exists() && Array.isArray(oldSnap.data().vehicleGalleryImages)
               ? oldSnap.data().vehicleGalleryImages
@@ -315,8 +359,14 @@ if (vehicleForm) {
       await setDoc(vehicleRef, payload, { merge: true });
 
       vehicleForm.reset();
-      document.getElementById("vehicleId").value = "";
-      document.getElementById("vehicleActive").checked = true;
+
+      if (document.getElementById("vehicleId")) {
+        document.getElementById("vehicleId").value = "";
+      }
+
+      if (document.getElementById("vehicleActive")) {
+        document.getElementById("vehicleActive").checked = true;
+      }
 
       clearFileInput("vehicleImage");
       clearFileInput("vehicleGalleryImages");
@@ -334,10 +384,18 @@ if (vehicleForm) {
 if (resetVehicleForm) {
   resetVehicleForm.addEventListener("click", () => {
     vehicleForm.reset();
-    document.getElementById("vehicleId").value = "";
-    document.getElementById("vehicleActive").checked = true;
+
+    if (document.getElementById("vehicleId")) {
+      document.getElementById("vehicleId").value = "";
+    }
+
+    if (document.getElementById("vehicleActive")) {
+      document.getElementById("vehicleActive").checked = true;
+    }
+
     clearFileInput("vehicleImage");
     clearFileInput("vehicleGalleryImages");
+
     setMessage("vehicleMessage", "Vehicle form cleared.");
   });
 }
@@ -361,6 +419,7 @@ async function loadVehicles() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const vehicleId = docSnap.id;
+
       const galleryCount = Array.isArray(data.vehicleGalleryImages)
         ? data.vehicleGalleryImages.length
         : 0;
@@ -370,6 +429,7 @@ async function loadVehicles() {
 
       card.innerHTML = `
         <h4>${escapeHtml(data.name || "Unnamed Vehicle")}</h4>
+
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
         <p><strong>Rental Price:</strong> Rs ${Number(data.price || 0).toLocaleString()} / day</p>
@@ -385,11 +445,18 @@ async function loadVehicles() {
 
         <div class="admin-trip-actions">
           <button class="edit-vehicle-btn" data-id="${vehicleId}">Edit</button>
+
           <button class="toggle-vehicle-btn" data-id="${vehicleId}" data-active="${data.active !== false}">
             ${data.active === false ? "Show" : "Hide"}
           </button>
-          <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">Clear Extra Pictures</button>
-          <button class="delete-vehicle-btn" data-id="${vehicleId}">Delete</button>
+
+          <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">
+            Clear Extra Pictures
+          </button>
+
+          <button class="delete-vehicle-btn" data-id="${vehicleId}">
+            Delete
+          </button>
         </div>
       `;
 
@@ -398,7 +465,9 @@ async function loadVehicles() {
 
     bindVehicleButtons(snapshot);
   } catch (error) {
-    adminVehiclesList.innerHTML = `<p style="color:red;">Failed to load vehicles: ${escapeHtml(error.message)}</p>`;
+    adminVehiclesList.innerHTML = `
+      <p style="color:red;">Failed to load vehicles: ${escapeHtml(error.message)}</p>
+    `;
   }
 }
 
@@ -416,24 +485,32 @@ function bindVehicleButtons(snapshot) {
       document.getElementById("vehicleCapacity").value = data.capacity || 0;
       document.getElementById("vehiclePrice").value = data.price || 0;
       document.getElementById("vehicleDescription").value = data.description || "";
-      document.getElementById("vehicleActive").checked = data.active !== false;
+
+      if (document.getElementById("vehicleActive")) {
+        document.getElementById("vehicleActive").checked = data.active !== false;
+      }
 
       setMessage("vehicleMessage", "Editing vehicle. Add more pictures if needed, then click Save Vehicle.");
+
       vehicleForm.scrollIntoView({ behavior: "smooth" });
     });
   });
 
   document.querySelectorAll(".toggle-vehicle-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const active = btn.dataset.active === "true";
+      try {
+        const active = btn.dataset.active === "true";
 
-      await updateDoc(doc(db, "vehicles", btn.dataset.id), {
-        active: !active,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "vehicles", btn.dataset.id), {
+          active: !active,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Vehicle Updated", active ? "Vehicle hidden." : "Vehicle visible.");
-      loadVehicles();
+        showPopup("Vehicle Updated", active ? "Vehicle hidden." : "Vehicle visible.");
+        loadVehicles();
+      } catch (error) {
+        showPopup("Vehicle Error", error.message || "Could not update vehicle.");
+      }
     });
   });
 
@@ -441,13 +518,17 @@ function bindVehicleButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Remove all extra pictures from this vehicle?")) return;
 
-      await updateDoc(doc(db, "vehicles", btn.dataset.id), {
-        vehicleGalleryImages: [],
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "vehicles", btn.dataset.id), {
+          vehicleGalleryImages: [],
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Gallery Cleared", "Extra vehicle pictures removed.");
-      loadVehicles();
+        showPopup("Gallery Cleared", "Extra vehicle pictures removed.");
+        loadVehicles();
+      } catch (error) {
+        showPopup("Gallery Error", error.message || "Could not clear vehicle pictures.");
+      }
     });
   });
 
@@ -455,14 +536,20 @@ function bindVehicleButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this vehicle permanently?")) return;
 
-      await deleteDoc(doc(db, "vehicles", btn.dataset.id));
-      showPopup("Vehicle Deleted", "Vehicle removed.");
-      loadVehicles();
+      try {
+        await deleteDoc(doc(db, "vehicles", btn.dataset.id));
+        showPopup("Vehicle Deleted", "Vehicle removed.");
+        loadVehicles();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete vehicle.");
+      }
     });
   });
 }
 
-/* PACKAGES */
+/* =========================
+   PACKAGES
+========================= */
 
 const tripForm = document.getElementById("tripForm");
 const resetTripForm = document.getElementById("resetTripForm");
@@ -501,6 +588,10 @@ if (tripForm) {
         throw new Error("Please fill in all required package fields.");
       }
 
+      if (payload.price < 0) {
+        throw new Error("Package price cannot be negative.");
+      }
+
       if (!tripId) {
         payload.createdAt = serverTimestamp();
       }
@@ -517,6 +608,7 @@ if (tripForm) {
 
         if (tripId) {
           const oldSnap = await getDoc(tripRef);
+
           const oldImages =
             oldSnap.exists() && Array.isArray(oldSnap.data().galleryImages)
               ? oldSnap.data().galleryImages
@@ -531,8 +623,14 @@ if (tripForm) {
       await setDoc(tripRef, payload, { merge: true });
 
       tripForm.reset();
-      document.getElementById("tripId").value = "";
-      document.getElementById("tripFeatured").checked = false;
+
+      if (document.getElementById("tripId")) {
+        document.getElementById("tripId").value = "";
+      }
+
+      if (document.getElementById("tripFeatured")) {
+        document.getElementById("tripFeatured").checked = false;
+      }
 
       clearFileInput("tripImage");
       clearFileInput("tripGalleryImages");
@@ -550,10 +648,18 @@ if (tripForm) {
 if (resetTripForm) {
   resetTripForm.addEventListener("click", () => {
     tripForm.reset();
-    document.getElementById("tripId").value = "";
-    document.getElementById("tripFeatured").checked = false;
+
+    if (document.getElementById("tripId")) {
+      document.getElementById("tripId").value = "";
+    }
+
+    if (document.getElementById("tripFeatured")) {
+      document.getElementById("tripFeatured").checked = false;
+    }
+
     clearFileInput("tripImage");
     clearFileInput("tripGalleryImages");
+
     setMessage("tripMessage", "Package form cleared.");
   });
 }
@@ -577,13 +683,16 @@ async function loadTrips() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const tripId = docSnap.id;
-      const galleryCount = Array.isArray(data.galleryImages) ? data.galleryImages.length : 0;
+      const galleryCount = Array.isArray(data.galleryImages)
+        ? data.galleryImages.length
+        : 0;
 
       const card = document.createElement("div");
       card.className = "admin-trip-card";
 
       card.innerHTML = `
         <h4>${escapeHtml(data.title || "Untitled Package")}</h4>
+
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Duration:</strong> ${escapeHtml(data.duration || "-")}</p>
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
@@ -599,14 +708,22 @@ async function loadTrips() {
 
         <div class="admin-trip-actions">
           <button class="edit-trip-btn" data-id="${tripId}">Edit</button>
+
           <button class="toggle-trip-btn" data-id="${tripId}" data-active="${data.active}">
             ${data.active ? "Disable" : "Enable"}
           </button>
+
           <button class="toggle-featured-trip-btn" data-id="${tripId}" data-featured="${data.featured === true}">
             ${data.featured ? "Remove Featured" : "Make Featured"}
           </button>
-          <button class="clear-trip-gallery-btn" data-id="${tripId}">Clear Extra Pictures</button>
-          <button class="delete-trip-btn" data-id="${tripId}">Delete</button>
+
+          <button class="clear-trip-gallery-btn" data-id="${tripId}">
+            Clear Extra Pictures
+          </button>
+
+          <button class="delete-trip-btn" data-id="${tripId}">
+            Delete
+          </button>
         </div>
       `;
 
@@ -615,7 +732,9 @@ async function loadTrips() {
 
     bindTripButtons(snapshot);
   } catch (error) {
-    adminTripsList.innerHTML = `<p style="color:red;">Failed to load packages: ${escapeHtml(error.message)}</p>`;
+    adminTripsList.innerHTML = `
+      <p style="color:red;">Failed to load packages: ${escapeHtml(error.message)}</p>
+    `;
   }
 }
 
@@ -638,38 +757,50 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripIncludes").value = Array.isArray(data.includes)
         ? data.includes.join("\n")
         : "";
-      document.getElementById("tripFeatured").checked = data.featured === true;
+
+      if (document.getElementById("tripFeatured")) {
+        document.getElementById("tripFeatured").checked = data.featured === true;
+      }
 
       setMessage("tripMessage", "Editing package. Add more pictures if needed, then click Save Package.");
+
       tripForm.scrollIntoView({ behavior: "smooth" });
     });
   });
 
   document.querySelectorAll(".toggle-trip-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const active = btn.dataset.active === "true";
+      try {
+        const active = btn.dataset.active === "true";
 
-      await updateDoc(doc(db, "trips", btn.dataset.id), {
-        active: !active,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          active: !active,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Package Updated", active ? "Package disabled." : "Package enabled.");
-      loadTrips();
+        showPopup("Package Updated", active ? "Package disabled." : "Package enabled.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Package Error", error.message || "Could not update package.");
+      }
     });
   });
 
   document.querySelectorAll(".toggle-featured-trip-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const featured = btn.dataset.featured === "true";
+      try {
+        const featured = btn.dataset.featured === "true";
 
-      await updateDoc(doc(db, "trips", btn.dataset.id), {
-        featured: !featured,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          featured: !featured,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Featured Updated", featured ? "Removed from homepage." : "Shown on homepage.");
-      loadTrips();
+        showPopup("Featured Updated", featured ? "Removed from homepage." : "Shown on homepage.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Featured Error", error.message || "Could not update featured status.");
+      }
     });
   });
 
@@ -677,13 +808,17 @@ function bindTripButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Remove all extra pictures from this package?")) return;
 
-      await updateDoc(doc(db, "trips", btn.dataset.id), {
-        galleryImages: [],
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "trips", btn.dataset.id), {
+          galleryImages: [],
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Gallery Cleared", "Extra package pictures removed.");
-      loadTrips();
+        showPopup("Gallery Cleared", "Extra package pictures removed.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Gallery Error", error.message || "Could not clear package pictures.");
+      }
     });
   });
 
@@ -691,14 +826,20 @@ function bindTripButtons(snapshot) {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this package permanently?")) return;
 
-      await deleteDoc(doc(db, "trips", btn.dataset.id));
-      showPopup("Package Deleted", "Package removed.");
-      loadTrips();
+      try {
+        await deleteDoc(doc(db, "trips", btn.dataset.id));
+        showPopup("Package Deleted", "Package removed.");
+        loadTrips();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete package.");
+      }
     });
   });
 }
 
-/* GALLERY */
+/* =========================
+   GALLERY
+========================= */
 
 const galleryForm = document.getElementById("galleryForm");
 const galleryImagesList = document.getElementById("galleryImagesList");
@@ -779,7 +920,10 @@ async function loadGalleryImages() {
           <button class="toggle-gallery-btn" data-id="${docSnap.id}" data-active="${data.active}">
             ${data.active ? "Disable" : "Enable"}
           </button>
-          <button class="delete-gallery-btn" data-id="${docSnap.id}">Delete</button>
+
+          <button class="delete-gallery-btn" data-id="${docSnap.id}">
+            Delete
+          </button>
         </div>
       `;
 
@@ -788,22 +932,28 @@ async function loadGalleryImages() {
 
     bindGalleryButtons();
   } catch (error) {
-    galleryImagesList.innerHTML = `<p style="color:red;">Failed to load gallery images: ${escapeHtml(error.message)}</p>`;
+    galleryImagesList.innerHTML = `
+      <p style="color:red;">Failed to load gallery images: ${escapeHtml(error.message)}</p>
+    `;
   }
 }
 
 function bindGalleryButtons() {
   document.querySelectorAll(".toggle-gallery-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      const active = btn.dataset.active === "true";
+      try {
+        const active = btn.dataset.active === "true";
 
-      await updateDoc(doc(db, "gallery", btn.dataset.id), {
-        active: !active,
-        updatedAt: serverTimestamp()
-      });
+        await updateDoc(doc(db, "gallery", btn.dataset.id), {
+          active: !active,
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
-      loadGalleryImages();
+        showPopup("Gallery Updated", active ? "Image disabled." : "Image enabled.");
+        loadGalleryImages();
+      } catch (error) {
+        showPopup("Gallery Error", error.message || "Could not update gallery image.");
+      }
     });
   });
 
@@ -811,14 +961,20 @@ function bindGalleryButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this gallery image?")) return;
 
-      await deleteDoc(doc(db, "gallery", btn.dataset.id));
-      showPopup("Image Deleted", "Gallery image removed.");
-      loadGalleryImages();
+      try {
+        await deleteDoc(doc(db, "gallery", btn.dataset.id));
+        showPopup("Image Deleted", "Gallery image removed.");
+        loadGalleryImages();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete gallery image.");
+      }
     });
   });
 }
 
-/* BOOKINGS */
+/* =========================
+   BOOKINGS
+========================= */
 
 async function loadBookings() {
   const tableBody = document.querySelector("#bookingsTable tbody");
@@ -862,7 +1018,6 @@ async function loadBookings() {
 
       const isRental = data.bookingType === "vehicle_rental";
       const typeText = isRental ? "Vehicle Rental" : "Package Booking";
-
       const packageText = isRental ? "Vehicle Rental Only" : data.package || "-";
 
       const vehicleText = data.vehicleName
@@ -909,10 +1064,14 @@ async function loadBookings() {
       tableBody.appendChild(row);
     });
 
-    revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+    if (revenueValue) {
+      revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+    }
 
-    const cappedRevenue = Math.min(totalRevenue, 200000);
-    revenueFill.style.width = `${(cappedRevenue / 200000) * 100}%`;
+    if (revenueFill) {
+      const cappedRevenue = Math.min(totalRevenue, 200000);
+      revenueFill.style.width = `${(cappedRevenue / 200000) * 100}%`;
+    }
 
     setText("totalBookingsValue", totalBookings);
     setText("pendingBookingsValue", pendingBookings);
@@ -921,22 +1080,32 @@ async function loadBookings() {
 
     bindBookingButtons();
   } catch (error) {
-    tableBody.innerHTML = `<tr><td colspan="11" style="color:red;">Error: ${escapeHtml(error.message)}</td></tr>`;
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="11" style="color:red;">
+          Error: ${escapeHtml(error.message)}
+        </td>
+      </tr>
+    `;
   }
 }
 
 function bindBookingButtons() {
   document.querySelectorAll(".approve-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      await updateDoc(doc(db, "bookings", btn.dataset.id), {
-        bookingStatus: "Confirmed",
-        paymentStatus: "Verified",
-        adminDecision: "Approved",
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "bookings", btn.dataset.id), {
+          bookingStatus: "Confirmed",
+          paymentStatus: "Verified",
+          adminDecision: "Approved",
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Booking Approved", "The booking has been confirmed.");
-      loadBookings();
+        showPopup("Booking Approved", "The booking has been confirmed.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Approve Error", error.message || "Could not approve booking.");
+      }
     });
   });
 
@@ -944,16 +1113,20 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       const reason = prompt("Enter rejection reason:");
 
-      await updateDoc(doc(db, "bookings", btn.dataset.id), {
-        bookingStatus: "Rejected",
-        paymentStatus: "Rejected",
-        adminDecision: "Rejected",
-        rejectionReason: reason || "No reason provided",
-        updatedAt: serverTimestamp()
-      });
+      try {
+        await updateDoc(doc(db, "bookings", btn.dataset.id), {
+          bookingStatus: "Rejected",
+          paymentStatus: "Rejected",
+          adminDecision: "Rejected",
+          rejectionReason: reason || "No reason provided",
+          updatedAt: serverTimestamp()
+        });
 
-      showPopup("Booking Rejected", "The booking has been rejected.");
-      loadBookings();
+        showPopup("Booking Rejected", "The booking has been rejected.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Reject Error", error.message || "Could not reject booking.");
+      }
     });
   });
 
@@ -961,9 +1134,13 @@ function bindBookingButtons() {
     btn.addEventListener("click", async () => {
       if (!confirm("Delete this booking?")) return;
 
-      await deleteDoc(doc(db, "bookings", btn.dataset.id));
-      showPopup("Booking Deleted", "The booking has been removed.");
-      loadBookings();
+      try {
+        await deleteDoc(doc(db, "bookings", btn.dataset.id));
+        showPopup("Booking Deleted", "The booking has been removed.");
+        loadBookings();
+      } catch (error) {
+        showPopup("Delete Error", error.message || "Could not delete booking.");
+      }
     });
   });
 }
