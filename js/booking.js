@@ -39,6 +39,7 @@ const bookingForm = document.getElementById("bookingForm");
 const selectedPackageInput = document.getElementById("selectedPackage");
 const vehicleOptionsList = document.getElementById("vehicleOptionsList");
 const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
+const vehicleSelectionBox = document.getElementById("vehicleSelectionBox");
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
@@ -152,17 +153,30 @@ function getPeopleCount() {
   return people > 0 ? people : 1;
 }
 
+function packageRequiresVehicle() {
+  return selectedTrip?.requiresVehicle === true;
+}
+
 function updateEstimatedTotal() {
   if (!bookingEstimatedTotal) return;
 
   const people = getPeopleCount();
-  const vehiclePrice = Number(selectedVehicle?.price || 0);
   const basePrice = Number(selectedTrip?.price || 0);
+
+  const vehiclePrice =
+    packageRequiresVehicle()
+      ? Number(selectedVehicle?.price || 0)
+      : 0;
 
   let total = 0;
 
-  if (vehiclePrice > 0) total = vehiclePrice * people;
-  else if (basePrice > 0) total = basePrice * people;
+  if (basePrice > 0) {
+    total += basePrice * people;
+  }
+
+  if (vehiclePrice > 0) {
+    total += vehiclePrice * people;
+  }
 
   bookingEstimatedTotal.textContent =
     total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
@@ -185,12 +199,26 @@ function renderVehicleOptions() {
 
   selectedVehicle = null;
 
+  if (!packageRequiresVehicle()) {
+    if (vehicleSelectionBox) {
+      vehicleSelectionBox.style.display = "none";
+    }
+
+    vehicleOptionsList.innerHTML = "";
+    updateEstimatedTotal();
+    return;
+  }
+
+  if (vehicleSelectionBox) {
+    vehicleSelectionBox.style.display = "block";
+  }
+
   const visibleVehicles = allVehicles.filter((vehicle) => vehicle.active !== false);
 
   if (visibleVehicles.length === 0) {
     vehicleOptionsList.innerHTML = `
       <div class="vehicle-empty">
-        No vehicles available yet.
+        No vehicles available yet. Please contact us before booking.
       </div>
     `;
     updateEstimatedTotal();
@@ -289,6 +317,7 @@ async function loadTrips() {
 
       trips.push({
         id: docSnap.id,
+        requiresVehicle: trip.requiresVehicle === true,
         ...trip
       });
     });
@@ -317,6 +346,10 @@ async function loadTrips() {
       const priceText = escapeHtml(formatPrice(trip));
       const galleryCount = Array.isArray(trip.galleryImages) ? trip.galleryImages.length : 0;
 
+      const vehicleBadge = trip.requiresVehicle === true
+        ? `<p><strong>Vehicle:</strong> Required</p>`
+        : `<p><strong>Vehicle:</strong> Not required</p>`;
+
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
 
@@ -328,6 +361,7 @@ async function loadTrips() {
         <p>${description}</p>
 
         ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ""}
+        ${vehicleBadge}
         ${galleryCount > 0 ? `<p><strong>Pictures:</strong> ${galleryCount + 1} photos</p>` : ""}
 
         ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
@@ -351,7 +385,6 @@ async function loadTrips() {
         openBookingModal(trip);
       });
     });
-
   } catch (error) {
     console.error("Load Trips Error:", error);
 
@@ -374,7 +407,11 @@ function openBookingModal(trip) {
     return;
   }
 
-  selectedTrip = trip;
+  selectedTrip = {
+    requiresVehicle: trip.requiresVehicle === true,
+    ...trip
+  };
+
   selectedVehicle = null;
 
   if (selectedPackageInput) {
@@ -422,13 +459,13 @@ if (bookingForm) {
       return;
     }
 
-    if (!selectedVehicle && allVehicles.length > 0) {
+    const submitBtn = bookingForm.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.textContent;
+
+    if (packageRequiresVehicle() && !selectedVehicle) {
       showPopup("Vehicle Required", "Please choose a vehicle before submitting your booking.");
       return;
     }
-
-    const submitBtn = bookingForm.querySelector("button[type='submit']");
-    const originalBtnText = submitBtn.textContent;
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
@@ -469,6 +506,7 @@ if (bookingForm) {
 
     try {
       const bookingDates = getBookingDates(date, selectedTrip.duration);
+      const endDate = bookingDates[bookingDates.length - 1] || date;
 
       const bookingRef = doc(collection(db, "bookings"));
       const bookingId = bookingRef.id;
@@ -483,16 +521,33 @@ if (bookingForm) {
       const uploadResult = await uploadBytes(storageRef, proofFile);
       const paymentProofUrl = await getDownloadURL(uploadResult.ref);
 
-      const vehiclePrice = Number(selectedVehicle?.price || 0);
       const basePrice = Number(selectedTrip.price || 0);
-      const pricePerPerson = vehiclePrice > 0 ? vehiclePrice : basePrice;
-      const totalPrice = pricePerPerson > 0 ? pricePerPerson * people : 0;
+
+      const vehiclePrice =
+        packageRequiresVehicle()
+          ? Number(selectedVehicle?.price || 0)
+          : 0;
+
+      const pricePerPerson =
+        basePrice + vehiclePrice > 0
+          ? basePrice + vehiclePrice
+          : 0;
+
+      const totalPrice =
+        pricePerPerson > 0
+          ? pricePerPerson * people
+          : 0;
 
       await setDoc(bookingRef, {
+        bookingType: "package_booking",
+
         userId: currentUser.uid,
         userEmail: currentUser.email || "",
 
         tripId: selectedTrip.id,
+        package: selectedTrip.title || "",
+        requiresVehicle: packageRequiresVehicle(),
+
         name,
         email,
         phone,
@@ -500,11 +555,11 @@ if (bookingForm) {
 
         date,
         startDate: date,
+        endDate,
         reservedDates: bookingDates,
         duration: selectedTrip.duration || "",
         durationDays: bookingDates.length,
-
-        package: selectedTrip.title || "",
+        bookingPeriod: `${date} → ${endDate}`,
 
         vehicleId: selectedVehicle?.id || "",
         vehicleName: selectedVehicle?.name || "",
@@ -514,6 +569,7 @@ if (bookingForm) {
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
         vehicleDescription: selectedVehicle?.description || "",
 
+        basePackagePrice: basePrice,
         pricePerPerson,
         totalPrice,
         priceType: selectedTrip.priceType || "Custom Quote",
@@ -539,7 +595,6 @@ if (bookingForm) {
         "Your booking and payment proof have been submitted. Admin will validate your payment and confirm your booking.",
         "index.html"
       );
-
     } catch (error) {
       console.error("Booking Error:", error);
 
@@ -547,7 +602,6 @@ if (bookingForm) {
         "Booking Error",
         error.message || "There was an error submitting your booking. Please try again."
       );
-
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = originalBtnText;
