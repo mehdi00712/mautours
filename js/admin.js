@@ -973,6 +973,89 @@ function bindGalleryButtons() {
 }
 
 /* =========================
+   REJECT BOOKING MODAL
+========================= */
+
+let selectedRejectBookingId = null;
+
+const rejectModal = document.getElementById("rejectModal");
+const closeRejectModal = document.getElementById("closeRejectModal");
+const rejectReasonInput = document.getElementById("rejectReasonInput");
+const confirmRejectBtn = document.getElementById("confirmRejectBtn");
+
+function openRejectModal(bookingId) {
+  selectedRejectBookingId = bookingId;
+
+  if (rejectReasonInput) {
+    rejectReasonInput.value = "";
+  }
+
+  if (rejectModal) {
+    rejectModal.classList.add("show");
+  }
+}
+
+function closeRejectBox() {
+  selectedRejectBookingId = null;
+
+  if (rejectModal) {
+    rejectModal.classList.remove("show");
+  }
+}
+
+if (closeRejectModal) {
+  closeRejectModal.addEventListener("click", closeRejectBox);
+}
+
+if (rejectModal) {
+  rejectModal.addEventListener("click", (e) => {
+    if (e.target === rejectModal) {
+      closeRejectBox();
+    }
+  });
+}
+
+if (confirmRejectBtn) {
+  confirmRejectBtn.addEventListener("click", async () => {
+    try {
+      const reason = rejectReasonInput?.value.trim() || "";
+
+      if (!selectedRejectBookingId) {
+        showPopup("Reject Error", "No booking selected.");
+        return;
+      }
+
+      if (!reason) {
+        showPopup("Reason Required", "Please enter a rejection reason.");
+        return;
+      }
+
+      await updateDoc(doc(db, "bookings", selectedRejectBookingId), {
+        bookingStatus: "Rejected",
+        paymentStatus: "Rejected",
+        adminDecision: "Rejected",
+        rejectionReason: reason,
+        customerMessage: `Your booking was rejected. Reason: ${reason}`,
+        customerMessageType: "booking_rejected",
+        messageSeenByCustomer: false,
+        updatedAt: serverTimestamp()
+      });
+
+      closeRejectBox();
+
+      showPopup(
+        "Booking Rejected",
+        "The rejection reason has been saved for the customer."
+      );
+
+      loadBookings();
+    } catch (error) {
+      showPopup("Reject Error", error.message || "Could not reject booking.");
+    }
+  });
+}
+
+/* =========================
    BOOKINGS
 ========================= */
 
@@ -1041,6 +1124,13 @@ async function loadBookings() {
         ? `<a href="${escapeHtml(data.paymentProofUrl)}" target="_blank" class="proof-link">View Proof</a>`
         : "No Proof";
 
+      const statusText = data.bookingStatus || "Pending";
+
+      const reasonText =
+        data.bookingStatus === "Rejected" && data.rejectionReason
+          ? `<br><small style="color:#b45309;font-weight:800;">Reason: ${escapeHtml(data.rejectionReason)}</small>`
+          : "";
+
       const row = document.createElement("tr");
 
       row.innerHTML = `
@@ -1053,7 +1143,7 @@ async function loadBookings() {
         <td>${escapeHtml(peopleText)}</td>
         <td><strong>${total}</strong></td>
         <td>${proofLink}</td>
-        <td>${escapeHtml(data.bookingStatus || "Pending")}</td>
+        <td>${escapeHtml(statusText)}${reasonText}</td>
         <td>
           <button class="approve-btn" data-id="${bookingId}">Approve</button>
           <button class="reject-btn" data-id="${bookingId}">Reject</button>
@@ -1098,6 +1188,9 @@ function bindBookingButtons() {
           bookingStatus: "Confirmed",
           paymentStatus: "Verified",
           adminDecision: "Approved",
+          customerMessage: "Your booking has been confirmed.",
+          customerMessageType: "booking_confirmed",
+          messageSeenByCustomer: false,
           updatedAt: serverTimestamp()
         });
 
@@ -1110,23 +1203,8 @@ function bindBookingButtons() {
   });
 
   document.querySelectorAll(".reject-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const reason = prompt("Enter rejection reason:");
-
-      try {
-        await updateDoc(doc(db, "bookings", btn.dataset.id), {
-          bookingStatus: "Rejected",
-          paymentStatus: "Rejected",
-          adminDecision: "Rejected",
-          rejectionReason: reason || "No reason provided",
-          updatedAt: serverTimestamp()
-        });
-
-        showPopup("Booking Rejected", "The booking has been rejected.");
-        loadBookings();
-      } catch (error) {
-        showPopup("Reject Error", error.message || "Could not reject booking.");
-      }
+    btn.addEventListener("click", () => {
+      openRejectModal(btn.dataset.id);
     });
   });
 
