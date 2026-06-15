@@ -580,6 +580,7 @@ if (tripForm) {
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
         featured: document.getElementById("tripFeatured")?.checked || false,
+        requiresVehicle: document.getElementById("tripRequiresVehicle")?.checked || false,
         active: true,
         updatedAt: serverTimestamp()
       };
@@ -632,6 +633,10 @@ if (tripForm) {
         document.getElementById("tripFeatured").checked = false;
       }
 
+      if (document.getElementById("tripRequiresVehicle")) {
+        document.getElementById("tripRequiresVehicle").checked = false;
+      }
+
       clearFileInput("tripImage");
       clearFileInput("tripGalleryImages");
 
@@ -655,6 +660,10 @@ if (resetTripForm) {
 
     if (document.getElementById("tripFeatured")) {
       document.getElementById("tripFeatured").checked = false;
+    }
+
+    if (document.getElementById("tripRequiresVehicle")) {
+      document.getElementById("tripRequiresVehicle").checked = false;
     }
 
     clearFileInput("tripImage");
@@ -687,6 +696,10 @@ async function loadTrips() {
         ? data.galleryImages.length
         : 0;
 
+      const vehicleText = data.requiresVehicle === true
+        ? "Vehicle Required"
+        : "No Vehicle Needed";
+
       const card = document.createElement("div");
       card.className = "admin-trip-card";
 
@@ -698,6 +711,7 @@ async function loadTrips() {
         <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
         <p><strong>Featured:</strong> ${data.featured ? "Yes" : "No"}</p>
+        <p><strong>Vehicle:</strong> ${escapeHtml(vehicleText)}</p>
         <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
 
         ${
@@ -760,6 +774,10 @@ function bindTripButtons(snapshot) {
 
       if (document.getElementById("tripFeatured")) {
         document.getElementById("tripFeatured").checked = data.featured === true;
+      }
+
+      if (document.getElementById("tripRequiresVehicle")) {
+        document.getElementById("tripRequiresVehicle").checked = data.requiresVehicle === true;
       }
 
       setMessage("tripMessage", "Editing package. Add more pictures if needed, then click Save Package.");
