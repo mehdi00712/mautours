@@ -111,7 +111,6 @@ function getDurationDays(durationText) {
   if (text.includes("full")) return 1;
 
   const match = text.match(/(\d+)/);
-
   if (!match) return 1;
 
   return Math.max(Number(match[1]), 1);
@@ -137,13 +136,22 @@ function updateEstimatedTotal() {
   const people = Number(document.getElementById("people")?.value || 1);
   const safePeople = people > 0 ? people : 1;
 
-  const vehiclePrice = Number(selectedVehicle?.price || 0);
   const basePrice = Number(currentPackage?.price || 0);
+
+  const vehiclePrice =
+    currentPackage?.requiresVehicle === true
+      ? Number(selectedVehicle?.price || 0)
+      : 0;
 
   let total = 0;
 
-  if (vehiclePrice > 0) total = vehiclePrice * safePeople;
-  else if (basePrice > 0) total = basePrice * safePeople;
+  if (basePrice > 0) {
+    total += basePrice * safePeople;
+  }
+
+  if (vehiclePrice > 0) {
+    total += vehiclePrice * safePeople;
+  }
 
   const totalText = total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
 
@@ -219,6 +227,19 @@ function selectVehicle(vehicle, card) {
 async function loadVehicles() {
   if (!packageVehiclesGrid) return;
 
+  if (currentPackage?.requiresVehicle !== true) {
+    selectedVehicle = null;
+
+    packageVehiclesGrid.innerHTML = `
+      <div class="vehicle-empty">
+        No vehicle selection is required for this package.
+      </div>
+    `;
+
+    updateEstimatedTotal();
+    return;
+  }
+
   try {
     const snapshot = await getDocs(collection(db, "vehicles"));
 
@@ -237,8 +258,11 @@ async function loadVehicles() {
 
     if (allVehicles.length === 0) {
       packageVehiclesGrid.innerHTML = `
-        <div class="vehicle-empty">No vehicles available yet.</div>
+        <div class="vehicle-empty">
+          No vehicles available yet. Please contact us before booking.
+        </div>
       `;
+
       updateEstimatedTotal();
       return;
     }
@@ -279,7 +303,6 @@ async function loadVehicles() {
         selectVehicle(vehicle, card);
       }
     });
-
   } catch (error) {
     console.error("Load Vehicles Error:", error);
 
@@ -312,6 +335,7 @@ async function loadPackageDetails() {
 
     currentPackage = {
       id: snap.id,
+      requiresVehicle: data.requiresVehicle === true,
       ...data
     };
 
@@ -346,7 +370,6 @@ async function loadPackageDetails() {
     if (packageDetailsContent) packageDetailsContent.style.display = "grid";
 
     updateEstimatedTotal();
-
   } catch (error) {
     console.error("Load Package Details Error:", error);
     showError(error.message || "Could not load package details.");
@@ -373,13 +396,13 @@ if (packageBookingForm) {
       return;
     }
 
-    if (!selectedVehicle && allVehicles.length > 0) {
+    const submitBtn = packageBookingForm.querySelector("button[type='submit']");
+    const originalBtnText = submitBtn.textContent;
+
+    if (currentPackage.requiresVehicle === true && !selectedVehicle) {
       showPopup("Vehicle Required", "Please choose a vehicle before booking.");
       return;
     }
-
-    const submitBtn = packageBookingForm.querySelector("button[type='submit']");
-    const originalBtnText = submitBtn.textContent;
 
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting...";
@@ -433,11 +456,22 @@ if (packageBookingForm) {
       const uploadResult = await uploadBytes(storageRef, proofFile);
       const paymentProofUrl = await getDownloadURL(uploadResult.ref);
 
-      const vehiclePrice = Number(selectedVehicle?.price || 0);
       const basePrice = Number(currentPackage.price || 0);
 
-      const pricePerPerson = vehiclePrice > 0 ? vehiclePrice : basePrice;
-      const totalPrice = pricePerPerson > 0 ? pricePerPerson * people : 0;
+      const vehiclePrice =
+        currentPackage.requiresVehicle === true
+          ? Number(selectedVehicle?.price || 0)
+          : 0;
+
+      const pricePerPerson =
+        basePrice + vehiclePrice > 0
+          ? basePrice + vehiclePrice
+          : 0;
+
+      const totalPrice =
+        pricePerPerson > 0
+          ? pricePerPerson * people
+          : 0;
 
       await setDoc(bookingRef, {
         bookingType: "package_booking",
@@ -447,6 +481,7 @@ if (packageBookingForm) {
 
         tripId: currentPackage.id,
         package: currentPackage.title || "",
+        requiresVehicle: currentPackage.requiresVehicle === true,
 
         name,
         email,
@@ -467,6 +502,7 @@ if (packageBookingForm) {
         vehicleCapacity: Number(selectedVehicle?.capacity || 0),
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
 
+        basePackagePrice: basePrice,
         pricePerPerson,
         totalPrice,
         priceType: currentPackage.priceType || "Custom Quote",
@@ -490,7 +526,6 @@ if (packageBookingForm) {
         "Your booking and payment proof have been submitted. Admin will validate your booking.",
         "index.html"
       );
-
     } catch (error) {
       console.error("Booking Error:", error);
       showPopup("Booking Error", error.message || "There was an error submitting your booking.");
