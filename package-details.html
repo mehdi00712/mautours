@@ -8,7 +8,7 @@
 
   <meta
     name="description"
-    content="View full package details, photos, inclusions, vehicles and book Mauritius private tours directly."
+    content="View full package details, photos, inclusions and book Mauritius private tours directly."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -95,14 +95,14 @@
 
             <div class="highlight-box">
               🚘
-              <strong>Vehicles</strong>
-              <span>Multiple Options</span>
+              <strong>Vehicle</strong>
+              <span id="packageVehicleRequirement">Depends on package</span>
             </div>
 
             <div class="highlight-box">
               ⭐
-              <strong>Private Tour</strong>
-              <span>Premium Experience</span>
+              <strong>Experience</strong>
+              <span>Premium Service</span>
             </div>
           </div>
         </div>
@@ -135,9 +135,9 @@
             <input type="number" id="people" placeholder="Number of People" min="1" required />
             <input type="date" id="date" required />
 
-            <div class="vehicle-selection-box">
-              <h4>Choose Vehicle</h4>
-              <p>Select your preferred private vehicle.</p>
+            <div id="packageVehicleSection" class="vehicle-selection-box">
+              <h4 id="vehicleSectionTitle">Choose Vehicle</h4>
+              <p id="vehicleSectionText">Select your preferred private vehicle.</p>
 
               <div id="packageVehiclesGrid" class="vehicle-options-list">
                 <div class="vehicle-empty">Loading vehicles...</div>
