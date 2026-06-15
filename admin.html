@@ -414,6 +414,28 @@
   </section>
 </main>
 
+<div id="rejectModal" class="modal">
+  <div class="modal-content luxury-modal">
+    <span id="closeRejectModal" class="close">&times;</span>
+
+    <h3>Reject Booking</h3>
+
+    <p style="color: var(--muted); margin-bottom: 1rem;">
+      Write a clear reason. This will be saved for the customer.
+    </p>
+
+    <textarea
+      id="rejectReasonInput"
+      placeholder="Example: Payment proof is not clear. Please upload a clearer payment proof."
+      style="width:100%; min-height:150px; padding:1rem; border-radius:14px; border:1px solid var(--line); resize:vertical;"
+    ></textarea>
+
+    <button id="confirmRejectBtn" class="btn" style="margin-top:1rem; width:100%;">
+      Confirm Rejection
+    </button>
+  </div>
+</div>
+
 <div id="popup" class="popup">
   <div class="popup-content">
     <h3 id="popupTitle"></h3>
