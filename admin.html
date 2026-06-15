@@ -83,7 +83,7 @@
 
       <div class="admin-note">
         <strong>How it works:</strong>
-        Customers view package details, choose a vehicle, upload payment proof, then you approve or reject the booking.
+        Customers view package details, upload payment proof, then you approve or reject the booking.
       </div>
     </div>
 
@@ -193,7 +193,7 @@
     <div id="packagesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Package Manager</h3>
-        <p>Add packages, full package details, main image and multiple gallery pictures.</p>
+        <p>Add packages, choose if vehicle is required, add full details and multiple gallery pictures.</p>
       </div>
 
       <form id="tripForm" class="media-upload-form friendly-form">
@@ -261,6 +261,11 @@
         <label class="admin-check-row">
           <input type="checkbox" id="tripFeatured" />
           <span>Show this package on homepage Featured Packages</span>
+        </label>
+
+        <label class="admin-check-row">
+          <input type="checkbox" id="tripRequiresVehicle" />
+          <span>This package requires customer to choose a vehicle</span>
         </label>
 
         <div class="form-group">
