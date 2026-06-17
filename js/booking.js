@@ -80,9 +80,9 @@ function formatPrice(trip) {
   const price = Number(trip.price || 0);
 
   if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
-  if (trip.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
+  if (trip.priceType === "Fixed") return `€ ${price.toLocaleString()}`;
 
-  return `${trip.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
+  return `${trip.priceType || "Starting From"} € ${price.toLocaleString()}`;
 }
 
 function formatIncludes(includes) {
@@ -179,7 +179,7 @@ function updateEstimatedTotal() {
   }
 
   bookingEstimatedTotal.textContent =
-    total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
+    total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
 }
 
 function setSelectedVehicle(vehicle, card = null) {
@@ -247,7 +247,7 @@ function renderVehicleOptions() {
         <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
         ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
         ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
-        <b>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</b>
+        <b>${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</b>
       </div>
     `;
 
