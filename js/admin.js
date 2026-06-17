@@ -97,7 +97,7 @@ function formatPrice(data) {
   const price = Number(data.price || 0);
 
   if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
-  if (data.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
+  if (data.priceType === "Fixed") return `€ ${price.toLocaleString()}`;
 
   return `${data.priceType || "Starting From"} € ${price.toLocaleString()}`;
 }
@@ -432,7 +432,7 @@ async function loadVehicles() {
 
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
-        <p><strong>Rental Price:</strong> Rs ${Number(data.price || 0).toLocaleString()} / day</p>
+        <p><strong>Rental Price:</strong> € ${Number(data.price || 0).toLocaleString()} / day</p>
         <p><strong>Status:</strong> ${data.active === false ? "Hidden" : "Visible"}</p>
         <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
         <p>${escapeHtml(data.description || "")}</p>
@@ -1122,7 +1122,7 @@ async function loadBookings() {
       const packageText = isRental ? "Vehicle Rental Only" : data.package || "-";
 
       const vehicleText = data.vehicleName
-        ? `${data.vehicleName} / Rs ${Number(data.vehiclePrice || 0).toLocaleString()}`
+        ? `${data.vehicleName} / € ${Number(data.vehiclePrice || 0).toLocaleString()}`
         : "-";
 
       const dateText = isRental
@@ -1135,7 +1135,7 @@ async function loadBookings() {
 
       const total =
         data.totalPrice && data.totalPrice > 0
-          ? `Rs ${Number(data.totalPrice).toLocaleString()}`
+          ? `€ ${Number(data.totalPrice).toLocaleString()}`
           : "Custom Quote";
 
       const proofLink = data.paymentProofUrl
@@ -1173,7 +1173,7 @@ async function loadBookings() {
     });
 
     if (revenueValue) {
-      revenueValue.textContent = `Rs ${totalRevenue.toLocaleString()}`;
+      revenueValue.textContent = `€ ${totalRevenue.toLocaleString()}`;
     }
 
     if (revenueFill) {
