@@ -97,9 +97,9 @@ function formatPrice(data) {
   const price = Number(data.price || 0);
 
   if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
-  if (data.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
+  if (data.priceType === "Fixed") return `€ ${price.toLocaleString()}`;
 
-  return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
+  return `${data.priceType || "Starting From"} € ${price.toLocaleString()}`;
 }
 
 function getDurationDays(durationText) {
@@ -153,7 +153,7 @@ function updateEstimatedTotal() {
     total += vehiclePrice * safePeople;
   }
 
-  const totalText = total > 0 ? `Rs ${total.toLocaleString()}` : "Custom Quote";
+  const totalText = total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
 
   if (bookingEstimatedTotal) bookingEstimatedTotal.textContent = totalText;
   if (sidePackagePrice) sidePackagePrice.textContent = totalText;
@@ -289,7 +289,7 @@ async function loadVehicles() {
           <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
           ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
           ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
-          <b>${price > 0 ? `Rs ${price.toLocaleString()}` : "Custom Quote"}</b>
+          <b>${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</b>
         </div>
       `;
 
