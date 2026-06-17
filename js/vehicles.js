@@ -106,7 +106,7 @@ function vehicleMatchesType(vehicle) {
 function formatPrice(price) {
   const p = Number(price || 0);
   if (p <= 0) return "Custom Quote";
-  return `Rs ${p.toLocaleString()}`;
+  return `€ ${p.toLocaleString()}`;
 }
 
 function getRentalDays(fromDate, toDate) {
@@ -134,7 +134,7 @@ function updateRentalTotal() {
   }
 
   const total = dailyPrice * rentalDays;
-  rentalEstimatedTotal.textContent = `Rs ${total.toLocaleString()} (${rentalDays} day${rentalDays > 1 ? "s" : ""})`;
+  rentalEstimatedTotal.textContent = `€ ${total.toLocaleString()} (${rentalDays} day${rentalDays > 1 ? "s" : ""})`;
 }
 
 function openRentalModal(vehicle) {
