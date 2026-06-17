@@ -98,7 +98,7 @@ function formatPrice(price) {
     return "Custom Quote";
   }
 
-  return `Rs ${p.toLocaleString()} / day`;
+  return `€ ${p.toLocaleString()} / day`;
 }
 
 function getRentalDays(fromDate, toDate) {
@@ -129,7 +129,7 @@ function updateRentalTotal() {
   const total = rentalDays * dailyPrice;
 
   rentalEstimatedTotal.textContent =
-    `Rs ${total.toLocaleString()} (${rentalDays} day${rentalDays > 1 ? "s" : ""})`;
+    `€ ${total.toLocaleString()} (${rentalDays} day${rentalDays > 1 ? "s" : ""})`;
 }
 
 function showError(message) {
