@@ -99,7 +99,7 @@ function formatPrice(data) {
   if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
   if (data.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
 
-  return `${data.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
+  return `${data.priceType || "Starting From"} € ${price.toLocaleString()}`;
 }
 
 function clearFileInput(id) {
