@@ -2585,3 +2585,33 @@ h2::after {
     font-size: 2rem;
   }
 }
+
+
+.admin-loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #071827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+.admin-loader {
+  width: 70px;
+  height: 70px;
+  border: 6px solid rgba(255,255,255,0.18);
+  border-top: 6px solid #c9a227;
+  border-radius: 50%;
+  animation: adminSpin 0.9s linear infinite;
+}
+
+@keyframes adminSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
