@@ -39,16 +39,29 @@ const adminUIDs = [
   "OeS88yW5sjSPxSk9kUlVjPeoZeY2"
 ];
 
+const adminLoadingScreen = document.getElementById("adminLoadingScreen");
+const adminContent = document.getElementById("adminContent");
+
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+function showAdminContent() {
+  if (adminLoadingScreen) adminLoadingScreen.style.display = "none";
+  if (adminContent) adminContent.style.display = "block";
+}
+
+function hideAdminAndRedirect(url) {
+  if (adminContent) adminContent.style.display = "none";
+  window.location.replace(url);
+}
+
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
+    if (redirect) window.location.replace(redirect);
     return;
   }
 
@@ -58,7 +71,7 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
+    if (redirect) window.location.replace(redirect);
   };
 }
 
@@ -131,21 +144,23 @@ async function uploadMultipleFiles(path, files) {
   return uploads;
 }
 
+/* =========================
+   AUTH GUARD - NO ADMIN GLIMPSE
+========================= */
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    showPopup("Login Required", "Please log in first.", "login.html");
+    hideAdminAndRedirect("login.html");
     return;
   }
 
   if (!adminUIDs.includes(user.uid)) {
     await signOut(auth);
-    showPopup(
-      "Access Denied",
-      `Admin privileges required.\n\nYour UID is:\n${user.uid}`,
-      "index.html"
-    );
+    hideAdminAndRedirect("index.html");
     return;
   }
+
+  showAdminContent();
 
   loadWebsiteSettings();
   loadHomepageContent();
