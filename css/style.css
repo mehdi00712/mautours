@@ -2615,3 +2615,18 @@ h2::after {
     transform: rotate(360deg);
   }
 }
+
+.admin-logout-btn {
+  background: #c9a227;
+  color: #071827;
+  border: none;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.admin-logout-btn:hover {
+  background: #a9861e;
+  color: #fff;
+}
