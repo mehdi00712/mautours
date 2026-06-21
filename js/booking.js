@@ -157,6 +157,21 @@ function packageRequiresVehicle() {
   return selectedTrip?.requiresVehicle === true;
 }
 
+function getSelectedActivities() {
+  const checked = document.querySelectorAll(".quick-activity-checkbox:checked");
+
+  return Array.from(checked).map((input) => ({
+    name: input.dataset.name || "",
+    price: Number(input.dataset.price || 0)
+  }));
+}
+
+function getSelectedActivitiesTotal() {
+  return getSelectedActivities().reduce((sum, activity) => {
+    return sum + Number(activity.price || 0);
+  }, 0);
+}
+
 function updateEstimatedTotal() {
   if (!bookingEstimatedTotal) return;
 
@@ -168,15 +183,15 @@ function updateEstimatedTotal() {
       ? Number(selectedVehicle?.price || 0)
       : 0;
 
-  let total = 0;
+  const activitiesTotal = getSelectedActivitiesTotal();
 
-  if (basePrice > 0) {
-    total += basePrice * people;
-  }
+  let pricePerPerson = 0;
 
-  if (vehiclePrice > 0) {
-    total += vehiclePrice * people;
-  }
+  if (basePrice > 0) pricePerPerson += basePrice;
+  if (vehiclePrice > 0) pricePerPerson += vehiclePrice;
+  if (activitiesTotal > 0) pricePerPerson += activitiesTotal;
+
+  const total = pricePerPerson > 0 ? pricePerPerson * people : 0;
 
   bookingEstimatedTotal.textContent =
     total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
@@ -190,6 +205,70 @@ function setSelectedVehicle(vehicle, card = null) {
   });
 
   if (card) card.classList.add("selected");
+
+  updateEstimatedTotal();
+}
+
+function renderActivityOptions() {
+  if (!bookingForm) return;
+
+  const oldBox = document.getElementById("quickActivitiesBox");
+  if (oldBox) oldBox.remove();
+
+  const activities = Array.isArray(selectedTrip?.activities)
+    ? selectedTrip.activities
+    : [];
+
+  if (activities.length === 0) {
+    updateEstimatedTotal();
+    return;
+  }
+
+  const box = document.createElement("div");
+  box.id = "quickActivitiesBox";
+  box.className = "vehicle-selection-box";
+
+  box.innerHTML = `
+    <h4>Choose Activities</h4>
+    <p>Select only the activities you want. The total updates automatically.</p>
+
+    <div class="activity-options-list">
+      ${activities
+        .filter((activity) => activity && activity.name)
+        .map((activity) => {
+          const name = activity.name || "";
+          const price = Number(activity.price || 0);
+
+          return `
+            <label class="activity-option-card">
+              <input
+                type="checkbox"
+                class="quick-activity-checkbox"
+                data-name="${escapeHtml(name)}"
+                data-price="${price}"
+              />
+              <span>
+                <strong>${escapeHtml(name)}</strong>
+                <small>${price > 0 ? `+ € ${price.toLocaleString()} per person` : "Included / Free"}</small>
+              </span>
+            </label>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+
+  if (vehicleSelectionBox) {
+    bookingForm.insertBefore(box, vehicleSelectionBox);
+  } else if (bookingEstimatedTotal) {
+    bookingForm.insertBefore(box, bookingEstimatedTotal.parentElement);
+  } else {
+    bookingForm.appendChild(box);
+  }
+
+  document.querySelectorAll(".quick-activity-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", updateEstimatedTotal);
+  });
 
   updateEstimatedTotal();
 }
@@ -318,6 +397,7 @@ async function loadTrips() {
       trips.push({
         id: docSnap.id,
         requiresVehicle: trip.requiresVehicle === true,
+        activities: Array.isArray(trip.activities) ? trip.activities : [],
         ...trip
       });
     });
@@ -345,10 +425,15 @@ async function loadTrips() {
       const includes = formatIncludes(trip.includes);
       const priceText = escapeHtml(formatPrice(trip));
       const galleryCount = Array.isArray(trip.galleryImages) ? trip.galleryImages.length : 0;
+      const activitiesCount = Array.isArray(trip.activities) ? trip.activities.length : 0;
 
       const vehicleBadge = trip.requiresVehicle === true
         ? `<p><strong>Vehicle:</strong> Required</p>`
         : `<p><strong>Vehicle:</strong> Not required</p>`;
+
+      const activitiesBadge = activitiesCount > 0
+        ? `<p><strong>Optional Activities:</strong> ${activitiesCount} available</p>`
+        : "";
 
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
@@ -362,6 +447,7 @@ async function loadTrips() {
 
         ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ""}
         ${vehicleBadge}
+        ${activitiesBadge}
         ${galleryCount > 0 ? `<p><strong>Pictures:</strong> ${galleryCount + 1} photos</p>` : ""}
 
         ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
@@ -409,6 +495,7 @@ function openBookingModal(trip) {
 
   selectedTrip = {
     requiresVehicle: trip.requiresVehicle === true,
+    activities: Array.isArray(trip.activities) ? trip.activities : [],
     ...trip
   };
 
@@ -418,6 +505,7 @@ function openBookingModal(trip) {
     selectedPackageInput.value = trip.title || "";
   }
 
+  renderActivityOptions();
   renderVehicleOptions();
   updateEstimatedTotal();
 
@@ -528,9 +616,12 @@ if (bookingForm) {
           ? Number(selectedVehicle?.price || 0)
           : 0;
 
+      const selectedActivities = getSelectedActivities();
+      const activitiesTotal = getSelectedActivitiesTotal();
+
       const pricePerPerson =
-        basePrice + vehiclePrice > 0
-          ? basePrice + vehiclePrice
+        basePrice + vehiclePrice + activitiesTotal > 0
+          ? basePrice + vehiclePrice + activitiesTotal
           : 0;
 
       const totalPrice =
@@ -568,6 +659,9 @@ if (bookingForm) {
         vehicleCapacity: Number(selectedVehicle?.capacity || 0),
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
         vehicleDescription: selectedVehicle?.description || "",
+
+        selectedActivities,
+        activitiesTotal,
 
         basePackagePrice: basePrice,
         pricePerPerson,
