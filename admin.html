@@ -42,7 +42,7 @@
       <span class="section-label center-label">Admin Panel</span>
       <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Manage bookings, packages, package galleries, vehicles, homepage and business settings.
+        Manage bookings, packages, activities, package galleries, vehicles, homepage and business settings.
       </p>
     </div>
 
@@ -89,7 +89,7 @@
 
       <div class="admin-note">
         <strong>How it works:</strong>
-        Customers view package details, upload payment proof, then you approve or reject the booking.
+        Customers view package details, choose optional activities, upload payment proof, then you approve or reject the booking.
       </div>
     </div>
 
@@ -199,7 +199,7 @@
     <div id="packagesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Package Manager</h3>
-        <p>Add packages, choose if vehicle is required, add full details and multiple gallery pictures.</p>
+        <p>Add packages, choose if vehicle is required, add optional activities, full details and multiple gallery pictures.</p>
       </div>
 
       <form id="tripForm" class="media-upload-form friendly-form">
@@ -262,6 +262,21 @@
         <div class="form-group">
           <label>What Is Included?</label>
           <textarea id="tripIncludes" placeholder="Write one item per line. Example: Private transfer"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Optional Activities With Prices (€)</label>
+          <textarea
+            id="tripActivities"
+            placeholder="Write one activity per line like this:
+Lunch Buffet | 30
+Catamaran Cruise | 80
+Dolphin Watching | 50
+Quad Biking | 90"
+          ></textarea>
+          <small>
+            Format: Activity Name | Price. Customers will tick the activities they want and the total will update automatically.
+          </small>
         </div>
 
         <label class="admin-check-row">
