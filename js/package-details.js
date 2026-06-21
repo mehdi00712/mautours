@@ -58,6 +58,9 @@ const packageWhatsappBtn = document.getElementById("packageWhatsappBtn");
 const packageBookingForm = document.getElementById("packageBookingForm");
 const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
 
+const packageVehicleSection = document.getElementById("packageVehicleSection");
+const packageVehicleRequirement = document.getElementById("packageVehicleRequirement");
+
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
@@ -91,6 +94,11 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function formatMoney(value) {
+  const amount = Number(value || 0);
+  return amount > 0 ? `€ ${amount.toLocaleString()}` : "Custom Quote";
 }
 
 function formatPrice(data) {
@@ -132,6 +140,21 @@ function showError(message) {
   }
 }
 
+function getSelectedActivities() {
+  const checked = document.querySelectorAll(".activity-checkbox:checked");
+
+  return Array.from(checked).map((input) => ({
+    name: input.dataset.name || "",
+    price: Number(input.dataset.price || 0)
+  }));
+}
+
+function getSelectedActivitiesTotal() {
+  return getSelectedActivities().reduce((sum, activity) => {
+    return sum + Number(activity.price || 0);
+  }, 0);
+}
+
 function updateEstimatedTotal() {
   const people = Number(document.getElementById("people")?.value || 1);
   const safePeople = people > 0 ? people : 1;
@@ -143,16 +166,15 @@ function updateEstimatedTotal() {
       ? Number(selectedVehicle?.price || 0)
       : 0;
 
-  let total = 0;
+  const activitiesTotal = getSelectedActivitiesTotal();
 
-  if (basePrice > 0) {
-    total += basePrice * safePeople;
-  }
+  let totalPerPerson = 0;
 
-  if (vehiclePrice > 0) {
-    total += vehiclePrice * safePeople;
-  }
+  if (basePrice > 0) totalPerPerson += basePrice;
+  if (vehiclePrice > 0) totalPerPerson += vehiclePrice;
+  if (activitiesTotal > 0) totalPerPerson += activitiesTotal;
 
+  const total = totalPerPerson > 0 ? totalPerPerson * safePeople : 0;
   const totalText = total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
 
   if (bookingEstimatedTotal) bookingEstimatedTotal.textContent = totalText;
@@ -213,6 +235,69 @@ function renderIncludes(includes) {
     .join("");
 }
 
+function renderActivities(activities) {
+  if (!packageBookingForm) return;
+
+  const oldBox = document.getElementById("packageActivitiesBox");
+  if (oldBox) oldBox.remove();
+
+  if (!Array.isArray(activities) || activities.length === 0) {
+    updateEstimatedTotal();
+    return;
+  }
+
+  const box = document.createElement("div");
+  box.id = "packageActivitiesBox";
+  box.className = "vehicle-selection-box";
+
+  box.innerHTML = `
+    <h4>Choose Activities</h4>
+    <p>Select only the activities you want. The total price will update automatically.</p>
+
+    <div class="activity-options-list">
+      ${activities
+        .filter((activity) => activity && activity.name)
+        .map((activity, index) => {
+          const name = activity.name || "";
+          const price = Number(activity.price || 0);
+
+          return `
+            <label class="activity-option-card">
+              <input
+                type="checkbox"
+                class="activity-checkbox"
+                data-name="${escapeHtml(name)}"
+                data-price="${price}"
+              />
+              <span>
+                <strong>${escapeHtml(name)}</strong>
+                <small>${price > 0 ? `+ € ${price.toLocaleString()} per person` : "Included / Free"}</small>
+              </span>
+            </label>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+
+  const vehicleSection = document.getElementById("packageVehicleSection");
+  const totalBox = packageBookingForm.querySelector(".booking-total-box");
+
+  if (vehicleSection) {
+    packageBookingForm.insertBefore(box, vehicleSection);
+  } else if (totalBox) {
+    packageBookingForm.insertBefore(box, totalBox);
+  } else {
+    packageBookingForm.appendChild(box);
+  }
+
+  document.querySelectorAll(".activity-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", updateEstimatedTotal);
+  });
+
+  updateEstimatedTotal();
+}
+
 function selectVehicle(vehicle, card) {
   selectedVehicle = vehicle;
 
@@ -230,6 +315,14 @@ async function loadVehicles() {
   if (currentPackage?.requiresVehicle !== true) {
     selectedVehicle = null;
 
+    if (packageVehicleSection) {
+      packageVehicleSection.style.display = "none";
+    }
+
+    if (packageVehicleRequirement) {
+      packageVehicleRequirement.textContent = "Not required";
+    }
+
     packageVehiclesGrid.innerHTML = `
       <div class="vehicle-empty">
         No vehicle selection is required for this package.
@@ -238,6 +331,14 @@ async function loadVehicles() {
 
     updateEstimatedTotal();
     return;
+  }
+
+  if (packageVehicleSection) {
+    packageVehicleSection.style.display = "block";
+  }
+
+  if (packageVehicleRequirement) {
+    packageVehicleRequirement.textContent = "Required";
   }
 
   try {
@@ -336,6 +437,7 @@ async function loadPackageDetails() {
     currentPackage = {
       id: snap.id,
       requiresVehicle: data.requiresVehicle === true,
+      activities: Array.isArray(data.activities) ? data.activities : [],
       ...data
     };
 
@@ -355,8 +457,14 @@ async function loadPackageDetails() {
         "Full package details will be confirmed by our team according to your travel dates and preferences.";
     }
 
+    if (packageVehicleRequirement) {
+      packageVehicleRequirement.textContent =
+        data.requiresVehicle === true ? "Required" : "Not required";
+    }
+
     renderIncludes(data.includes);
     renderGallery(data);
+    renderActivities(data.activities);
 
     if (packageWhatsappBtn) {
       const message = encodeURIComponent(
@@ -463,9 +571,12 @@ if (packageBookingForm) {
           ? Number(selectedVehicle?.price || 0)
           : 0;
 
+      const selectedActivities = getSelectedActivities();
+      const activitiesTotal = getSelectedActivitiesTotal();
+
       const pricePerPerson =
-        basePrice + vehiclePrice > 0
-          ? basePrice + vehiclePrice
+        basePrice + vehiclePrice + activitiesTotal > 0
+          ? basePrice + vehiclePrice + activitiesTotal
           : 0;
 
       const totalPrice =
@@ -501,6 +612,9 @@ if (packageBookingForm) {
         vehiclePrice,
         vehicleCapacity: Number(selectedVehicle?.capacity || 0),
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
+
+        selectedActivities,
+        activitiesTotal,
 
         basePackagePrice: basePrice,
         pricePerPerson,
