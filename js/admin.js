@@ -106,6 +106,37 @@ function toIncludesArray(value) {
     .filter(Boolean);
 }
 
+function parseActivities(value) {
+  return String(value || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = line.split("|").map((part) => part.trim());
+      const name = parts[0] || "";
+      const price = Number(parts[1] || 0);
+
+      return {
+        name,
+        price: price > 0 ? price : 0,
+        active: true
+      };
+    })
+    .filter((activity) => activity.name);
+}
+
+function activitiesToText(activities) {
+  if (!Array.isArray(activities)) return "";
+
+  return activities
+    .map((activity) => {
+      const name = activity.name || "";
+      const price = Number(activity.price || 0);
+      return `${name} | ${price}`;
+    })
+    .join("\n");
+}
+
 function formatPrice(data) {
   const price = Number(data.price || 0);
 
@@ -444,7 +475,6 @@ async function loadVehicles() {
 
       card.innerHTML = `
         <h4>${escapeHtml(data.name || "Unnamed Vehicle")}</h4>
-
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
         <p><strong>Rental Price:</strong> € ${Number(data.price || 0).toLocaleString()} / day</p>
@@ -460,18 +490,11 @@ async function loadVehicles() {
 
         <div class="admin-trip-actions">
           <button class="edit-vehicle-btn" data-id="${vehicleId}">Edit</button>
-
           <button class="toggle-vehicle-btn" data-id="${vehicleId}" data-active="${data.active !== false}">
             ${data.active === false ? "Show" : "Hide"}
           </button>
-
-          <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">
-            Clear Extra Pictures
-          </button>
-
-          <button class="delete-vehicle-btn" data-id="${vehicleId}">
-            Delete
-          </button>
+          <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">Clear Extra Pictures</button>
+          <button class="delete-vehicle-btn" data-id="${vehicleId}">Delete</button>
         </div>
       `;
 
@@ -506,7 +529,6 @@ function bindVehicleButtons(snapshot) {
       }
 
       setMessage("vehicleMessage", "Editing vehicle. Add more pictures if needed, then click Save Vehicle.");
-
       vehicleForm.scrollIntoView({ behavior: "smooth" });
     });
   });
@@ -585,6 +607,10 @@ if (tripForm) {
         ? doc(db, "trips", tripId)
         : doc(collection(db, "trips"));
 
+      const activities = parseActivities(
+        document.getElementById("tripActivities")?.value
+      );
+
       const payload = {
         title: document.getElementById("tripTitle")?.value.trim() || "",
         category: document.getElementById("tripCategory")?.value || "",
@@ -594,6 +620,7 @@ if (tripForm) {
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
+        activities,
         featured: document.getElementById("tripFeatured")?.checked || false,
         requiresVehicle: document.getElementById("tripRequiresVehicle")?.checked || false,
         active: true,
@@ -640,23 +667,15 @@ if (tripForm) {
 
       tripForm.reset();
 
-      if (document.getElementById("tripId")) {
-        document.getElementById("tripId").value = "";
-      }
-
-      if (document.getElementById("tripFeatured")) {
-        document.getElementById("tripFeatured").checked = false;
-      }
-
-      if (document.getElementById("tripRequiresVehicle")) {
-        document.getElementById("tripRequiresVehicle").checked = false;
-      }
+      if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
+      if (document.getElementById("tripFeatured")) document.getElementById("tripFeatured").checked = false;
+      if (document.getElementById("tripRequiresVehicle")) document.getElementById("tripRequiresVehicle").checked = false;
 
       clearFileInput("tripImage");
       clearFileInput("tripGalleryImages");
 
       setMessage("tripMessage", "Package saved successfully.");
-      showPopup("Package Saved", "Package saved.");
+      showPopup("Package Saved", "Package saved with optional activities.");
       loadTrips();
     } catch (error) {
       setMessage("tripMessage", error.message || "Failed to save package.", true);
@@ -669,17 +688,9 @@ if (resetTripForm) {
   resetTripForm.addEventListener("click", () => {
     tripForm.reset();
 
-    if (document.getElementById("tripId")) {
-      document.getElementById("tripId").value = "";
-    }
-
-    if (document.getElementById("tripFeatured")) {
-      document.getElementById("tripFeatured").checked = false;
-    }
-
-    if (document.getElementById("tripRequiresVehicle")) {
-      document.getElementById("tripRequiresVehicle").checked = false;
-    }
+    if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
+    if (document.getElementById("tripFeatured")) document.getElementById("tripFeatured").checked = false;
+    if (document.getElementById("tripRequiresVehicle")) document.getElementById("tripRequiresVehicle").checked = false;
 
     clearFileInput("tripImage");
     clearFileInput("tripGalleryImages");
@@ -707,13 +718,30 @@ async function loadTrips() {
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
       const tripId = docSnap.id;
-      const galleryCount = Array.isArray(data.galleryImages)
-        ? data.galleryImages.length
-        : 0;
+
+      const galleryCount = Array.isArray(data.galleryImages) ? data.galleryImages.length : 0;
+      const activitiesCount = Array.isArray(data.activities) ? data.activities.length : 0;
 
       const vehicleText = data.requiresVehicle === true
         ? "Vehicle Required"
         : "No Vehicle Needed";
+
+      const activitiesHtml = Array.isArray(data.activities) && data.activities.length > 0
+        ? `
+          <div style="margin-top:8px;">
+            <strong>Optional Activities:</strong>
+            <ul style="margin:8px 0 0 18px;">
+              ${data.activities
+                .map((activity) => `
+                  <li>
+                    ${escapeHtml(activity.name)} — € ${Number(activity.price || 0).toLocaleString()}
+                  </li>
+                `)
+                .join("")}
+            </ul>
+          </div>
+        `
+        : `<p><strong>Optional Activities:</strong> 0</p>`;
 
       const card = document.createElement("div");
       card.className = "admin-trip-card";
@@ -728,6 +756,8 @@ async function loadTrips() {
         <p><strong>Featured:</strong> ${data.featured ? "Yes" : "No"}</p>
         <p><strong>Vehicle:</strong> ${escapeHtml(vehicleText)}</p>
         <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
+        <p><strong>Activities Count:</strong> ${activitiesCount}</p>
+        ${activitiesHtml}
 
         ${
           data.imageUrl
@@ -737,22 +767,14 @@ async function loadTrips() {
 
         <div class="admin-trip-actions">
           <button class="edit-trip-btn" data-id="${tripId}">Edit</button>
-
           <button class="toggle-trip-btn" data-id="${tripId}" data-active="${data.active}">
             ${data.active ? "Disable" : "Enable"}
           </button>
-
           <button class="toggle-featured-trip-btn" data-id="${tripId}" data-featured="${data.featured === true}">
             ${data.featured ? "Remove Featured" : "Make Featured"}
           </button>
-
-          <button class="clear-trip-gallery-btn" data-id="${tripId}">
-            Clear Extra Pictures
-          </button>
-
-          <button class="delete-trip-btn" data-id="${tripId}">
-            Delete
-          </button>
+          <button class="clear-trip-gallery-btn" data-id="${tripId}">Clear Extra Pictures</button>
+          <button class="delete-trip-btn" data-id="${tripId}">Delete</button>
         </div>
       `;
 
@@ -783,9 +805,14 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripDuration").value = data.duration || "";
       document.getElementById("tripPrice").value = data.price || 0;
       document.getElementById("tripPriceType").value = data.priceType || "Custom Quote";
+
       document.getElementById("tripIncludes").value = Array.isArray(data.includes)
         ? data.includes.join("\n")
         : "";
+
+      if (document.getElementById("tripActivities")) {
+        document.getElementById("tripActivities").value = activitiesToText(data.activities);
+      }
 
       if (document.getElementById("tripFeatured")) {
         document.getElementById("tripFeatured").checked = data.featured === true;
@@ -795,8 +822,7 @@ function bindTripButtons(snapshot) {
         document.getElementById("tripRequiresVehicle").checked = data.requiresVehicle === true;
       }
 
-      setMessage("tripMessage", "Editing package. Add more pictures if needed, then click Save Package.");
-
+      setMessage("tripMessage", "Editing package. Change activities if needed, then click Save Package.");
       tripForm.scrollIntoView({ behavior: "smooth" });
     });
   });
@@ -953,10 +979,7 @@ async function loadGalleryImages() {
           <button class="toggle-gallery-btn" data-id="${docSnap.id}" data-active="${data.active}">
             ${data.active ? "Disable" : "Enable"}
           </button>
-
-          <button class="delete-gallery-btn" data-id="${docSnap.id}">
-            Delete
-          </button>
+          <button class="delete-gallery-btn" data-id="${docSnap.id}">Delete</button>
         </div>
       `;
 
@@ -1042,9 +1065,7 @@ if (closeRejectModal) {
 
 if (rejectModal) {
   rejectModal.addEventListener("click", (e) => {
-    if (e.target === rejectModal) {
-      closeRejectBox();
-    }
+    if (e.target === rejectModal) closeRejectBox();
   });
 }
 
@@ -1148,6 +1169,11 @@ async function loadBookings() {
         ? data.passengers || data.people || "-"
         : data.people || "-";
 
+      const activitiesText =
+        Array.isArray(data.selectedActivities) && data.selectedActivities.length > 0
+          ? data.selectedActivities.map((a) => `${a.name} (€ ${Number(a.price || 0).toLocaleString()})`).join(", ")
+          : "-";
+
       const total =
         data.totalPrice && data.totalPrice > 0
           ? `€ ${Number(data.totalPrice).toLocaleString()}`
@@ -1170,7 +1196,10 @@ async function loadBookings() {
         <td>${escapeHtml(data.name || "-")}<br><small>${escapeHtml(typeText)}</small></td>
         <td>${escapeHtml(data.phone || "-")}</td>
         <td>${escapeHtml(data.email || "-")}</td>
-        <td>${escapeHtml(packageText)}</td>
+        <td>
+          ${escapeHtml(packageText)}
+          <br><small><strong>Activities:</strong> ${escapeHtml(activitiesText)}</small>
+        </td>
         <td>${escapeHtml(vehicleText)}</td>
         <td>${escapeHtml(dateText)}</td>
         <td>${escapeHtml(peopleText)}</td>
