@@ -8,7 +8,7 @@
 
   <meta
     name="description"
-    content="View full package details, photos, inclusions and book Mauritius private tours directly."
+    content="View full package details, photos, inclusions, optional activities and book Mauritius private tours directly."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -24,6 +24,8 @@
       <a href="booking.html">Packages</a>
       <a href="vehicles.html">Vehicles</a>
       <a href="login.html">Sign In</a>
+      <a href="register.html">Register</a>
+      <a href="my-bookings.html">My Bookings</a>
       <a href="admin.html">Dashboard</a>
     </nav>
 
@@ -89,7 +91,7 @@
 
             <div class="highlight-box">
               💰
-              <strong>Price</strong>
+              <strong>Base Price</strong>
               <span id="packagePrice">Custom Quote</span>
             </div>
 
@@ -100,9 +102,9 @@
             </div>
 
             <div class="highlight-box">
-              ⭐
-              <strong>Experience</strong>
-              <span>Premium Service</span>
+              ✅
+              <strong>Activities</strong>
+              <span>Customizable</span>
             </div>
           </div>
         </div>
@@ -135,6 +137,8 @@
             <input type="number" id="people" placeholder="Number of People" min="1" required />
             <input type="date" id="date" required />
 
+            <div id="packageActivitiesAnchor"></div>
+
             <div id="packageVehicleSection" class="vehicle-selection-box">
               <h4 id="vehicleSectionTitle">Choose Vehicle</h4>
               <p id="vehicleSectionText">Select your preferred private vehicle.</p>
@@ -147,7 +151,9 @@
             <div class="booking-total-box">
               <span>Total Estimate</span>
               <strong id="bookingEstimatedTotal">Custom Quote</strong>
-              <small>Final confirmation will be reviewed by admin.</small>
+              <small>
+                Final confirmation will be reviewed by admin. Activities and vehicle choices may affect the final price.
+              </small>
             </div>
 
             <label class="upload-label" for="paymentProof">
