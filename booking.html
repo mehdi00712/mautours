@@ -7,7 +7,7 @@
   <title>Mautour Holidays | Mauritius Luxury Packages</title>
   <meta
     name="description"
-    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with private vehicle options. Bank transfer booking with payment proof validation."
+    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with optional activities, private vehicle options and payment proof validation."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -21,7 +21,10 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html" class="active">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
       <a href="login.html">Sign In</a>
+      <a href="register.html">Register</a>
+      <a href="my-bookings.html">My Bookings</a>
       <a href="admin.html">Dashboard</a>
     </nav>
 
@@ -40,13 +43,13 @@
   </video>
 
   <div class="hero-content">
-    <span class="hero-badge">Private Tours + Vehicle Options</span>
+    <span class="hero-badge">Private Tours + Optional Activities</span>
 
     <h2>Luxury Mauritius Experiences</h2>
 
     <p>
-      Choose from our latest private tours, luxury packages, transfers and island experiences.
-      Select your preferred vehicle when booking.
+      Choose your package, select the activities you want, add a private vehicle if required,
+      then upload your payment proof for admin validation.
     </p>
 
     <div class="hero-actions">
@@ -69,8 +72,8 @@
   <h2>Choose Your Mauritius Experience</h2>
 
   <p class="center section-subtitle">
-    Browse our latest tours, excursions and luxury experiences.
-    Choose a package, select your vehicle, upload payment proof and wait for admin validation.
+    Browse our latest tours and luxury experiences. Some packages include optional activities,
+    so customers can customize the trip and the price updates automatically.
   </p>
 </section>
 
@@ -92,9 +95,7 @@
     <div class="bank-box">
       <h4>Bank Transfer Details</h4>
 
-      <p>
-        Please transfer the booking amount using the details below.
-      </p>
+      <p>Please transfer the booking amount using the details below.</p>
 
       <p><strong>Bank:</strong> TO BE ADDED</p>
       <p><strong>Account Name:</strong> TO BE ADDED</p>
@@ -112,46 +113,15 @@
     </div>
 
     <form id="bookingForm">
-      <input
-        type="text"
-        id="name"
-        placeholder="Full Name"
-        required
-      />
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email Address" required />
+      <input type="text" id="phone" placeholder="WhatsApp / Phone Number" required />
+      <input type="number" id="people" placeholder="Number of People" min="1" required />
+      <input type="date" id="date" required />
 
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-        required
-      />
+      <input type="text" id="selectedPackage" readonly />
 
-      <input
-        type="text"
-        id="phone"
-        placeholder="WhatsApp / Phone Number"
-        required
-      />
-
-      <input
-        type="number"
-        id="people"
-        placeholder="Number of People"
-        min="1"
-        required
-      />
-
-      <input
-        type="date"
-        id="date"
-        required
-      />
-
-      <input
-        type="text"
-        id="selectedPackage"
-        readonly
-      />
+      <div id="quickActivitiesAnchor"></div>
 
       <div id="vehicleSelectionBox" class="vehicle-selection-box">
         <h4>Choose Your Vehicle</h4>
@@ -171,8 +141,9 @@
 
       <div class="booking-total-box">
         <span>Estimated Total</span>
-        <strong id="bookingEstimatedTotal">Rs 0</strong>
+        <strong id="bookingEstimatedTotal">Custom Quote</strong>
         <small>
+          Activities and vehicle options can change the final total.
           Final confirmation is done after admin validates your payment proof.
         </small>
       </div>
