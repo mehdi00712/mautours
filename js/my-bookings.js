@@ -36,6 +36,69 @@ function money(value) {
   return price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote";
 }
 
+function formatActivities(activities) {
+  if (!Array.isArray(activities) || activities.length === 0) {
+    return "";
+  }
+
+  return `
+    <div class="admin-note">
+      <strong>Selected Activities:</strong>
+      <ul style="margin:8px 0 0 18px;">
+        ${activities
+          .map((activity) => {
+            const name = activity.name || "Activity";
+            const price = Number(activity.price || 0);
+
+            return `
+              <li>
+                ${escapeHtml(name)}
+                ${price > 0 ? ` — ${money(price)}` : ""}
+              </li>
+            `;
+          })
+          .join("")}
+      </ul>
+    </div>
+  `;
+}
+
+function getBookingTitle(booking) {
+  if (booking.bookingType === "vehicle_rental") {
+    return booking.vehicleName || "Vehicle Rental";
+  }
+
+  return booking.package || booking.vehicleName || "Booking";
+}
+
+function getBookingDate(booking) {
+  return (
+    booking.bookingPeriod ||
+    booking.rentalPeriod ||
+    booking.date ||
+    booking.startDate ||
+    "-"
+  );
+}
+
+function getPeopleOrPassengers(booking) {
+  return booking.people || booking.passengers || "-";
+}
+
+function getStatusClass(status) {
+  const value = String(status || "").toLowerCase();
+
+  if (value.includes("confirm") || value.includes("approved")) {
+    return "status-confirmed";
+  }
+
+  if (value.includes("reject") || value.includes("cancel")) {
+    return "status-rejected";
+  }
+
+  return "status-pending";
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html?redirect=my-bookings.html";
@@ -46,6 +109,15 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 async function loadBookings(uid) {
+  if (!bookingsList) return;
+
+  bookingsList.innerHTML = `
+    <div class="loading-card">
+      <h3>Loading bookings...</h3>
+      <p>Please wait.</p>
+    </div>
+  `;
+
   try {
     const q = query(
       collection(db, "bookings"),
@@ -87,22 +159,62 @@ async function loadBookings(uid) {
       card.className = "admin-trip-card";
 
       const status = booking.bookingStatus || "Pending";
-      const isRejected = status === "Rejected";
+      const isRejected = String(status).toLowerCase().includes("rejected");
+
+      const activitiesHtml = formatActivities(booking.selectedActivities);
+
+      const vehicleHtml = booking.vehicleName
+        ? `
+          <p><strong>Vehicle:</strong> ${escapeHtml(booking.vehicleName)}</p>
+          ${
+            booking.vehiclePrice
+              ? `<p><strong>Vehicle Price:</strong> ${money(booking.vehiclePrice)}</p>`
+              : ""
+          }
+        `
+        : "";
+
+      const proofHtml = booking.paymentProofUrl
+        ? `
+          <a
+            href="${escapeHtml(booking.paymentProofUrl)}"
+            target="_blank"
+            class="proof-link"
+          >
+            View Payment Proof
+          </a>
+        `
+        : "";
 
       card.innerHTML = `
-        <h4>${escapeHtml(booking.package || booking.vehicleName || "Booking")}</h4>
+        <h4>${escapeHtml(getBookingTitle(booking))}</h4>
 
-        <p><strong>Status:</strong> ${escapeHtml(status)}</p>
+        <p>
+          <strong>Status:</strong>
+          <span class="${getStatusClass(status)}">${escapeHtml(status)}</span>
+        </p>
+
         <p><strong>Payment:</strong> ${escapeHtml(booking.paymentStatus || "-")}</p>
-        <p><strong>Date:</strong> ${escapeHtml(booking.bookingPeriod || booking.rentalPeriod || booking.date || "-")}</p>
-        <p><strong>People / Passengers:</strong> ${escapeHtml(booking.people || booking.passengers || "-")}</p>
-        <p><strong>Total:</strong> ${money(booking.totalPrice)}</p>
+        <p><strong>Date:</strong> ${escapeHtml(getBookingDate(booking))}</p>
+        <p><strong>People / Passengers:</strong> ${escapeHtml(getPeopleOrPassengers(booking))}</p>
 
         ${
-          booking.vehicleName
-            ? `<p><strong>Vehicle:</strong> ${escapeHtml(booking.vehicleName)}</p>`
+          booking.basePackagePrice
+            ? `<p><strong>Base Package Price:</strong> ${money(booking.basePackagePrice)}</p>`
             : ""
         }
+
+        ${
+          booking.activitiesTotal
+            ? `<p><strong>Activities Total:</strong> ${money(booking.activitiesTotal)}</p>`
+            : ""
+        }
+
+        ${vehicleHtml}
+
+        <p><strong>Total:</strong> ${money(booking.totalPrice)}</p>
+
+        ${activitiesHtml}
 
         ${
           isRejected && booking.rejectionReason
@@ -126,11 +238,7 @@ async function loadBookings(uid) {
             : ""
         }
 
-        ${
-          booking.paymentProofUrl
-            ? `<a href="${escapeHtml(booking.paymentProofUrl)}" target="_blank" class="proof-link">View Payment Proof</a>`
-            : ""
-        }
+        ${proofHtml}
       `;
 
       bookingsList.appendChild(card);
