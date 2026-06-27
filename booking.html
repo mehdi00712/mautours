@@ -7,7 +7,7 @@
   <title>Mautour Holidays | Mauritius Luxury Packages</title>
   <meta
     name="description"
-    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with optional activities, private vehicle options and payment proof validation."
+    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with optional activities and payment proof validation."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -21,11 +21,9 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html" class="active">Packages</a>
-      <a href="vehicles.html">Vehicles</a>
-      <a href="login.html">Sign In</a>
       <a href="register.html">Register</a>
+      <a href="login.html">Sign In</a>
       <a href="my-bookings.html">My Bookings</a>
-      <a href="admin.html">Dashboard</a>
     </nav>
 
     <div class="hamburger" id="hamburger">
@@ -48,7 +46,7 @@
     <h2>Luxury Mauritius Experiences</h2>
 
     <p>
-      Choose your package, select the activities you want, add a private vehicle if required,
+      Choose your package, select the activities you want, choose a vehicle only if the package requires it,
       then upload your payment proof for admin validation.
     </p>
 
@@ -124,12 +122,14 @@
       <div id="quickActivitiesAnchor"></div>
 
       <div id="vehicleSelectionBox" class="vehicle-selection-box">
-        <h4>Choose Your Vehicle</h4>
-        <p>Select the vehicle you want for this package.</p>
+        <h4>Vehicle for This Package</h4>
+        <p>
+          Select a vehicle only when this package includes transport options.
+        </p>
 
         <div id="vehicleOptionsList" class="vehicle-options-list">
           <div class="vehicle-empty">
-            Vehicle options will appear after selecting a package.
+            Vehicle options will appear only for packages that require transport.
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@
         <span>Estimated Total</span>
         <strong id="bookingEstimatedTotal">Custom Quote</strong>
         <small>
-          Activities and vehicle options can change the final total.
+          Optional activities and package vehicle choices can change the final total.
           Final confirmation is done after admin validates your payment proof.
         </small>
       </div>
