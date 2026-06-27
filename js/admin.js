@@ -334,7 +334,7 @@ async function loadHomepageContent() {
 }
 
 /* =========================
-   VEHICLES
+   PACKAGE VEHICLES
 ========================= */
 
 const vehicleForm = document.getElementById("vehicleForm");
@@ -418,7 +418,7 @@ if (vehicleForm) {
       clearFileInput("vehicleGalleryImages");
 
       setMessage("vehicleMessage", "Vehicle saved successfully.");
-      showPopup("Vehicle Saved", "Vehicle saved with pictures.");
+      showPopup("Vehicle Saved", "Vehicle saved for package selection.");
       loadVehicles();
     } catch (error) {
       setMessage("vehicleMessage", error.message || "Failed to save vehicle.", true);
@@ -477,8 +477,8 @@ async function loadVehicles() {
         <h4>${escapeHtml(data.name || "Unnamed Vehicle")}</h4>
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Capacity:</strong> ${Number(data.capacity || 0)} passengers</p>
-        <p><strong>Rental Price:</strong> € ${Number(data.price || 0).toLocaleString()} / day</p>
-        <p><strong>Status:</strong> ${data.active === false ? "Hidden" : "Visible"}</p>
+        <p><strong>Vehicle Price:</strong> € ${Number(data.price || 0).toLocaleString()}</p>
+        <p><strong>Status:</strong> ${data.active === false ? "Unavailable" : "Available For Packages"}</p>
         <p><strong>Extra Pictures:</strong> ${galleryCount}</p>
         <p>${escapeHtml(data.description || "")}</p>
 
@@ -491,7 +491,7 @@ async function loadVehicles() {
         <div class="admin-trip-actions">
           <button class="edit-vehicle-btn" data-id="${vehicleId}">Edit</button>
           <button class="toggle-vehicle-btn" data-id="${vehicleId}" data-active="${data.active !== false}">
-            ${data.active === false ? "Show" : "Hide"}
+            ${data.active === false ? "Make Available" : "Make Unavailable"}
           </button>
           <button class="clear-vehicle-gallery-btn" data-id="${vehicleId}">Clear Extra Pictures</button>
           <button class="delete-vehicle-btn" data-id="${vehicleId}">Delete</button>
@@ -528,7 +528,7 @@ function bindVehicleButtons(snapshot) {
         document.getElementById("vehicleActive").checked = data.active !== false;
       }
 
-      setMessage("vehicleMessage", "Editing vehicle. Add more pictures if needed, then click Save Vehicle.");
+      setMessage("vehicleMessage", "Editing vehicle for package selection. Add more pictures if needed, then click Save Vehicle.");
       vehicleForm.scrollIntoView({ behavior: "smooth" });
     });
   });
@@ -543,7 +543,13 @@ function bindVehicleButtons(snapshot) {
           updatedAt: serverTimestamp()
         });
 
-        showPopup("Vehicle Updated", active ? "Vehicle hidden." : "Vehicle visible.");
+        showPopup(
+          "Vehicle Updated",
+          active
+            ? "Vehicle unavailable for package selection."
+            : "Vehicle available for package selection."
+        );
+
         loadVehicles();
       } catch (error) {
         showPopup("Vehicle Error", error.message || "Could not update vehicle.");
@@ -1153,21 +1159,16 @@ async function loadBookings() {
         pendingBookings++;
       }
 
-      const isRental = data.bookingType === "vehicle_rental";
-      const typeText = isRental ? "Vehicle Rental" : "Package Booking";
-      const packageText = isRental ? "Vehicle Rental Only" : data.package || "-";
+      const typeText = "Package Booking";
+      const packageText = data.package || "-";
 
       const vehicleText = data.vehicleName
         ? `${data.vehicleName} / € ${Number(data.vehiclePrice || 0).toLocaleString()}`
         : "-";
 
-      const dateText = isRental
-        ? data.rentalPeriod || `${data.pickupDate || "-"} → ${data.returnDate || "-"}`
-        : data.bookingPeriod || `${data.startDate || data.date || "-"} → ${data.endDate || "-"}`;
+      const dateText = data.bookingPeriod || `${data.startDate || data.date || "-"} → ${data.endDate || "-"}`;
 
-      const peopleText = isRental
-        ? data.passengers || data.people || "-"
-        : data.people || "-";
+      const peopleText = data.people || data.passengers || "-";
 
       const activitiesText =
         Array.isArray(data.selectedActivities) && data.selectedActivities.length > 0
