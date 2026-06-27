@@ -5,20 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>My Bookings | Mautour Holidays</title>
+
+  <meta
+    name="description"
+    content="View and manage all your Mauritius holiday bookings with Mautour Holidays."
+  />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="nav-container">
+
     <h1 class="logo">Mautour Holidays</h1>
 
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="vehicles.html">Vehicles</a>
+      <a href="register.html">Register</a>
+      <a href="login.html">Sign In</a>
       <a href="my-bookings.html" class="active">My Bookings</a>
-      <button id="logoutBtn" class="admin-logout-btn">Logout</button>
+
+      <button
+        id="logoutBtn"
+        class="admin-logout-btn"
+        type="button"
+      >
+        Logout
+      </button>
     </nav>
 
     <div class="hamburger" id="hamburger">
@@ -26,23 +41,60 @@
       <span></span>
       <span></span>
     </div>
+
   </div>
 </header>
 
 <main class="admin-main">
+
   <section class="dashboard-container">
-    <span class="section-label center-label">Customer Area</span>
+
+    <span class="section-label center-label">
+      Customer Portal
+    </span>
+
     <h2>My Bookings</h2>
 
+    <p
+      class="center section-subtitle"
+      style="margin-bottom:35px;"
+    >
+      View all your Mauritius holiday bookings, booking status,
+      selected activities, payment details and admin updates.
+    </p>
+
     <div id="bookingsList" class="admin-trip-list">
+
       <div class="loading-card">
-        <h3>Loading bookings...</h3>
+        <h3>Loading Your Bookings...</h3>
+
+        <p>
+          Please wait while we securely retrieve your bookings.
+        </p>
       </div>
+
     </div>
+
   </section>
+
 </main>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">
+      OK
+    </button>
+  </div>
+</div>
+
+<footer class="footer">
+  <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
+</footer>
 
 <script src="js/main.js"></script>
 <script type="module" src="js/my-bookings.js"></script>
+
 </body>
 </html>
