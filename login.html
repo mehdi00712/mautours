@@ -3,125 +3,169 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mautours – Sign In</title>
+  <title>Mautour Holidays | Sign In</title>
+
+  <meta
+    name="description"
+    content="Sign in to manage your Mauritius holiday bookings, packages and travel experiences with Mautour Holidays."
+  />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="nav-container">
-      <h1 class="logo">Mautours</h1>
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautour Holidays</h1>
 
-      <nav class="nav" id="nav">
-        <a href="index.html">Home</a>
-        <a href="booking.html">Book</a>
-        <a href="login.html" class="active">Sign In</a>
-        <a href="admin.html">Dashboard</a>
-        <a href="register.html">Register</a>
-        <a href="my-bookings.html">My Bookings</a>
-      </nav>
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="register.html">Register</a>
+      <a href="my-bookings.html">My Bookings</a>
+      <a href="login.html" class="active">Sign In</a>
+    </nav>
 
-      <div class="hamburger" id="hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-  </header>
-
-  <main class="login-page">
-    <div class="login-hero">
-
-      <div class="login-left">
-        <span class="tagline">Discover Mauritius</span>
-
-        <h1>Your Adventure Starts Here</h1>
-
-        <p>
-          Sign in to book exclusive island tours, airport transfers,
-          private trips, and unforgettable experiences with Mautours.
-        </p>
-
-        <ul class="benefits">
-          <li>Secure online bookings</li>
-          <li>Instant reservation requests</li>
-          <li>Exclusive Mauritius travel packages</li>
-          <li>Manage your bookings easily</li>
-        </ul>
-      </div>
-
-      <div class="login-box">
-        <div class="login-header">
-          <h2>Welcome Back</h2>
-          <p>Sign in to continue your journey</p>
-        </div>
-
-        <form id="loginForm">
-          <div class="input-group">
-            <label for="loginEmail">Email Address</label>
-            <input
-              type="email"
-              id="loginEmail"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="loginPassword">Password</label>
-            <input
-              type="password"
-              id="loginPassword"
-              placeholder="Enter your password"
-              required
-            />
-          </div>
-
-          <button type="submit" class="btn login-btn">
-            Sign In
-          </button>
-        </form>
-
-        <p id="loginMessage" class="center"></p>
-
-        <div class="divider">
-          <span>Travel with confidence</span>
-        </div>
-
-        <p class="login-note">
-          Bookings are available only for signed-in users to keep every reservation secure.
-        </p>
-      </div>
-
-    </div>
-  </main>
-
-  <section class="trust-section">
-    <div class="trust-card">
-      <h3>500+</h3>
-      <p>Happy Travellers</p>
-    </div>
-
-    <div class="trust-card">
-      <h3>50+</h3>
-      <p>Destinations Covered</p>
-    </div>
-
-    <div class="trust-card">
-      <h3>24/7</h3>
-      <p>Customer Support</p>
-    </div>
-  </section>
-
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <h3 id="popupTitle"></h3>
-      <p id="popupMessage"></p>
-      <button id="popupBtn" class="btn">OK</button>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
   </div>
+</header>
 
-  <script type="module" src="js/auth.js"></script>
-  <script src="js/main.js"></script>
+<main class="login-page">
+
+  <div class="login-hero">
+
+    <div class="login-left">
+
+      <span class="tagline">
+        Discover Mauritius
+      </span>
+
+      <h1>
+        Your Mauritius Journey Starts Here
+      </h1>
+
+      <p>
+        Sign in to book premium Mauritius experiences, customise your package,
+        select optional activities, track your reservations and manage all of
+        your bookings in one secure place.
+      </p>
+
+      <ul class="benefits">
+        <li>Secure online bookings</li>
+        <li>Manage all your reservations</li>
+        <li>Choose optional activities</li>
+        <li>Vehicle selection included when required</li>
+        <li>Track your booking status</li>
+      </ul>
+
+    </div>
+
+    <div class="login-box">
+
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue planning your Mauritius holiday.</p>
+      </div>
+
+      <form id="loginForm">
+
+        <div class="input-group">
+          <label for="loginEmail">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="loginPassword">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn login-btn"
+        >
+          Sign In
+        </button>
+
+      </form>
+
+      <p id="loginMessage" class="center"></p>
+
+      <div class="divider">
+        <span>New to Mautour Holidays?</span>
+      </div>
+
+      <a
+        href="register.html"
+        class="btn-outline full-width-btn"
+      >
+        Create an Account
+      </a>
+
+      <p class="login-note">
+        Creating an account allows you to book packages, customise your
+        experience, upload payment proof and follow your booking status from
+        your personal dashboard.
+      </p>
+
+    </div>
+
+  </div>
+
+</main>
+
+<section class="trust-section">
+
+  <div class="trust-card">
+    <h3>500+</h3>
+    <p>Happy Travellers</p>
+  </div>
+
+  <div class="trust-card">
+    <h3>50+</h3>
+    <p>Destinations Covered</p>
+  </div>
+
+  <div class="trust-card">
+    <h3>24/7</h3>
+    <p>Customer Support</p>
+  </div>
+
+</section>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">
+      OK
+    </button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/auth.js"></script>
+
 </body>
 </html>
