@@ -3,33 +3,206 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Register | Mautour Holidays</title>
+
+  <title>Create Account | Mautour Holidays</title>
+
+  <meta
+    name="description"
+    content="Create your Mautour Holidays account to book Mauritius packages, choose optional activities and manage your bookings."
+  />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
-<section class="login-page">
-  <div class="login-box">
-    <h2>Create Account</h2>
+<header class="site-header">
+  <div class="nav-container">
 
-    <form id="registerForm">
-      <input type="text" id="name" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Email Address" required />
-      <input type="text" id="phone" placeholder="Phone / WhatsApp" required />
-      <input type="password" id="password" placeholder="Password" minlength="6" required />
+    <h1 class="logo">
+      Mautour Holidays
+    </h1>
 
-      <button type="submit" class="btn full-width-btn">Register</button>
-    </form>
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="register.html" class="active">Register</a>
+      <a href="login.html">Sign In</a>
+      <a href="my-bookings.html">My Bookings</a>
+    </nav>
 
-    <p class="login-note">
-      Already have an account?
-      <a href="login.html">Login</a>
-    </p>
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
-    <p id="registerMessage"></p>
   </div>
+</header>
+
+<main class="login-page">
+
+  <div class="login-hero">
+
+    <div class="login-left">
+
+      <span class="tagline">
+        Discover Mauritius
+      </span>
+
+      <h1>
+        Create Your Travel Account
+      </h1>
+
+      <p>
+        Register once to book luxury Mauritius packages, customise your
+        activities, upload payment proof and follow every booking from your
+        personal dashboard.
+      </p>
+
+      <ul class="benefits">
+        <li>Book premium Mauritius experiences</li>
+        <li>Select optional activities</li>
+        <li>Vehicle selection when required by the package</li>
+        <li>Track booking approval status</li>
+        <li>Secure customer account</li>
+      </ul>
+
+    </div>
+
+    <div class="login-box">
+
+      <div class="login-header">
+        <h2>Create Account</h2>
+
+        <p>
+          Join Mautour Holidays and start planning your dream trip.
+        </p>
+      </div>
+
+      <form id="registerForm">
+
+        <div class="input-group">
+          <label for="name">
+            Full Name
+          </label>
+
+          <input
+            type="text"
+            id="name"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="phone">
+            Phone / WhatsApp
+          </label>
+
+          <input
+            type="tel"
+            id="phone"
+            placeholder="+230..."
+            autocomplete="tel"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">
+            Password
+          </label>
+
+          <input
+            type="password"
+            id="password"
+            placeholder="Minimum 6 characters"
+            minlength="6"
+            autocomplete="new-password"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn login-btn"
+        >
+          Create Account
+        </button>
+
+      </form>
+
+      <p id="registerMessage" class="center"></p>
+
+      <div class="divider">
+        <span>Already have an account?</span>
+      </div>
+
+      <a
+        href="login.html"
+        class="btn-outline full-width-btn"
+      >
+        Sign In
+      </a>
+
+      <p class="login-note">
+        After creating your account you will be able to book packages,
+        customise activities, upload payment proof and manage all your
+        reservations from <strong>My Bookings</strong>.
+      </p>
+
+    </div>
+
+  </div>
+
+</main>
+
+<section class="trust-section">
+
+  <div class="trust-card">
+    <h3>500+</h3>
+    <p>Happy Travellers</p>
+  </div>
+
+  <div class="trust-card">
+    <h3>50+</h3>
+    <p>Destinations Covered</p>
+  </div>
+
+  <div class="trust-card">
+    <h3>24/7</h3>
+    <p>Customer Support</p>
+  </div>
+
 </section>
 
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button id="popupBtn" class="btn">
+      OK
+    </button>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
 <script type="module" src="js/register.js"></script>
+
 </body>
 </html>
