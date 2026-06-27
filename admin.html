@@ -22,7 +22,6 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="vehicles.html">Vehicles</a>
       <a href="admin.html" class="active">Dashboard</a>
       <button id="logoutBtn" class="admin-logout-btn">Logout</button>
     </nav>
@@ -42,14 +41,14 @@
       <span class="section-label center-label">Admin Panel</span>
       <h2 class="center">Mautour Holidays Control Panel</h2>
       <p class="center" style="color: var(--muted);">
-        Manage bookings, packages, activities, package galleries, vehicles, homepage and business settings.
+        Manage bookings, packages, optional activities, package vehicles, galleries, homepage and business settings.
       </p>
     </div>
 
     <div class="admin-tabs">
       <button class="admin-tab active" data-tab="dashboardTab">Dashboard</button>
       <button class="admin-tab" data-tab="bookingsTab">Bookings</button>
-      <button class="admin-tab" data-tab="vehiclesTab">Vehicles</button>
+      <button class="admin-tab" data-tab="vehiclesTab">Package Vehicles</button>
       <button class="admin-tab" data-tab="packagesTab">Packages</button>
       <button class="admin-tab" data-tab="galleryTab">Gallery</button>
       <button class="admin-tab" data-tab="homepageTab">Homepage</button>
@@ -89,7 +88,7 @@
 
       <div class="admin-note">
         <strong>How it works:</strong>
-        Customers view package details, choose optional activities, upload payment proof, then you approve or reject the booking.
+        Customers browse packages, choose optional activities, select a vehicle only when required by the package, upload payment proof, then you approve or reject the booking.
       </div>
     </div>
 
@@ -127,8 +126,8 @@
 
     <div id="vehiclesTab" class="admin-tab-content">
       <div class="admin-section-title">
-        <h3>Vehicle Fleet Manager</h3>
-        <p>Add vehicles customers can view, rent and see with multiple pictures.</p>
+        <h3>Vehicles Used In Packages</h3>
+        <p>Manage vehicles that customers can choose only inside packages that require transportation.</p>
       </div>
 
       <form id="vehicleForm" class="media-upload-form friendly-form">
@@ -156,30 +155,30 @@
         </div>
 
         <div class="form-group">
-          <label>Rental Price Per Day (€)</label>
+          <label>Vehicle Price (€)</label>
           <input type="number" id="vehiclePrice" placeholder="Example: 100" min="0" required />
         </div>
 
         <div class="form-group">
           <label>Description</label>
-          <textarea id="vehicleDescription" placeholder="Comfortable SUV for families and airport transfers."></textarea>
+          <textarea id="vehicleDescription" placeholder="Comfortable SUV for package transport."></textarea>
         </div>
 
         <div class="form-group">
           <label>Main Vehicle Image</label>
           <input type="file" id="vehicleImage" accept="image/*" />
-          <small>This is the main image shown on vehicle cards.</small>
+          <small>Main image shown when a package includes this vehicle.</small>
         </div>
 
         <div class="form-group">
           <label>Extra Vehicle Pictures</label>
           <input type="file" id="vehicleGalleryImages" accept="image/*" multiple />
-          <small>Upload side view, rear view, interior, seats, luggage space, etc.</small>
+          <small>Upload additional pictures of the vehicle.</small>
         </div>
 
         <label class="admin-check-row">
           <input type="checkbox" id="vehicleActive" checked />
-          <span>Vehicle Visible To Customers</span>
+          <span>Available For Package Selection</span>
         </label>
 
         <button type="submit" class="btn">Save Vehicle</button>
@@ -312,7 +311,7 @@ Quad Biking | 90"
     <div id="galleryTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Gallery Manager</h3>
-        <p>Upload homepage, activity, luxury, package and vehicle images.</p>
+        <p>Upload homepage, activity, luxury and package images.</p>
       </div>
 
       <form id="galleryForm" class="media-upload-form friendly-form">
@@ -330,7 +329,6 @@ Quad Biking | 90"
             <option value="package">Package</option>
             <option value="luxury">Luxury</option>
             <option value="activity">Activity</option>
-            <option value="vehicle">Vehicle</option>
           </select>
         </div>
 
