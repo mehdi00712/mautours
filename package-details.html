@@ -22,11 +22,9 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="vehicles.html">Vehicles</a>
-      <a href="login.html">Sign In</a>
       <a href="register.html">Register</a>
+      <a href="login.html">Sign In</a>
       <a href="my-bookings.html">My Bookings</a>
-      <a href="admin.html">Dashboard</a>
     </nav>
 
     <div class="hamburger" id="hamburger">
@@ -98,7 +96,7 @@
             <div class="highlight-box">
               🚘
               <strong>Vehicle</strong>
-              <span id="packageVehicleRequirement">Depends on package</span>
+              <span id="packageVehicleRequirement">Only if package requires</span>
             </div>
 
             <div class="highlight-box">
@@ -140,8 +138,10 @@
             <div id="packageActivitiesAnchor"></div>
 
             <div id="packageVehicleSection" class="vehicle-selection-box">
-              <h4 id="vehicleSectionTitle">Choose Vehicle</h4>
-              <p id="vehicleSectionText">Select your preferred private vehicle.</p>
+              <h4 id="vehicleSectionTitle">Vehicle for This Package</h4>
+              <p id="vehicleSectionText">
+                Select your preferred vehicle only if this package includes transport options.
+              </p>
 
               <div id="packageVehiclesGrid" class="vehicle-options-list">
                 <div class="vehicle-empty">Loading vehicles...</div>
@@ -152,7 +152,7 @@
               <span>Total Estimate</span>
               <strong id="bookingEstimatedTotal">Custom Quote</strong>
               <small>
-                Final confirmation will be reviewed by admin. Activities and vehicle choices may affect the final price.
+                Final confirmation will be reviewed by admin. Optional activities and package vehicle choices may affect the final price.
               </small>
             </div>
 
