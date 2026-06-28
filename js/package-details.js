@@ -96,6 +96,10 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function normalizeBool(value) {
+  return value === true || value === "true" || value === 1 || value === "1";
+}
+
 function formatMoney(value) {
   const amount = Number(value || 0);
   return amount > 0 ? `€ ${amount.toLocaleString()}` : "Custom Quote";
@@ -162,7 +166,7 @@ function updateEstimatedTotal() {
   const basePrice = Number(currentPackage?.price || 0);
 
   const vehiclePrice =
-    currentPackage?.requiresVehicle === true
+    currentPackage?.requiresVehicle
       ? Number(selectedVehicle?.price || 0)
       : 0;
 
@@ -246,6 +250,13 @@ function renderActivities(activities) {
     return;
   }
 
+  const validActivities = activities.filter((activity) => activity && activity.name);
+
+  if (validActivities.length === 0) {
+    updateEstimatedTotal();
+    return;
+  }
+
   const box = document.createElement("div");
   box.id = "packageActivitiesBox";
   box.className = "vehicle-selection-box";
@@ -255,9 +266,8 @@ function renderActivities(activities) {
     <p>Select only the activities you want. The total price will update automatically.</p>
 
     <div class="activity-options-list">
-      ${activities
-        .filter((activity) => activity && activity.name)
-        .map((activity, index) => {
+      ${validActivities
+        .map((activity) => {
           const name = activity.name || "";
           const price = Number(activity.price || 0);
 
@@ -312,7 +322,7 @@ function selectVehicle(vehicle, card) {
 async function loadVehicles() {
   if (!packageVehiclesGrid) return;
 
-  if (currentPackage?.requiresVehicle !== true) {
+  if (!currentPackage?.requiresVehicle) {
     selectedVehicle = null;
 
     if (packageVehicleSection) {
@@ -341,6 +351,12 @@ async function loadVehicles() {
     packageVehicleRequirement.textContent = "Required";
   }
 
+  packageVehiclesGrid.innerHTML = `
+    <div class="vehicle-empty">
+      Loading vehicles...
+    </div>
+  `;
+
   try {
     const snapshot = await getDocs(collection(db, "vehicles"));
 
@@ -358,6 +374,8 @@ async function loadVehicles() {
     });
 
     if (allVehicles.length === 0) {
+      selectedVehicle = null;
+
       packageVehiclesGrid.innerHTML = `
         <div class="vehicle-empty">
           No vehicles available yet. Please contact us before booking.
@@ -381,7 +399,7 @@ async function loadVehicles() {
       card.innerHTML = `
         ${
           vehicle.imageUrl
-            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
+            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
             : `<div class="vehicle-placeholder">🚘</div>`
         }
 
@@ -407,9 +425,15 @@ async function loadVehicles() {
   } catch (error) {
     console.error("Load Vehicles Error:", error);
 
+    selectedVehicle = null;
+
     packageVehiclesGrid.innerHTML = `
-      <div class="vehicle-empty">Could not load vehicles.</div>
+      <div class="vehicle-empty">
+        Could not load vehicles. Check Firestore rules for the vehicles collection.
+      </div>
     `;
+
+    updateEstimatedTotal();
   }
 }
 
@@ -436,9 +460,9 @@ async function loadPackageDetails() {
 
     currentPackage = {
       id: snap.id,
-      requiresVehicle: data.requiresVehicle === true,
-      activities: Array.isArray(data.activities) ? data.activities : [],
-      ...data
+      ...data,
+      requiresVehicle: normalizeBool(data.requiresVehicle),
+      activities: Array.isArray(data.activities) ? data.activities : []
     };
 
     document.title = `${data.title || "Package Details"} | Mautour Holidays`;
@@ -459,12 +483,12 @@ async function loadPackageDetails() {
 
     if (packageVehicleRequirement) {
       packageVehicleRequirement.textContent =
-        data.requiresVehicle === true ? "Required" : "Not required";
+        currentPackage.requiresVehicle ? "Required" : "Not required";
     }
 
     renderIncludes(data.includes);
     renderGallery(data);
-    renderActivities(data.activities);
+    renderActivities(currentPackage.activities);
 
     if (packageWhatsappBtn) {
       const message = encodeURIComponent(
@@ -507,7 +531,7 @@ if (packageBookingForm) {
     const submitBtn = packageBookingForm.querySelector("button[type='submit']");
     const originalBtnText = submitBtn.textContent;
 
-    if (currentPackage.requiresVehicle === true && !selectedVehicle) {
+    if (currentPackage.requiresVehicle && !selectedVehicle) {
       showPopup("Vehicle Required", "Please choose a vehicle before booking.");
       return;
     }
@@ -567,7 +591,7 @@ if (packageBookingForm) {
       const basePrice = Number(currentPackage.price || 0);
 
       const vehiclePrice =
-        currentPackage.requiresVehicle === true
+        currentPackage.requiresVehicle
           ? Number(selectedVehicle?.price || 0)
           : 0;
 
@@ -592,7 +616,7 @@ if (packageBookingForm) {
 
         tripId: currentPackage.id,
         package: currentPackage.title || "",
-        requiresVehicle: currentPackage.requiresVehicle === true,
+        requiresVehicle: currentPackage.requiresVehicle,
 
         name,
         email,
