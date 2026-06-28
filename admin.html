@@ -198,7 +198,7 @@
     <div id="packagesTab" class="admin-tab-content">
       <div class="admin-section-title">
         <h3>Package Manager</h3>
-        <p>Add packages, choose if vehicle is required, add optional activities, full details and multiple gallery pictures.</p>
+        <p>Add packages, optional activities, package photos and choose if transport is required.</p>
       </div>
 
       <form id="tripForm" class="media-upload-form friendly-form">
@@ -264,29 +264,47 @@
         </div>
 
         <div class="form-group">
-          <label>Optional Activities With Prices (€)</label>
-          <textarea
-            id="tripActivities"
-            placeholder="Write one activity per line like this:
-Lunch Buffet | 30
-Catamaran Cruise | 80
-Dolphin Watching | 50
-Quad Biking | 90"
-          ></textarea>
-          <small>
-            Format: Activity Name | Price. Customers will tick the activities they want and the total will update automatically.
-          </small>
+          <label>Optional Activities</label>
+
+          <div class="activity-builder-box">
+            <div class="activity-builder-header">
+              <div>
+                <h4>Add Activities Customers Can Choose</h4>
+                <p>Leave this empty if the package has no optional activities.</p>
+              </div>
+
+              <button type="button" id="addActivityBtn" class="activity-add-btn">
+                + Add Activity
+              </button>
+            </div>
+
+            <div id="activityEmptyNote" class="activity-empty-note">
+              No optional activities added yet.
+            </div>
+
+            <div id="activityRows" class="activity-rows"></div>
+          </div>
+
+          <textarea id="tripActivities" style="display:none;"></textarea>
         </div>
 
-        <label class="admin-check-row">
-          <input type="checkbox" id="tripFeatured" />
-          <span>Show this package on homepage Featured Packages</span>
-        </label>
+        <div class="admin-options">
+          <label class="admin-option-card">
+            <input type="checkbox" id="tripFeatured" />
+            <div>
+              <strong>⭐ Featured Package</strong>
+              <p>Show this package on the homepage Featured Packages section.</p>
+            </div>
+          </label>
 
-        <label class="admin-check-row">
-          <input type="checkbox" id="tripRequiresVehicle" />
-          <span>This package requires customer to choose a vehicle</span>
-        </label>
+          <label class="admin-option-card">
+            <input type="checkbox" id="tripRequiresVehicle" />
+            <div>
+              <strong>🚐 Vehicle Required</strong>
+              <p>Customer must choose one of your vehicles for this package.</p>
+            </div>
+          </label>
+        </div>
 
         <div class="form-group">
           <label>Main Package Image</label>
