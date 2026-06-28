@@ -2673,3 +2673,239 @@ h2::after {
     font-size: 2rem;
   }
 }
+
+/* =========================================================
+   PACKAGE VEHICLE SELECTION
+========================================================= */
+
+.vehicle-selection-box{
+    margin-top:25px;
+    padding:24px;
+    background:#fff;
+    border-radius:20px;
+    border:1px solid #e8e8e8;
+}
+
+.vehicle-selection-box h4{
+    font-size:1.3rem;
+    margin-bottom:8px;
+    color:#1f2937;
+}
+
+.vehicle-selection-box p{
+    color:#6b7280;
+    margin-bottom:20px;
+    line-height:1.6;
+}
+
+.vehicle-options-list{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:20px;
+}
+
+.vehicle-option-card{
+    background:#fff;
+    border:2px solid #ececec;
+    border-radius:18px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:.3s;
+    display:flex;
+    flex-direction:column;
+    text-align:left;
+    padding:0;
+}
+
+.vehicle-option-card:hover{
+    transform:translateY(-6px);
+    border-color:#c59d3d;
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+}
+
+.vehicle-option-card.selected{
+    border-color:#c59d3d;
+    box-shadow:0 0 0 4px rgba(197,157,61,.20);
+    background:#fffdf6;
+}
+
+.vehicle-option-card img{
+    width:100%;
+    height:180px;
+    object-fit:cover;
+}
+
+.vehicle-placeholder{
+    width:100%;
+    height:180px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:60px;
+    background:#f4f4f4;
+}
+
+.vehicle-option-info{
+    padding:18px;
+}
+
+.vehicle-option-info strong{
+    display:block;
+    font-size:1.2rem;
+    color:#1f2937;
+    margin-bottom:8px;
+}
+
+.vehicle-option-info span{
+    display:inline-block;
+    color:#c59d3d;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+.vehicle-option-info small{
+    display:block;
+    color:#6b7280;
+    margin-bottom:6px;
+    line-height:1.5;
+}
+
+.vehicle-short-description{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+}
+
+.vehicle-option-info b{
+    display:block;
+    margin-top:12px;
+    color:#c59d3d;
+    font-size:1.15rem;
+}
+
+/* =========================================================
+   SELECTED VEHICLE
+========================================================= */
+
+.selected-vehicle-details{
+    margin-top:24px;
+    border-radius:20px;
+    border:2px solid #c59d3d;
+    background:#fffdf6;
+    padding:20px;
+}
+
+.selected-vehicle-details h4{
+    margin-bottom:15px;
+    color:#1f2937;
+}
+
+.selected-vehicle-card{
+    display:grid;
+    grid-template-columns:180px 1fr;
+    gap:20px;
+    align-items:center;
+}
+
+.selected-vehicle-card img{
+    width:180px;
+    height:130px;
+    object-fit:cover;
+    border-radius:15px;
+}
+
+.selected-vehicle-placeholder{
+    width:180px;
+    height:130px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:70px;
+    background:#eee;
+    border-radius:15px;
+}
+
+.selected-vehicle-card strong{
+    display:block;
+    font-size:1.35rem;
+    color:#1f2937;
+    margin-bottom:10px;
+}
+
+.selected-vehicle-card p{
+    margin:6px 0;
+    color:#6b7280;
+}
+
+.selected-price{
+    color:#c59d3d !important;
+    font-weight:800;
+    font-size:1.25rem;
+}
+
+.selected-vehicle-card small{
+    display:block;
+    margin-top:12px;
+    color:#6b7280;
+    line-height:1.6;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px){
+
+.vehicle-options-list{
+    grid-template-columns:1fr;
+}
+
+.vehicle-option-card img{
+    height:220px;
+}
+
+.vehicle-placeholder{
+    height:220px;
+}
+
+.selected-vehicle-card{
+    grid-template-columns:1fr;
+}
+
+.selected-vehicle-card img,
+.selected-vehicle-placeholder{
+    width:100%;
+    height:220px;
+}
+
+}
+
+@media(max-width:600px){
+
+.vehicle-selection-box{
+    padding:18px;
+}
+
+.vehicle-option-card img{
+    height:190px;
+}
+
+.vehicle-placeholder{
+    height:190px;
+}
+
+.selected-vehicle-card img,
+.selected-vehicle-placeholder{
+    height:190px;
+}
+
+.selected-vehicle-card strong{
+    font-size:1.2rem;
+}
+
+.selected-price{
+    font-size:1.1rem;
+}
+
+}
