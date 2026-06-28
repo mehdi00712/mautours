@@ -66,9 +66,211 @@ const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
+let selectedVehicleDetails = document.getElementById("selectedVehicleDetails");
+
 onAuthStateChanged(auth, (user) => {
   currentUser = user;
 });
+
+function injectVehicleStyles() {
+  if (document.getElementById("vehicleSelectionFixStyles")) return;
+
+  const style = document.createElement("style");
+  style.id = "vehicleSelectionFixStyles";
+
+  style.textContent = `
+    .vehicle-options-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .vehicle-option-card {
+      width: 100%;
+      border: 2px solid #e5e7eb;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.25s ease;
+      padding: 0;
+    }
+
+    .vehicle-option-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      box-shadow: 0 12px 30px rgba(7, 24, 39, 0.1);
+    }
+
+    .vehicle-option-card.selected {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.18);
+      background: #fffdf5;
+    }
+
+    .vehicle-option-card img,
+    .vehicle-placeholder {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      background: var(--sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .vehicle-option-info {
+      padding: 16px;
+    }
+
+    .vehicle-option-info strong {
+      display: block;
+      color: var(--darkblue);
+      font-size: 1.05rem;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+
+    .vehicle-option-info span {
+      display: inline-block;
+      color: var(--gold);
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .vehicle-option-info small {
+      display: block;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .vehicle-short-description {
+      display: -webkit-box !important;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .vehicle-option-info b {
+      display: block;
+      color: var(--gold);
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+
+    .selected-vehicle-details {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 20px;
+      background: #fff;
+      border: 2px solid var(--gold);
+      box-shadow: 0 12px 30px rgba(7, 24, 39, 0.08);
+    }
+
+    .selected-vehicle-details h4 {
+      color: var(--darkblue);
+      margin-bottom: 14px;
+      font-size: 1.15rem;
+    }
+
+    .selected-vehicle-card {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .selected-vehicle-card img,
+    .selected-vehicle-placeholder {
+      width: 130px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 16px;
+      background: var(--sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .selected-vehicle-card strong {
+      display: block;
+      color: var(--darkblue);
+      font-size: 1.15rem;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+
+    .selected-vehicle-card p {
+      margin: 3px 0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .selected-vehicle-card .selected-price {
+      color: var(--gold);
+      font-weight: 900;
+      font-size: 1.05rem;
+    }
+
+    .selected-vehicle-card small {
+      display: block;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 768px) {
+      .vehicle-options-list {
+        grid-template-columns: 1fr;
+      }
+
+      .vehicle-option-card {
+        display: block;
+      }
+
+      .vehicle-option-card img,
+      .vehicle-placeholder {
+        height: 210px;
+      }
+
+      .vehicle-option-info {
+        padding: 18px;
+      }
+
+      .selected-vehicle-card {
+        grid-template-columns: 1fr;
+      }
+
+      .selected-vehicle-card img,
+      .selected-vehicle-placeholder {
+        width: 100%;
+        height: 210px;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function ensureSelectedVehicleDetailsBox() {
+  if (selectedVehicleDetails) return selectedVehicleDetails;
+
+  if (!packageVehicleSection) return null;
+
+  selectedVehicleDetails = document.createElement("div");
+  selectedVehicleDetails.id = "selectedVehicleDetails";
+  selectedVehicleDetails.className = "selected-vehicle-details";
+  selectedVehicleDetails.style.display = "none";
+
+  packageVehicleSection.appendChild(selectedVehicleDetails);
+
+  return selectedVehicleDetails;
+}
 
 function showPopup(title, message, redirect = null) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
@@ -98,11 +300,6 @@ function escapeHtml(value) {
 
 function normalizeBool(value) {
   return value === true || value === "true" || value === 1 || value === "1";
-}
-
-function formatMoney(value) {
-  const amount = Number(value || 0);
-  return amount > 0 ? `€ ${amount.toLocaleString()}` : "Custom Quote";
 }
 
 function formatPrice(data) {
@@ -316,11 +513,47 @@ function selectVehicle(vehicle, card) {
   });
 
   card.classList.add("selected");
+
+  const detailsBox = ensureSelectedVehicleDetailsBox();
+
+  if (detailsBox) {
+    const price = Number(vehicle.price || 0);
+    const capacity = Number(vehicle.capacity || 0);
+
+    detailsBox.style.display = "block";
+
+    detailsBox.innerHTML = `
+      <h4>Selected Vehicle</h4>
+
+      <div class="selected-vehicle-card">
+        ${
+          vehicle.imageUrl
+            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
+            : `<div class="selected-vehicle-placeholder">🚘</div>`
+        }
+
+        <div>
+          <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+          <p>${escapeHtml(vehicle.category || "Vehicle")}</p>
+          ${capacity > 0 ? `<p>${capacity} passengers</p>` : ""}
+          <p class="selected-price">${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</p>
+          ${
+            vehicle.description
+              ? `<small>${escapeHtml(vehicle.description)}</small>`
+              : ""
+          }
+        </div>
+      </div>
+    `;
+  }
+
   updateEstimatedTotal();
 }
 
 async function loadVehicles() {
   if (!packageVehiclesGrid) return;
+
+  ensureSelectedVehicleDetailsBox();
 
   if (!currentPackage?.requiresVehicle) {
     selectedVehicle = null;
@@ -338,6 +571,10 @@ async function loadVehicles() {
         No vehicle selection is required for this package.
       </div>
     `;
+
+    if (selectedVehicleDetails) {
+      selectedVehicleDetails.style.display = "none";
+    }
 
     updateEstimatedTotal();
     return;
@@ -382,6 +619,10 @@ async function loadVehicles() {
         </div>
       `;
 
+      if (selectedVehicleDetails) {
+        selectedVehicleDetails.style.display = "none";
+      }
+
       updateEstimatedTotal();
       return;
     }
@@ -407,7 +648,11 @@ async function loadVehicles() {
           <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
           <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
           ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
-          ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
+          ${
+            vehicle.description
+              ? `<small class="vehicle-short-description">${escapeHtml(vehicle.description)}</small>`
+              : ""
+          }
           <b>${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</b>
         </div>
       `;
@@ -432,6 +677,10 @@ async function loadVehicles() {
         Could not load vehicles. Check Firestore rules for the vehicles collection.
       </div>
     `;
+
+    if (selectedVehicleDetails) {
+      selectedVehicleDetails.style.display = "none";
+    }
 
     updateEstimatedTotal();
   }
@@ -636,6 +885,7 @@ if (packageBookingForm) {
         vehiclePrice,
         vehicleCapacity: Number(selectedVehicle?.capacity || 0),
         vehicleImageUrl: selectedVehicle?.imageUrl || "",
+        vehicleDescription: selectedVehicle?.description || "",
 
         selectedActivities,
         activitiesTotal,
@@ -659,6 +909,10 @@ if (packageBookingForm) {
       packageBookingForm.reset();
       selectedVehicle = null;
 
+      if (selectedVehicleDetails) {
+        selectedVehicleDetails.style.display = "none";
+      }
+
       showPopup(
         "Booking Submitted ✅",
         "Your booking and payment proof have been submitted. Admin will validate your booking.",
@@ -675,6 +929,7 @@ if (packageBookingForm) {
 }
 
 async function init() {
+  injectVehicleStyles();
   await loadPackageDetails();
   await loadVehicles();
 }
