@@ -48,6 +48,8 @@ const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+let activityRows = [];
+
 function showAdminContent() {
   if (adminLoadingScreen) adminLoadingScreen.style.display = "none";
   if (adminContent) adminContent.style.display = "block";
@@ -176,6 +178,387 @@ async function uploadMultipleFiles(path, files) {
 }
 
 /* =========================
+   EASIER PACKAGE UI
+========================= */
+
+function injectAdminBetterUiStyles() {
+  if (document.getElementById("adminBetterUiStyles")) return;
+
+  const style = document.createElement("style");
+  style.id = "adminBetterUiStyles";
+  style.textContent = `
+    .activity-builder-box {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 22px rgba(7, 24, 39, 0.05);
+    }
+
+    .activity-builder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .activity-builder-header h4 {
+      color: var(--darkblue);
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .activity-builder-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .activity-add-btn {
+      border: none;
+      background: var(--gold);
+      color: var(--darkblue);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .activity-rows {
+      display: grid;
+      gap: 12px;
+    }
+
+    .activity-row {
+      display: grid;
+      grid-template-columns: 1fr 150px auto;
+      gap: 10px;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .activity-row input {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+
+    .activity-remove-btn {
+      border: none;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .activity-empty-note {
+      background: rgba(201, 162, 39, 0.12);
+      border: 1px dashed rgba(201, 162, 39, 0.5);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .admin-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 10px 0;
+    }
+
+    .admin-option-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: #ffffff;
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 18px;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .admin-option-card:hover {
+      border-color: var(--gold);
+      background: #fffdf5;
+      transform: translateY(-2px);
+    }
+
+    .admin-option-card input {
+      width: 22px !important;
+      height: 22px;
+      margin-top: 3px;
+      accent-color: var(--gold);
+      flex: 0 0 auto;
+    }
+
+    .admin-option-card strong {
+      display: block;
+      color: var(--darkblue);
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+
+    .admin-option-card p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .admin-option-card:has(input:checked) {
+      border-color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+    }
+
+    @media (max-width: 700px) {
+      .activity-row {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function addActivityRow(name = "", price = "") {
+  const rowsBox = document.getElementById("activityRows");
+  const emptyNote = document.getElementById("activityEmptyNote");
+  if (!rowsBox) return;
+
+  const rowId = `activity_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+  const row = document.createElement("div");
+  row.className = "activity-row";
+  row.dataset.rowId = rowId;
+
+  row.innerHTML = `
+    <input
+      type="text"
+      class="activity-name-input"
+      placeholder="Activity name e.g. Lunch Buffet"
+      value="${escapeHtml(name)}"
+    />
+
+    <input
+      type="number"
+      class="activity-price-input"
+      placeholder="Price €"
+      min="0"
+      value="${price !== "" ? Number(price || 0) : ""}"
+    />
+
+    <button type="button" class="activity-remove-btn">
+      Remove
+    </button>
+  `;
+
+  rowsBox.appendChild(row);
+
+  row.querySelector(".activity-name-input").addEventListener("input", syncActivitiesTextarea);
+  row.querySelector(".activity-price-input").addEventListener("input", syncActivitiesTextarea);
+
+  row.querySelector(".activity-remove-btn").addEventListener("click", () => {
+    row.remove();
+    syncActivitiesTextarea();
+    toggleActivityEmptyNote();
+  });
+
+  activityRows.push(rowId);
+  toggleActivityEmptyNote();
+  syncActivitiesTextarea();
+}
+
+function toggleActivityEmptyNote() {
+  const rowsBox = document.getElementById("activityRows");
+  const emptyNote = document.getElementById("activityEmptyNote");
+
+  if (!rowsBox || !emptyNote) return;
+
+  const hasRows = rowsBox.querySelectorAll(".activity-row").length > 0;
+  emptyNote.style.display = hasRows ? "none" : "block";
+}
+
+function syncActivitiesTextarea() {
+  const textarea = document.getElementById("tripActivities");
+  const rowsBox = document.getElementById("activityRows");
+
+  if (!textarea || !rowsBox) return;
+
+  const lines = [];
+
+  rowsBox.querySelectorAll(".activity-row").forEach((row) => {
+    const name = row.querySelector(".activity-name-input")?.value.trim() || "";
+    const price = Number(row.querySelector(".activity-price-input")?.value || 0);
+
+    if (name) {
+      lines.push(`${name} | ${price > 0 ? price : 0}`);
+    }
+  });
+
+  textarea.value = lines.join("\n");
+}
+
+function loadActivitiesIntoBuilder(activitiesText = "") {
+  const rowsBox = document.getElementById("activityRows");
+  if (!rowsBox) return;
+
+  rowsBox.innerHTML = "";
+  activityRows = [];
+
+  const activities = parseActivities(activitiesText);
+
+  activities.forEach((activity) => {
+    addActivityRow(activity.name, activity.price);
+  });
+
+  toggleActivityEmptyNote();
+  syncActivitiesTextarea();
+}
+
+function enhanceActivitiesInput() {
+  const textarea = document.getElementById("tripActivities");
+  if (!textarea) return;
+
+  if (document.getElementById("activityBuilderBox")) return;
+
+  textarea.style.display = "none";
+
+  const wrapper = document.createElement("div");
+  wrapper.id = "activityBuilderBox";
+  wrapper.className = "activity-builder-box";
+
+  wrapper.innerHTML = `
+    <div class="activity-builder-header">
+      <div>
+        <h4>Optional Activities</h4>
+        <p>Add activities customers can tick when booking. Leave empty if this package has no optional activities.</p>
+      </div>
+
+      <button type="button" id="addActivityBtn" class="activity-add-btn">
+        + Add Activity
+      </button>
+    </div>
+
+    <div id="activityEmptyNote" class="activity-empty-note">
+      No optional activities added yet.
+    </div>
+
+    <div id="activityRows" class="activity-rows"></div>
+  `;
+
+  textarea.parentElement.appendChild(wrapper);
+
+  document.getElementById("addActivityBtn").addEventListener("click", () => {
+    addActivityRow();
+  });
+
+  loadActivitiesIntoBuilder(textarea.value);
+}
+
+function enhancePackageCheckboxes() {
+  const featured = document.getElementById("tripFeatured");
+  const requiresVehicle = document.getElementById("tripRequiresVehicle");
+
+  if (!featured || !requiresVehicle) return;
+  if (document.getElementById("adminPackageOptions")) return;
+
+  const featuredLabel = featured.closest("label");
+  const vehicleLabel = requiresVehicle.closest("label");
+
+  if (!featuredLabel || !vehicleLabel) return;
+
+  const optionsBox = document.createElement("div");
+  optionsBox.id = "adminPackageOptions";
+  optionsBox.className = "admin-options";
+
+  const featuredCard = document.createElement("label");
+  featuredCard.className = "admin-option-card";
+  featuredCard.innerHTML = `
+    <input type="checkbox" id="tripFeaturedNew" />
+    <div>
+      <strong>⭐ Featured Package</strong>
+      <p>Show this package on the homepage Featured Packages section.</p>
+    </div>
+  `;
+
+  const vehicleCard = document.createElement("label");
+  vehicleCard.className = "admin-option-card";
+  vehicleCard.innerHTML = `
+    <input type="checkbox" id="tripRequiresVehicleNew" />
+    <div>
+      <strong>🚐 Vehicle Required</strong>
+      <p>Customer must choose one of your vehicles for this package.</p>
+    </div>
+  `;
+
+  optionsBox.appendChild(featuredCard);
+  optionsBox.appendChild(vehicleCard);
+
+  vehicleLabel.after(optionsBox);
+
+  featuredLabel.style.display = "none";
+  vehicleLabel.style.display = "none";
+
+  const featuredNew = document.getElementById("tripFeaturedNew");
+  const requiresVehicleNew = document.getElementById("tripRequiresVehicleNew");
+
+  featuredNew.checked = featured.checked;
+  requiresVehicleNew.checked = requiresVehicle.checked;
+
+  featuredNew.addEventListener("change", () => {
+    featured.checked = featuredNew.checked;
+  });
+
+  requiresVehicleNew.addEventListener("change", () => {
+    requiresVehicle.checked = requiresVehicleNew.checked;
+  });
+}
+
+function syncNewCheckboxCards() {
+  const featured = document.getElementById("tripFeatured");
+  const requiresVehicle = document.getElementById("tripRequiresVehicle");
+  const featuredNew = document.getElementById("tripFeaturedNew");
+  const requiresVehicleNew = document.getElementById("tripRequiresVehicleNew");
+
+  if (featured && featuredNew) featuredNew.checked = featured.checked;
+  if (requiresVehicle && requiresVehicleNew) requiresVehicleNew.checked = requiresVehicle.checked;
+}
+
+function resetNewCheckboxCards() {
+  const featured = document.getElementById("tripFeatured");
+  const requiresVehicle = document.getElementById("tripRequiresVehicle");
+  const featuredNew = document.getElementById("tripFeaturedNew");
+  const requiresVehicleNew = document.getElementById("tripRequiresVehicleNew");
+
+  if (featured) featured.checked = false;
+  if (requiresVehicle) requiresVehicle.checked = false;
+  if (featuredNew) featuredNew.checked = false;
+  if (requiresVehicleNew) requiresVehicleNew.checked = false;
+}
+
+function enhanceAdminFormUI() {
+  injectAdminBetterUiStyles();
+  enhanceActivitiesInput();
+  enhancePackageCheckboxes();
+}
+
+/* =========================
    AUTH GUARD - NO ADMIN GLIMPSE
 ========================= */
 
@@ -192,6 +575,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   showAdminContent();
+  enhanceAdminFormUI();
 
   loadWebsiteSettings();
   loadHomepageContent();
@@ -602,6 +986,8 @@ if (tripForm) {
   tripForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    syncActivitiesTextarea();
+
     const tripId = document.getElementById("tripId")?.value.trim();
     const imageFile = document.getElementById("tripImage")?.files[0];
     const galleryFiles = document.getElementById("tripGalleryImages")?.files || [];
@@ -674,8 +1060,9 @@ if (tripForm) {
       tripForm.reset();
 
       if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
-      if (document.getElementById("tripFeatured")) document.getElementById("tripFeatured").checked = false;
-      if (document.getElementById("tripRequiresVehicle")) document.getElementById("tripRequiresVehicle").checked = false;
+
+      resetNewCheckboxCards();
+      loadActivitiesIntoBuilder("");
 
       clearFileInput("tripImage");
       clearFileInput("tripGalleryImages");
@@ -695,8 +1082,9 @@ if (resetTripForm) {
     tripForm.reset();
 
     if (document.getElementById("tripId")) document.getElementById("tripId").value = "";
-    if (document.getElementById("tripFeatured")) document.getElementById("tripFeatured").checked = false;
-    if (document.getElementById("tripRequiresVehicle")) document.getElementById("tripRequiresVehicle").checked = false;
+
+    resetNewCheckboxCards();
+    loadActivitiesIntoBuilder("");
 
     clearFileInput("tripImage");
     clearFileInput("tripGalleryImages");
@@ -816,9 +1204,13 @@ function bindTripButtons(snapshot) {
         ? data.includes.join("\n")
         : "";
 
+      const activitiesText = activitiesToText(data.activities);
+
       if (document.getElementById("tripActivities")) {
-        document.getElementById("tripActivities").value = activitiesToText(data.activities);
+        document.getElementById("tripActivities").value = activitiesText;
       }
+
+      loadActivitiesIntoBuilder(activitiesText);
 
       if (document.getElementById("tripFeatured")) {
         document.getElementById("tripFeatured").checked = data.featured === true;
@@ -827,6 +1219,8 @@ function bindTripButtons(snapshot) {
       if (document.getElementById("tripRequiresVehicle")) {
         document.getElementById("tripRequiresVehicle").checked = data.requiresVehicle === true;
       }
+
+      syncNewCheckboxCards();
 
       setMessage("tripMessage", "Editing package. Change activities if needed, then click Save Package.");
       tripForm.scrollIntoView({ behavior: "smooth" });
