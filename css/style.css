@@ -2909,3 +2909,17 @@ h2::after {
 }
 
 }
+
+.activity-contact-note{
+    margin-top:15px;
+    padding:15px;
+    border-radius:15px;
+    background:#f8fafc;
+    border-left:4px solid #c59d3d;
+    color:#374151;
+    line-height:1.6;
+}
+
+.activity-contact-note strong{
+    color:#111827;
+}
