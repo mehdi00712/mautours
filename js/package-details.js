@@ -1,37 +1,25 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getFirestore,
   doc,
   getDoc,
   collection,
-  getDocs,
-  setDoc,
-  serverTimestamp
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
+
+const WHATSAPP_NUMBER = "23059066404";
 
 const params = new URLSearchParams(window.location.search);
 const packageId = params.get("id");
 
-let currentUser = null;
 let currentPackage = null;
 let selectedVehicle = null;
 let allVehicles = [];
@@ -47,104 +35,137 @@ const packageCategory = document.getElementById("packageCategory");
 const packageTitle = document.getElementById("packageTitle");
 const packageDescription = document.getElementById("packageDescription");
 const packageDuration = document.getElementById("packageDuration");
-const packagePrice = document.getElementById("packagePrice");
-const sidePackagePrice = document.getElementById("sidePackagePrice");
 const packageIncludes = document.getElementById("packageIncludes");
 const packageFullDetails = document.getElementById("packageFullDetails");
 const breadcrumbPackage = document.getElementById("breadcrumbPackage");
 
-const packageVehiclesGrid = document.getElementById("packageVehiclesGrid");
-const packageWhatsappBtn = document.getElementById("packageWhatsappBtn");
-const packageBookingForm = document.getElementById("packageBookingForm");
-const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
-
 const packageVehicleSection = document.getElementById("packageVehicleSection");
-const packageVehicleRequirement = document.getElementById("packageVehicleRequirement");
+const packageVehicleRequirement = document.getElementById(
+  "packageVehicleRequirement"
+);
+const packageVehiclesGrid = document.getElementById("packageVehiclesGrid");
+const selectedVehicleDetails = document.getElementById(
+  "selectedVehicleDetails"
+);
+
+const packageBookingForm = document.getElementById("packageBookingForm");
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
-let selectedVehicleDetails = document.getElementById("selectedVehicleDetails");
-
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-});
-
-function injectVehicleStyles() {
-  if (document.getElementById("vehicleSelectionFixStyles")) return;
+function injectPackageStyles() {
+  if (document.getElementById("packageWhatsappStyles")) return;
 
   const style = document.createElement("style");
-  style.id = "vehicleSelectionFixStyles";
+  style.id = "packageWhatsappStyles";
 
   style.textContent = `
+    .whatsapp-enquiry-heading {
+      margin-bottom: 24px;
+    }
+
+    .whatsapp-enquiry-heading small {
+      display: block;
+      color: var(--gold, #c9a227);
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .whatsapp-enquiry-heading h2 {
+      color: var(--darkblue, #071827);
+      margin-bottom: 10px;
+    }
+
+    .whatsapp-enquiry-heading p {
+      color: var(--muted, #6b7280);
+      line-height: 1.65;
+    }
+
+    .form-field-label {
+      display: block;
+      margin: 4px 0 -4px;
+      color: var(--darkblue, #071827);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    .package-booking-form textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 120px;
+      font: inherit;
+    }
+
     .vehicle-options-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 15px;
+      margin-top: 16px;
     }
 
     .vehicle-option-card {
       width: 100%;
-      border: 2px solid #e5e7eb;
-      background: #fff;
-      border-radius: 20px;
       overflow: hidden;
+      padding: 0;
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      background: #fff;
       cursor: pointer;
       text-align: left;
-      transition: 0.25s ease;
-      padding: 0;
+      transition: 0.22s ease;
     }
 
     .vehicle-option-card:hover {
       transform: translateY(-3px);
-      border-color: var(--gold);
-      box-shadow: 0 12px 30px rgba(7, 24, 39, 0.1);
+      border-color: var(--gold, #c9a227);
+      box-shadow: 0 12px 28px rgba(7, 24, 39, 0.1);
     }
 
     .vehicle-option-card.selected {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.18);
+      border-color: var(--gold, #c9a227);
       background: #fffdf5;
+      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.16);
     }
 
     .vehicle-option-card img,
     .vehicle-placeholder {
       width: 100%;
-      height: 170px;
+      height: 165px;
       object-fit: cover;
-      background: var(--sand);
       display: flex;
       align-items: center;
       justify-content: center;
+      background: var(--sand, #f4efe4);
       font-size: 2.5rem;
     }
 
     .vehicle-option-info {
-      padding: 16px;
+      padding: 15px;
     }
 
     .vehicle-option-info strong {
       display: block;
-      color: var(--darkblue);
+      color: var(--darkblue, #071827);
       font-size: 1.05rem;
-      margin-bottom: 6px;
-      line-height: 1.25;
+      margin-bottom: 5px;
     }
 
     .vehicle-option-info span {
-      display: inline-block;
-      color: var(--gold);
-      font-weight: 900;
-      margin-bottom: 8px;
+      display: block;
+      color: var(--gold, #c9a227);
+      font-weight: 800;
+      margin-bottom: 7px;
     }
 
     .vehicle-option-info small {
       display: block;
-      color: var(--muted);
+      color: var(--muted, #6b7280);
       line-height: 1.5;
-      margin-bottom: 6px;
+      margin-top: 4px;
     }
 
     .vehicle-short-description {
@@ -154,22 +175,62 @@ function injectVehicleStyles() {
       overflow: hidden;
     }
 
-    .vehicle-option-info b {
+    .selected-vehicle-details {
+      margin-top: 17px;
+      padding: 17px;
+      border: 2px solid var(--gold, #c9a227);
+      border-radius: 18px;
+      background: #fffdf5;
+    }
+
+    .selected-vehicle-details h4 {
+      color: var(--darkblue, #071827);
+      margin-bottom: 13px;
+    }
+
+    .selected-vehicle-card {
+      display: grid;
+      grid-template-columns: 125px 1fr;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .selected-vehicle-card img,
+    .selected-vehicle-placeholder {
+      width: 125px;
+      height: 95px;
+      object-fit: cover;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--sand, #f4efe4);
+      font-size: 2rem;
+    }
+
+    .selected-vehicle-card strong {
       display: block;
-      color: var(--gold);
+      color: var(--darkblue, #071827);
       font-size: 1.1rem;
-      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .selected-vehicle-card p,
+    .selected-vehicle-card small {
+      color: var(--muted, #6b7280);
+      line-height: 1.5;
+      margin: 3px 0;
     }
 
     .activity-selection-box {
-      margin-bottom: 18px;
+      margin-top: 18px;
     }
 
     .activity-options-list {
       display: grid;
       grid-template-columns: 1fr;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 15px;
     }
 
     .activity-option-card {
@@ -185,7 +246,7 @@ function injectVehicleStyles() {
     }
 
     .activity-option-card:hover {
-      border-color: var(--gold);
+      border-color: var(--gold, #c9a227);
       background: #fffdf5;
     }
 
@@ -193,7 +254,7 @@ function injectVehicleStyles() {
       width: 20px;
       height: 20px;
       flex: 0 0 auto;
-      accent-color: var(--gold);
+      accent-color: var(--gold, #c9a227);
     }
 
     .activity-option-card span {
@@ -203,100 +264,37 @@ function injectVehicleStyles() {
     }
 
     .activity-option-card strong {
-      color: var(--darkblue);
-      line-height: 1.3;
+      color: var(--darkblue, #071827);
     }
 
     .activity-option-card small {
-      color: var(--muted);
-      line-height: 1.4;
+      color: var(--muted, #6b7280);
     }
 
-    .activity-contact-note {
+    .whatsapp-booking-note {
       display: flex;
       flex-direction: column;
       gap: 5px;
-      margin-top: 16px;
-      padding: 15px;
-      border-left: 4px solid var(--gold);
+      padding: 16px;
+      border-left: 4px solid #25d366;
       border-radius: 14px;
-      background: #f8fafc;
-      color: var(--muted);
-      line-height: 1.5;
-      text-decoration: none;
-      transition: 0.2s ease;
-    }
-
-    .activity-contact-note:hover {
-      transform: translateY(-1px);
-      background: #fffdf5;
-    }
-
-    .activity-contact-note strong {
-      color: var(--darkblue);
-    }
-
-    .selected-vehicle-details {
-      margin-top: 18px;
-      padding: 18px;
-      border-radius: 20px;
-      background: #fff;
-      border: 2px solid var(--gold);
-      box-shadow: 0 12px 30px rgba(7, 24, 39, 0.08);
-    }
-
-    .selected-vehicle-details h4 {
-      color: var(--darkblue);
-      margin-bottom: 14px;
-      font-size: 1.15rem;
-    }
-
-    .selected-vehicle-card {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .selected-vehicle-card img,
-    .selected-vehicle-placeholder {
-      width: 130px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 16px;
-      background: var(--sand);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-    }
-
-    .selected-vehicle-card strong {
-      display: block;
-      color: var(--darkblue);
-      font-size: 1.15rem;
-      margin-bottom: 6px;
-      line-height: 1.25;
-    }
-
-    .selected-vehicle-card p {
-      margin: 3px 0;
-      color: var(--muted);
-      font-weight: 700;
-      line-height: 1.4;
-    }
-
-    .selected-vehicle-card .selected-price {
-      color: var(--gold);
-      font-weight: 900;
-      font-size: 1.05rem;
-    }
-
-    .selected-vehicle-card small {
-      display: block;
-      color: var(--muted);
-      margin-top: 8px;
+      background: #f0fdf4;
+      color: #4b5563;
       line-height: 1.55;
+    }
+
+    .whatsapp-booking-note strong {
+      color: #166534;
+    }
+
+    #continueWhatsappBtn {
+      background: #25d366;
+      border-color: #25d366;
+    }
+
+    #continueWhatsappBtn:hover {
+      background: #1fb85a;
+      border-color: #1fb85a;
     }
 
     @media (max-width: 768px) {
@@ -304,17 +302,9 @@ function injectVehicleStyles() {
         grid-template-columns: 1fr;
       }
 
-      .vehicle-option-card {
-        display: block;
-      }
-
       .vehicle-option-card img,
       .vehicle-placeholder {
         height: 210px;
-      }
-
-      .vehicle-option-info {
-        padding: 18px;
       }
 
       .selected-vehicle-card {
@@ -332,25 +322,9 @@ function injectVehicleStyles() {
   document.head.appendChild(style);
 }
 
-function ensureSelectedVehicleDetailsBox() {
-  if (selectedVehicleDetails) return selectedVehicleDetails;
-
-  if (!packageVehicleSection) return null;
-
-  selectedVehicleDetails = document.createElement("div");
-  selectedVehicleDetails.id = "selectedVehicleDetails";
-  selectedVehicleDetails.className = "selected-vehicle-details";
-  selectedVehicleDetails.style.display = "none";
-
-  packageVehicleSection.appendChild(selectedVehicleDetails);
-
-  return selectedVehicleDetails;
-}
-
-function showPopup(title, message, redirect = null) {
+function showPopup(title, message) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
     return;
   }
 
@@ -360,7 +334,6 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
   };
 }
 
@@ -374,117 +347,98 @@ function escapeHtml(value) {
 }
 
 function normalizeBool(value) {
-  return value === true || value === "true" || value === 1 || value === "1";
-}
-
-function formatPrice(data) {
-  const price = Number(data.price || 0);
-
-  if (price <= 0 || data.priceType === "Custom Quote") return "Custom Quote";
-  if (data.priceType === "Fixed") return `€ ${price.toLocaleString()}`;
-
-  return `${data.priceType || "Starting From"} € ${price.toLocaleString()}`;
-}
-
-function getDurationDays(durationText) {
-  if (!durationText) return 1;
-
-  const text = String(durationText).toLowerCase();
-
-  if (text.includes("half")) return 1;
-  if (text.includes("full")) return 1;
-
-  const match = text.match(/(\d+)/);
-  if (!match) return 1;
-
-  return Math.max(Number(match[1]), 1);
-}
-
-function calculateEndDate(startDate, durationDays) {
-  const date = new Date(`${startDate}T00:00:00`);
-  date.setDate(date.getDate() + durationDays - 1);
-  return date.toISOString().split("T")[0];
+  return (
+    value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1"
+  );
 }
 
 function showError(message) {
-  if (packageLoading) {
-    packageLoading.innerHTML = `
-      <h3>Package Not Found</h3>
-      <p>${escapeHtml(message)}</p>
-      <a href="booking.html" class="btn">Back to Packages</a>
-    `;
-  }
+  if (!packageLoading) return;
+
+  packageLoading.innerHTML = `
+    <h3>Package Not Found</h3>
+    <p>${escapeHtml(message)}</p>
+    <a href="booking.html" class="btn">Back to Packages</a>
+  `;
 }
 
-function getSelectedActivities() {
-  const checked = document.querySelectorAll(".activity-checkbox:checked");
+function setMinimumTravelDate() {
+  const dateInput = document.getElementById("date");
+  if (!dateInput) return;
 
-  return Array.from(checked).map((input) => ({
-    name: input.dataset.name || ""
-  }));
-}
+  const today = new Date();
+  const localDate = new Date(
+    today.getTime() - today.getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .split("T")[0];
 
-function updateEstimatedTotal() {
-  const people = Number(document.getElementById("people")?.value || 1);
-  const safePeople = people > 0 ? people : 1;
-
-  const basePrice = Number(currentPackage?.price || 0);
-
-  const vehiclePrice =
-    currentPackage?.requiresVehicle
-      ? Number(selectedVehicle?.price || 0)
-      : 0;
-
-  let totalPerPerson = 0;
-
-  if (basePrice > 0) totalPerPerson += basePrice;
-  if (vehiclePrice > 0) totalPerPerson += vehiclePrice;
-
-  const total = totalPerPerson > 0 ? totalPerPerson * safePeople : 0;
-  const totalText = total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
-
-  if (bookingEstimatedTotal) bookingEstimatedTotal.textContent = totalText;
-  if (sidePackagePrice) sidePackagePrice.textContent = totalText;
+  dateInput.min = localDate;
 }
 
 function renderGallery(packageData) {
   const images = [];
 
-  if (packageData.imageUrl) images.push(packageData.imageUrl);
+  if (packageData.imageUrl) {
+    images.push(packageData.imageUrl);
+  }
 
   if (Array.isArray(packageData.galleryImages)) {
     packageData.galleryImages.forEach((url) => {
-      if (url && !images.includes(url)) images.push(url);
+      if (url && !images.includes(url)) {
+        images.push(url);
+      }
     });
   }
 
-  if (images.length === 0) images.push("assets/ile.jpg");
+  if (images.length === 0) {
+    images.push("assets/ile.jpg");
+  }
 
-  if (photoCount) photoCount.textContent = images.length;
-  if (mainPackageImage) mainPackageImage.src = images[0];
+  if (photoCount) {
+    photoCount.textContent = images.length;
+  }
+
+  if (mainPackageImage) {
+    mainPackageImage.src = images[0];
+    mainPackageImage.alt =
+      packageData.title || "Mauritius tour package";
+  }
 
   if (!packageThumbnailGrid) return;
 
   packageThumbnailGrid.innerHTML = "";
 
   images.forEach((url, index) => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = `package-thumb ${index === 0 ? "active" : ""}`;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `package-thumb ${index === 0 ? "active" : ""}`;
 
-    btn.innerHTML = `<img src="${escapeHtml(url)}" alt="Package photo ${index + 1}">`;
+    button.innerHTML = `
+      <img
+        src="${escapeHtml(url)}"
+        alt="${escapeHtml(
+          `${packageData.title || "Package"} photo ${index + 1}`
+        )}"
+      >
+    `;
 
-    btn.addEventListener("click", () => {
-      mainPackageImage.src = url;
+    button.addEventListener("click", () => {
+      if (mainPackageImage) {
+        mainPackageImage.src = url;
+      }
 
       document.querySelectorAll(".package-thumb").forEach((thumb) => {
         thumb.classList.remove("active");
       });
 
-      btn.classList.add("active");
+      button.classList.add("active");
     });
 
-    packageThumbnailGrid.appendChild(btn);
+    packageThumbnailGrid.appendChild(button);
   });
 }
 
@@ -492,13 +446,26 @@ function renderIncludes(includes) {
   if (!packageIncludes) return;
 
   if (!Array.isArray(includes) || includes.length === 0) {
-    packageIncludes.innerHTML = `<li>Custom itinerary planning</li>`;
+    packageIncludes.innerHTML = `
+      <li>Personalised itinerary planning</li>
+      <li>Support from the Mautour Holidays team</li>
+      <li>Booking assistance through WhatsApp</li>
+    `;
     return;
   }
 
   packageIncludes.innerHTML = includes
+    .filter(Boolean)
     .map((item) => `<li>${escapeHtml(item)}</li>`)
     .join("");
+}
+
+function getSelectedActivities() {
+  return Array.from(
+    document.querySelectorAll(".activity-checkbox:checked")
+  )
+    .map((input) => input.dataset.name || "")
+    .filter(Boolean);
 }
 
 function renderActivities(activities) {
@@ -508,22 +475,20 @@ function renderActivities(activities) {
   if (oldBox) oldBox.remove();
 
   if (!Array.isArray(activities) || activities.length === 0) {
-    updateEstimatedTotal();
     return;
   }
 
-  const validActivities = activities.filter((activity) => {
-    if (typeof activity === "string") {
-      return activity.trim() !== "";
-    }
+  const activityNames = activities
+    .map((activity) => {
+      if (typeof activity === "string") {
+        return activity.trim();
+      }
 
-    return activity && String(activity.name || "").trim() !== "";
-  });
+      return String(activity?.name || "").trim();
+    })
+    .filter(Boolean);
 
-  if (validActivities.length === 0) {
-    updateEstimatedTotal();
-    return;
-  }
+  if (activityNames.length === 0) return;
 
   const box = document.createElement("div");
   box.id = "packageActivitiesBox";
@@ -531,97 +496,46 @@ function renderActivities(activities) {
 
   box.innerHTML = `
     <h4>Optional Activities</h4>
+
     <p>
-      Select the activities you are interested in. Prices are provided personally
-      according to availability, travel date and group size.
+      Select the activities you are interested in. Our team will provide
+      availability, details and a personalised quotation on WhatsApp.
     </p>
 
     <div class="activity-options-list">
-      ${validActivities
-        .map((activity) => {
-          const name =
-            typeof activity === "string"
-              ? activity.trim()
-              : String(activity.name || "").trim();
-
-          return `
+      ${activityNames
+        .map(
+          (name) => `
             <label class="activity-option-card">
               <input
                 type="checkbox"
                 class="activity-checkbox"
                 data-name="${escapeHtml(name)}"
-              />
+              >
 
               <span>
                 <strong>${escapeHtml(name)}</strong>
                 <small>Select if interested</small>
               </span>
             </label>
-          `;
-        })
+          `
+        )
         .join("")}
     </div>
-
-    <a
-      href="#"
-      id="activitiesWhatsappBtn"
-      class="activity-contact-note"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      <strong>Need prices or more details?</strong>
-      <span>
-        Contact us on WhatsApp for activity information and a personalised quotation.
-      </span>
-    </a>
   `;
 
-  const activitiesAnchor = document.getElementById("packageActivitiesAnchor");
-  const vehicleSection = document.getElementById("packageVehicleSection");
-  const totalBox = packageBookingForm.querySelector(".booking-total-box");
+  const anchor = document.getElementById("packageActivitiesAnchor");
+  const vehicleSection = document.getElementById(
+    "packageVehicleSection"
+  );
 
-  if (activitiesAnchor) {
-    activitiesAnchor.insertAdjacentElement("afterend", box);
+  if (anchor) {
+    anchor.insertAdjacentElement("afterend", box);
   } else if (vehicleSection) {
     packageBookingForm.insertBefore(box, vehicleSection);
-  } else if (totalBox) {
-    packageBookingForm.insertBefore(box, totalBox);
   } else {
     packageBookingForm.appendChild(box);
   }
-
-  const updateActivitiesWhatsAppLink = () => {
-    const selectedNames = getSelectedActivities()
-      .map((activity) => activity.name)
-      .filter(Boolean);
-
-    const packageName = currentPackage?.title || "Mauritius package";
-
-    const activityText =
-      selectedNames.length > 0
-        ? selectedNames.map((name) => `- ${name}`).join("\n")
-        : "I would like more information about the optional activities.";
-
-    const message = encodeURIComponent(
-      `Hi, I would like prices and more details about optional activities for ${packageName}.\n\n${activityText}`
-    );
-
-    const whatsappBtn = document.getElementById("activitiesWhatsappBtn");
-
-    if (whatsappBtn) {
-      whatsappBtn.href = `https://wa.me/23059066404?text=${message}`;
-    }
-  };
-
-  document.querySelectorAll(".activity-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      updateActivitiesWhatsAppLink();
-      updateEstimatedTotal();
-    });
-  });
-
-  updateActivitiesWhatsAppLink();
-  updateEstimatedTotal();
 }
 
 function selectVehicle(vehicle, card) {
@@ -633,48 +547,51 @@ function selectVehicle(vehicle, card) {
 
   card.classList.add("selected");
 
-  const detailsBox = ensureSelectedVehicleDetailsBox();
+  if (!selectedVehicleDetails) return;
 
-  if (detailsBox) {
-    const price = Number(vehicle.price || 0);
-    const capacity = Number(vehicle.capacity || 0);
+  const capacity = Number(vehicle.capacity || 0);
 
-    detailsBox.style.display = "block";
+  selectedVehicleDetails.style.display = "block";
+  selectedVehicleDetails.innerHTML = `
+    <h4>Selected Vehicle</h4>
 
-    detailsBox.innerHTML = `
-      <h4>Selected Vehicle</h4>
+    <div class="selected-vehicle-card">
+      ${
+        vehicle.imageUrl
+          ? `
+            <img
+              src="${escapeHtml(vehicle.imageUrl)}"
+              alt="${escapeHtml(vehicle.name || "Vehicle")}"
+            >
+          `
+          : `<div class="selected-vehicle-placeholder">🚘</div>`
+      }
 
-      <div class="selected-vehicle-card">
+      <div>
+        <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+
+        <p>${escapeHtml(vehicle.category || "Vehicle")}</p>
+
         ${
-          vehicle.imageUrl
-            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
-            : `<div class="selected-vehicle-placeholder">🚘</div>`
+          capacity > 0
+            ? `<p>Up to ${capacity} passengers</p>`
+            : ""
         }
 
-        <div>
-          <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
-          <p>${escapeHtml(vehicle.category || "Vehicle")}</p>
-          ${capacity > 0 ? `<p>${capacity} passengers</p>` : ""}
-          <p class="selected-price">${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</p>
-          ${
-            vehicle.description
-              ? `<small>${escapeHtml(vehicle.description)}</small>`
-              : ""
-          }
-        </div>
+        ${
+          vehicle.description
+            ? `<small>${escapeHtml(vehicle.description)}</small>`
+            : ""
+        }
       </div>
-    `;
-  }
-
-  updateEstimatedTotal();
+    </div>
+  `;
 }
 
 async function loadVehicles() {
-  if (!packageVehiclesGrid) return;
+  if (!packageVehiclesGrid || !currentPackage) return;
 
-  ensureSelectedVehicleDetailsBox();
-
-  if (!currentPackage?.requiresVehicle) {
+  if (!currentPackage.requiresVehicle) {
     selectedVehicle = null;
 
     if (packageVehicleSection) {
@@ -685,17 +602,6 @@ async function loadVehicles() {
       packageVehicleRequirement.textContent = "Not required";
     }
 
-    packageVehiclesGrid.innerHTML = `
-      <div class="vehicle-empty">
-        No vehicle selection is required for this package.
-      </div>
-    `;
-
-    if (selectedVehicleDetails) {
-      selectedVehicleDetails.style.display = "none";
-    }
-
-    updateEstimatedTotal();
     return;
   }
 
@@ -704,13 +610,11 @@ async function loadVehicles() {
   }
 
   if (packageVehicleRequirement) {
-    packageVehicleRequirement.textContent = "Required";
+    packageVehicleRequirement.textContent = "Selection available";
   }
 
   packageVehiclesGrid.innerHTML = `
-    <div class="vehicle-empty">
-      Loading vehicles...
-    </div>
+    <div class="vehicle-empty">Loading vehicles...</div>
   `;
 
   try {
@@ -734,7 +638,8 @@ async function loadVehicles() {
 
       packageVehiclesGrid.innerHTML = `
         <div class="vehicle-empty">
-          No vehicles available yet. Please contact us before booking.
+          No vehicle options are currently listed.
+          Please ask our team on WhatsApp.
         </div>
       `;
 
@@ -742,14 +647,12 @@ async function loadVehicles() {
         selectedVehicleDetails.style.display = "none";
       }
 
-      updateEstimatedTotal();
       return;
     }
 
     packageVehiclesGrid.innerHTML = "";
 
-    allVehicles.forEach((vehicle, index) => {
-      const price = Number(vehicle.price || 0);
+    allVehicles.forEach((vehicle) => {
       const capacity = Number(vehicle.capacity || 0);
 
       const card = document.createElement("button");
@@ -759,20 +662,35 @@ async function loadVehicles() {
       card.innerHTML = `
         ${
           vehicle.imageUrl
-            ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name || "Vehicle")}">`
+            ? `
+              <img
+                src="${escapeHtml(vehicle.imageUrl)}"
+                alt="${escapeHtml(vehicle.name || "Vehicle")}"
+              >
+            `
             : `<div class="vehicle-placeholder">🚘</div>`
         }
 
         <div class="vehicle-option-info">
           <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+
           <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
-          ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
+
           ${
-            vehicle.description
-              ? `<small class="vehicle-short-description">${escapeHtml(vehicle.description)}</small>`
+            capacity > 0
+              ? `<small>Up to ${capacity} passengers</small>`
               : ""
           }
-          <b>${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</b>
+
+          ${
+            vehicle.description
+              ? `
+                <small class="vehicle-short-description">
+                  ${escapeHtml(vehicle.description)}
+                </small>
+              `
+              : ""
+          }
         </div>
       `;
 
@@ -781,10 +699,6 @@ async function loadVehicles() {
       });
 
       packageVehiclesGrid.appendChild(card);
-
-      if (index === 0) {
-        selectVehicle(vehicle, card);
-      }
     });
   } catch (error) {
     console.error("Load Vehicles Error:", error);
@@ -793,15 +707,14 @@ async function loadVehicles() {
 
     packageVehiclesGrid.innerHTML = `
       <div class="vehicle-empty">
-        Could not load vehicles. Check Firestore rules for the vehicles collection.
+        We could not load the vehicle options.
+        Please continue on WhatsApp and our team will assist you.
       </div>
     `;
 
     if (selectedVehicleDetails) {
       selectedVehicleDetails.style.display = "none";
     }
-
-    updateEstimatedTotal();
   }
 }
 
@@ -812,14 +725,14 @@ async function loadPackageDetails() {
   }
 
   try {
-    const snap = await getDoc(doc(db, "trips", packageId));
+    const snapshot = await getDoc(doc(db, "trips", packageId));
 
-    if (!snap.exists()) {
-      showError("This package does not exist or was removed.");
+    if (!snapshot.exists()) {
+      showError("This package does not exist or has been removed.");
       return;
     }
 
-    const data = snap.data();
+    const data = snapshot.data();
 
     if (data.active === false) {
       showError("This package is currently unavailable.");
@@ -827,231 +740,213 @@ async function loadPackageDetails() {
     }
 
     currentPackage = {
-      id: snap.id,
+      id: snapshot.id,
       ...data,
       requiresVehicle: normalizeBool(data.requiresVehicle),
-      activities: Array.isArray(data.activities) ? data.activities : []
+      activities: Array.isArray(data.activities)
+        ? data.activities
+        : []
     };
 
-    document.title = `${data.title || "Package Details"} | Mautour Holidays`;
+    document.title = `${
+      data.title || "Package Details"
+    } | Mautour Holidays`;
 
-    if (breadcrumbPackage) breadcrumbPackage.textContent = data.title || "Package";
-    if (packageCategory) packageCategory.textContent = data.category || "Package";
-    if (packageTitle) packageTitle.textContent = data.title || "Package Details";
-    if (packageDescription) packageDescription.textContent = data.description || "";
-    if (packageDuration) packageDuration.textContent = data.duration || "-";
-    if (packagePrice) packagePrice.textContent = formatPrice(data);
-    if (sidePackagePrice) sidePackagePrice.textContent = formatPrice(data);
+    if (breadcrumbPackage) {
+      breadcrumbPackage.textContent = data.title || "Package";
+    }
 
-    if (packageFullDetails) {
-      packageFullDetails.textContent =
-        data.fullDetails ||
-        "Full package details will be confirmed by our team according to your travel dates and preferences.";
+    if (packageCategory) {
+      packageCategory.textContent = data.category || "Package";
+    }
+
+    if (packageTitle) {
+      packageTitle.textContent = data.title || "Package Details";
+    }
+
+    if (packageDescription) {
+      packageDescription.textContent = data.description || "";
+    }
+
+    if (packageDuration) {
+      packageDuration.textContent =
+        data.duration || "To be confirmed";
     }
 
     if (packageVehicleRequirement) {
       packageVehicleRequirement.textContent =
-        currentPackage.requiresVehicle ? "Required" : "Not required";
+        currentPackage.requiresVehicle
+          ? "Selection available"
+          : "Not required";
+    }
+
+    if (packageFullDetails) {
+      packageFullDetails.textContent =
+        data.fullDetails ||
+        "Full itinerary details will be confirmed by our team according to your dates, preferences and group requirements.";
     }
 
     renderIncludes(data.includes);
     renderGallery(data);
     renderActivities(currentPackage.activities);
 
-    if (packageWhatsappBtn) {
-      const message = encodeURIComponent(
-        `Hi, I want to know more about this package: ${data.title || "Mauritius Package"} 🇲🇺`
-      );
-
-      packageWhatsappBtn.href = `https://wa.me/23059066404?text=${message}`;
+    if (packageLoading) {
+      packageLoading.style.display = "none";
     }
 
-    if (packageLoading) packageLoading.style.display = "none";
-    if (packageDetailsContent) packageDetailsContent.style.display = "grid";
+    if (packageDetailsContent) {
+      packageDetailsContent.style.display = "grid";
+    }
 
-    updateEstimatedTotal();
+    await loadVehicles();
   } catch (error) {
     console.error("Load Package Details Error:", error);
-    showError(error.message || "Could not load package details.");
+
+    showError(
+      error.message || "Could not load the package details."
+    );
   }
 }
 
-document.getElementById("people")?.addEventListener("input", updateEstimatedTotal);
+function buildWhatsAppMessage() {
+  const name = document.getElementById("name")?.value.trim() || "";
+  const email = document.getElementById("email")?.value.trim() || "";
+  const phone = document.getElementById("phone")?.value.trim() || "";
+  const people = Number(
+    document.getElementById("people")?.value || 0
+  );
+  const date = document.getElementById("date")?.value || "";
+  const specialRequests =
+    document.getElementById("specialRequests")?.value.trim() || "";
+
+  const selectedActivities = getSelectedActivities();
+
+  const vehicleName = selectedVehicle?.name || "To be discussed";
+  const vehicleCategory =
+    selectedVehicle?.category || "Not specified";
+
+  const activityList =
+    selectedActivities.length > 0
+      ? selectedActivities.map((item) => `• ${item}`).join("\n")
+      : "• No optional activities selected";
+
+  const specialRequestText =
+    specialRequests || "No special requests provided";
+
+  const message = `
+Hello Mautour Holidays,
+
+I would like to enquire about and book the following holiday package.
+
+*PACKAGE*
+${currentPackage?.title || "Mauritius Holiday Package"}
+
+*DURATION*
+${currentPackage?.duration || "To be confirmed"}
+
+*TRAVEL DETAILS*
+Preferred date: ${date}
+Number of people: ${people}
+
+*CUSTOMER DETAILS*
+Name: ${name}
+Email: ${email}
+WhatsApp / Phone: ${phone}
+
+*PREFERRED VEHICLE*
+${vehicleName}
+Category: ${vehicleCategory}
+
+*OPTIONAL ACTIVITIES*
+${activityList}
+
+*SPECIAL REQUESTS*
+${specialRequestText}
+
+Please send me the full details, availability, personalised quotation, payment instructions and booking confirmation.
+
+Thank you.
+  `.trim();
+
+  return encodeURIComponent(message);
+}
 
 if (packageBookingForm) {
-  packageBookingForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  packageBookingForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-    if (!currentUser) {
+    if (!currentPackage) {
       showPopup(
-        "Login Required",
-        "Please sign in before making a booking.",
-        `login.html?redirect=package-details.html?id=${packageId}`
+        "Package Not Ready",
+        "Please wait for the package details to finish loading."
       );
       return;
     }
 
-    if (!currentPackage) {
-      showPopup("Package Error", "Package details are not loaded yet.");
-      return;
-    }
+    const name =
+      document.getElementById("name")?.value.trim() || "";
+    const email =
+      document.getElementById("email")?.value.trim() || "";
+    const phone =
+      document.getElementById("phone")?.value.trim() || "";
+    const people = Number(
+      document.getElementById("people")?.value || 0
+    );
+    const date =
+      document.getElementById("date")?.value || "";
 
-    const submitBtn = packageBookingForm.querySelector("button[type='submit']");
-    const originalBtnText = submitBtn.textContent;
-
-    if (currentPackage.requiresVehicle && !selectedVehicle) {
-      showPopup("Vehicle Required", "Please choose a vehicle before booking.");
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const people = Number(document.getElementById("people").value);
-    const startDate = document.getElementById("date").value.trim();
-    const proofFile = document.getElementById("paymentProof").files[0];
-
-    if (!name || !email || !phone || !people || !startDate || !proofFile) {
-      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+    if (!name || !email || !phone || !people || !date) {
+      showPopup(
+        "Missing Information",
+        "Please complete your name, email, phone number, number of people and preferred travel date."
+      );
       return;
     }
 
     if (people < 1) {
-      showPopup("Invalid Number", "Please enter at least 1 person.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      showPopup(
+        "Invalid Number",
+        "Please enter at least one traveller."
+      );
       return;
     }
 
-    const selectedDate = new Date(`${startDate}T00:00:00`);
+    const selectedDate = new Date(`${date}T00:00:00`);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-      showPopup("Invalid Date", "Please select today or a future date.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      showPopup(
+        "Invalid Date",
+        "Please choose today or a future travel date."
+      );
       return;
     }
 
-    try {
-      const durationDays = getDurationDays(currentPackage.duration);
-      const endDate = calculateEndDate(startDate, durationDays);
-
-      const bookingRef = doc(collection(db, "bookings"));
-      const bookingId = bookingRef.id;
-
-      const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-      const storageRef = ref(
-        storage,
-        `payment_proofs/${currentUser.uid}/${bookingId}_${safeFileName}`
-      );
-
-      const uploadResult = await uploadBytes(storageRef, proofFile);
-      const paymentProofUrl = await getDownloadURL(uploadResult.ref);
-
-      const basePrice = Number(currentPackage.price || 0);
-
-      const vehiclePrice =
-        currentPackage.requiresVehicle
-          ? Number(selectedVehicle?.price || 0)
-          : 0;
-
-      const selectedActivities = getSelectedActivities();
-      const activitiesTotal = 0;
-
-      const pricePerPerson =
-        basePrice + vehiclePrice > 0
-          ? basePrice + vehiclePrice
-          : 0;
-
-      const totalPrice =
-        pricePerPerson > 0
-          ? pricePerPerson * people
-          : 0;
-
-      await setDoc(bookingRef, {
-        bookingType: "package_booking",
-
-        userId: currentUser.uid,
-        userEmail: currentUser.email || "",
-
-        tripId: currentPackage.id,
-        package: currentPackage.title || "",
-        requiresVehicle: currentPackage.requiresVehicle,
-
-        name,
-        email,
-        phone,
-        people,
-
-        date: startDate,
-        startDate,
-        endDate,
-        duration: currentPackage.duration || "",
-        durationDays,
-        bookingPeriod: `${startDate} → ${endDate}`,
-
-        vehicleId: selectedVehicle?.id || "",
-        vehicleName: selectedVehicle?.name || "",
-        vehicleCategory: selectedVehicle?.category || "",
-        vehiclePrice,
-        vehicleCapacity: Number(selectedVehicle?.capacity || 0),
-        vehicleImageUrl: selectedVehicle?.imageUrl || "",
-        vehicleDescription: selectedVehicle?.description || "",
-
-        selectedActivities,
-        activitiesTotal,
-        activitiesPricingStatus: "Contact via WhatsApp for quotation",
-
-        basePackagePrice: basePrice,
-        pricePerPerson,
-        totalPrice,
-        priceType: currentPackage.priceType || "Custom Quote",
-
-        paymentMethod: "Bank Transfer",
-        paymentStatus: "Proof Uploaded",
-        paymentProofUrl,
-
-        adminDecision: "Pending",
-        bookingStatus: "Awaiting Admin Validation",
-
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-
-      packageBookingForm.reset();
-      selectedVehicle = null;
-
-      if (selectedVehicleDetails) {
-        selectedVehicleDetails.style.display = "none";
-      }
-
+    if (
+      currentPackage.requiresVehicle &&
+      allVehicles.length > 0 &&
+      !selectedVehicle
+    ) {
       showPopup(
-        "Booking Submitted ✅",
-        "Your booking and payment proof have been submitted. Admin will validate your booking.",
-        "index.html"
+        "Choose a Vehicle",
+        "Please select your preferred vehicle before continuing on WhatsApp."
       );
-    } catch (error) {
-      console.error("Booking Error:", error);
-      showPopup("Booking Error", error.message || "There was an error submitting your booking.");
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      return;
     }
+
+    const message = buildWhatsAppMessage();
+    const whatsappUrl =
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   });
 }
 
 async function init() {
-  injectVehicleStyles();
+  injectPackageStyles();
+  setMinimumTravelDate();
   await loadPackageDetails();
-  await loadVehicles();
 }
 
 init();
