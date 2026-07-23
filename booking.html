@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Mautour Holidays | Mauritius Luxury Packages</title>
+
   <meta
     name="description"
-    content="Book Mauritius luxury packages, private tours, airport transfers and honeymoon experiences with optional activities and payment proof validation."
+    content="Explore Mauritius luxury packages, private tours, airport transfers and honeymoon experiences, then continue directly on WhatsApp for a personalised quotation and booking."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -21,12 +22,11 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html" class="active">Packages</a>
-      <a href="register.html">Register</a>
-      <a href="login.html">Sign In</a>
-      <a href="my-bookings.html">My Bookings</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
     </nav>
 
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
       <span></span>
       <span></span>
       <span></span>
@@ -41,24 +41,25 @@
   </video>
 
   <div class="hero-content">
-    <span class="hero-badge">Private Tours + Optional Activities</span>
+    <span class="hero-badge">Private Tours + Personalised Planning</span>
 
     <h2>Luxury Mauritius Experiences</h2>
 
     <p>
-      Choose your package, select the activities you want, choose a vehicle only if the package requires it,
-      then upload your payment proof for admin validation.
+      Explore our packages, choose the experience that suits you, and continue
+      directly on WhatsApp for availability, a personalised quotation and booking confirmation.
     </p>
 
     <div class="hero-actions">
       <a href="#packages" class="btn">Explore Packages</a>
 
       <a
-        href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
+        href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package."
         target="_blank"
+        rel="noopener noreferrer"
         class="btn-outline hero-outline"
       >
-        Book via WhatsApp
+        Contact on WhatsApp
       </a>
     </div>
   </div>
@@ -70,8 +71,8 @@
   <h2>Choose Your Mauritius Experience</h2>
 
   <p class="center section-subtitle">
-    Browse our latest tours and luxury experiences. Some packages include optional activities,
-    so customers can customize the trip and the price updates automatically.
+    Browse our latest tours and luxury experiences. Every quotation, itinerary,
+    payment arrangement and final booking confirmation is handled personally on WhatsApp.
   </p>
 </section>
 
@@ -88,33 +89,52 @@
   <div class="modal-content luxury-modal">
     <span id="closeModal" class="close">&times;</span>
 
-    <h3>Request Booking</h3>
-
-    <div class="bank-box">
-      <h4>Bank Transfer Details</h4>
-
-      <p>Please transfer the booking amount using the details below.</p>
-
-      <p><strong>Bank:</strong> TO BE ADDED</p>
-      <p><strong>Account Name:</strong> TO BE ADDED</p>
-      <p><strong>Account Number:</strong> TO BE ADDED</p>
-
+    <div class="whatsapp-enquiry-heading">
+      <small>Personalised Travel Planning</small>
+      <h3>Continue on WhatsApp</h3>
       <p>
-        <strong>Reference:</strong>
-        Please use your full name as payment reference.
+        Complete the details below. Your selected package and preferences will
+        be added automatically to a WhatsApp message.
       </p>
-
-      <div class="payment-note">
-        Upload proof of payment after completing the transfer.
-        Your booking will be reviewed and validated by our admin team.
-      </div>
     </div>
 
     <form id="bookingForm">
-      <input type="text" id="name" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Email Address" required />
-      <input type="text" id="phone" placeholder="WhatsApp / Phone Number" required />
-      <input type="number" id="people" placeholder="Number of People" min="1" required />
+      <input
+        type="text"
+        id="name"
+        placeholder="Full Name"
+        autocomplete="name"
+        required
+      />
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Email Address"
+        autocomplete="email"
+        required
+      />
+
+      <input
+        type="tel"
+        id="phone"
+        placeholder="WhatsApp / Phone Number"
+        autocomplete="tel"
+        required
+      />
+
+      <input
+        type="number"
+        id="people"
+        placeholder="Number of People"
+        min="1"
+        required
+      />
+
+      <label class="form-field-label" for="date">
+        Preferred Travel Date
+      </label>
+
       <input type="date" id="date" required />
 
       <input type="text" id="selectedPackage" readonly />
@@ -122,45 +142,46 @@
       <div id="quickActivitiesAnchor"></div>
 
       <div id="vehicleSelectionBox" class="vehicle-selection-box">
-        <h4>Vehicle for This Package</h4>
+        <h4>Preferred Vehicle</h4>
+
         <p>
-          Select a vehicle only when this package includes transport options.
+          Select your preferred vehicle when transport is part of the package.
+          Availability will be confirmed on WhatsApp.
         </p>
 
         <div id="vehicleOptionsList" class="vehicle-options-list">
           <div class="vehicle-empty">
-            Vehicle options will appear only for packages that require transport.
+            Vehicle options will appear only for packages that include transport.
           </div>
         </div>
+
+        <div
+          id="selectedQuickVehicleDetails"
+          class="selected-vehicle-details"
+          style="display:none;"
+        ></div>
       </div>
 
-      <input type="hidden" id="selectedVehicleName" />
-      <input type="hidden" id="selectedVehiclePrice" />
-      <input type="hidden" id="selectedVehicleCapacity" />
-      <input type="hidden" id="selectedVehicleImageUrl" />
-
-      <div class="booking-total-box">
-        <span>Estimated Total</span>
-        <strong id="bookingEstimatedTotal">Custom Quote</strong>
-        <small>
-          Optional activities and package vehicle choices can change the final total.
-          Final confirmation is done after admin validates your payment proof.
-        </small>
-      </div>
-
-      <label class="upload-label" for="paymentProof">
-        Upload Payment Proof
+      <label class="form-field-label" for="specialRequests">
+        Special Requests
       </label>
 
-      <input
-        type="file"
-        id="paymentProof"
-        accept="image/*,.pdf"
-        required
-      />
+      <textarea
+        id="specialRequests"
+        rows="5"
+        placeholder="Hotel, airport transfer, children, accessibility, dietary needs or anything else we should know..."
+      ></textarea>
 
-      <button type="submit" class="btn">
-        Submit Booking for Validation
+      <div class="whatsapp-booking-note">
+        <strong>No online payment is required.</strong>
+        <span>
+          Our team will discuss availability, itinerary, quotation, payment
+          instructions and final confirmation with you directly on WhatsApp.
+        </span>
+      </div>
+
+      <button type="submit" class="btn full-width-btn">
+        Continue on WhatsApp
       </button>
     </form>
   </div>
@@ -176,8 +197,9 @@
 
 <a
   class="whatsapp-float"
-  href="https://wa.me/23059066404?text=Hi%2C%20I%20want%20to%20book%20a%20tour%20in%20Mauritius%20%F0%9F%87%B2%F0%9F%87%BA"
+  href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package."
   target="_blank"
+  rel="noopener noreferrer"
 >
   WhatsApp
 </a>
@@ -188,5 +210,6 @@
 
 <script src="js/main.js"></script>
 <script type="module" src="js/booking.js"></script>
+
 </body>
 </html>
