@@ -161,6 +161,81 @@ function injectVehicleStyles() {
       margin-top: 10px;
     }
 
+    .activity-selection-box {
+      margin-bottom: 18px;
+    }
+
+    .activity-options-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .activity-option-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .activity-option-card:hover {
+      border-color: var(--gold);
+      background: #fffdf5;
+    }
+
+    .activity-option-card input {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      accent-color: var(--gold);
+    }
+
+    .activity-option-card span {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .activity-option-card strong {
+      color: var(--darkblue);
+      line-height: 1.3;
+    }
+
+    .activity-option-card small {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .activity-contact-note {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 16px;
+      padding: 15px;
+      border-left: 4px solid var(--gold);
+      border-radius: 14px;
+      background: #f8fafc;
+      color: var(--muted);
+      line-height: 1.5;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+
+    .activity-contact-note:hover {
+      transform: translateY(-1px);
+      background: #fffdf5;
+    }
+
+    .activity-contact-note strong {
+      color: var(--darkblue);
+    }
+
     .selected-vehicle-details {
       margin-top: 18px;
       padding: 18px;
@@ -345,15 +420,8 @@ function getSelectedActivities() {
   const checked = document.querySelectorAll(".activity-checkbox:checked");
 
   return Array.from(checked).map((input) => ({
-    name: input.dataset.name || "",
-    price: Number(input.dataset.price || 0)
+    name: input.dataset.name || ""
   }));
-}
-
-function getSelectedActivitiesTotal() {
-  return getSelectedActivities().reduce((sum, activity) => {
-    return sum + Number(activity.price || 0);
-  }, 0);
 }
 
 function updateEstimatedTotal() {
@@ -367,13 +435,10 @@ function updateEstimatedTotal() {
       ? Number(selectedVehicle?.price || 0)
       : 0;
 
-  const activitiesTotal = getSelectedActivitiesTotal();
-
   let totalPerPerson = 0;
 
   if (basePrice > 0) totalPerPerson += basePrice;
   if (vehiclePrice > 0) totalPerPerson += vehiclePrice;
-  if (activitiesTotal > 0) totalPerPerson += activitiesTotal;
 
   const total = totalPerPerson > 0 ? totalPerPerson * safePeople : 0;
   const totalText = total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
@@ -447,7 +512,13 @@ function renderActivities(activities) {
     return;
   }
 
-  const validActivities = activities.filter((activity) => activity && activity.name);
+  const validActivities = activities.filter((activity) => {
+    if (typeof activity === "string") {
+      return activity.trim() !== "";
+    }
+
+    return activity && String(activity.name || "").trim() !== "";
+  });
 
   if (validActivities.length === 0) {
     updateEstimatedTotal();
@@ -456,17 +527,22 @@ function renderActivities(activities) {
 
   const box = document.createElement("div");
   box.id = "packageActivitiesBox";
-  box.className = "vehicle-selection-box";
+  box.className = "vehicle-selection-box activity-selection-box";
 
   box.innerHTML = `
-    <h4>Choose Activities</h4>
-    <p>Select only the activities you want. The total price will update automatically.</p>
+    <h4>Optional Activities</h4>
+    <p>
+      Select the activities you are interested in. Prices are provided personally
+      according to availability, travel date and group size.
+    </p>
 
     <div class="activity-options-list">
       ${validActivities
         .map((activity) => {
-          const name = activity.name || "";
-          const price = Number(activity.price || 0);
+          const name =
+            typeof activity === "string"
+              ? activity.trim()
+              : String(activity.name || "").trim();
 
           return `
             <label class="activity-option-card">
@@ -474,23 +550,39 @@ function renderActivities(activities) {
                 type="checkbox"
                 class="activity-checkbox"
                 data-name="${escapeHtml(name)}"
-                data-price="${price}"
               />
+
               <span>
                 <strong>${escapeHtml(name)}</strong>
-                <small>${price > 0 ? `+ € ${price.toLocaleString()} per person` : "Included / Free"}</small>
+                <small>Select if interested</small>
               </span>
             </label>
           `;
         })
         .join("")}
     </div>
+
+    <a
+      href="#"
+      id="activitiesWhatsappBtn"
+      class="activity-contact-note"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <strong>Need prices or more details?</strong>
+      <span>
+        Contact us on WhatsApp for activity information and a personalised quotation.
+      </span>
+    </a>
   `;
 
+  const activitiesAnchor = document.getElementById("packageActivitiesAnchor");
   const vehicleSection = document.getElementById("packageVehicleSection");
   const totalBox = packageBookingForm.querySelector(".booking-total-box");
 
-  if (vehicleSection) {
+  if (activitiesAnchor) {
+    activitiesAnchor.insertAdjacentElement("afterend", box);
+  } else if (vehicleSection) {
     packageBookingForm.insertBefore(box, vehicleSection);
   } else if (totalBox) {
     packageBookingForm.insertBefore(box, totalBox);
@@ -498,10 +590,37 @@ function renderActivities(activities) {
     packageBookingForm.appendChild(box);
   }
 
+  const updateActivitiesWhatsAppLink = () => {
+    const selectedNames = getSelectedActivities()
+      .map((activity) => activity.name)
+      .filter(Boolean);
+
+    const packageName = currentPackage?.title || "Mauritius package";
+
+    const activityText =
+      selectedNames.length > 0
+        ? selectedNames.map((name) => `- ${name}`).join("\n")
+        : "I would like more information about the optional activities.";
+
+    const message = encodeURIComponent(
+      `Hi, I would like prices and more details about optional activities for ${packageName}.\n\n${activityText}`
+    );
+
+    const whatsappBtn = document.getElementById("activitiesWhatsappBtn");
+
+    if (whatsappBtn) {
+      whatsappBtn.href = `https://wa.me/23059066404?text=${message}`;
+    }
+  };
+
   document.querySelectorAll(".activity-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", updateEstimatedTotal);
+    checkbox.addEventListener("change", () => {
+      updateActivitiesWhatsAppLink();
+      updateEstimatedTotal();
+    });
   });
 
+  updateActivitiesWhatsAppLink();
   updateEstimatedTotal();
 }
 
@@ -845,11 +964,11 @@ if (packageBookingForm) {
           : 0;
 
       const selectedActivities = getSelectedActivities();
-      const activitiesTotal = getSelectedActivitiesTotal();
+      const activitiesTotal = 0;
 
       const pricePerPerson =
-        basePrice + vehiclePrice + activitiesTotal > 0
-          ? basePrice + vehiclePrice + activitiesTotal
+        basePrice + vehiclePrice > 0
+          ? basePrice + vehiclePrice
           : 0;
 
       const totalPrice =
@@ -889,6 +1008,7 @@ if (packageBookingForm) {
 
         selectedActivities,
         activitiesTotal,
+        activitiesPricingStatus: "Contact via WhatsApp for quotation",
 
         basePackagePrice: basePrice,
         pricePerPerson,
