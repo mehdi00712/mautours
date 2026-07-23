@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Mautour Holidays | Package Details</title>
 
   <meta
     name="description"
-    content="View full package details, photos, inclusions, optional activities and book Mauritius private tours directly."
+    content="Explore Mauritius tour package details, activities and vehicle options, then contact Mautour Holidays directly on WhatsApp."
   />
 
   <link rel="stylesheet" href="css/style.css" />
@@ -22,12 +22,11 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="register.html">Register</a>
-      <a href="login.html">Sign In</a>
-      <a href="my-bookings.html">My Bookings</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#contact">Contact</a>
     </nav>
 
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
       <span></span>
       <span></span>
       <span></span>
@@ -51,10 +50,14 @@
 
     <div id="packageLoading" class="loading-card">
       <h3>Loading Package...</h3>
-      <p>Please wait while we load package details.</p>
+      <p>Please wait while we load the package details.</p>
     </div>
 
-    <div id="packageDetailsContent" class="package-details-content" style="display:none;">
+    <div
+      id="packageDetailsContent"
+      class="package-details-content"
+      style="display:none;"
+    >
 
       <div class="package-main-column">
 
@@ -62,7 +65,7 @@
           <img
             id="mainPackageImage"
             src="assets/ile.jpg"
-            alt="Package"
+            alt="Mauritius tour package"
             class="package-main-image"
           />
 
@@ -71,39 +74,47 @@
           </div>
         </div>
 
-        <div id="packageThumbnailGrid" class="package-thumbnail-grid"></div>
+        <div
+          id="packageThumbnailGrid"
+          class="package-thumbnail-grid"
+        ></div>
 
         <div class="package-overview-card">
           <span id="packageCategory" class="section-label">Package</span>
 
-          <h1 id="packageTitle">Luxury Mauritius Package</h1>
+          <h1 id="packageTitle">Mauritius Holiday Package</h1>
 
-          <p id="packageDescription" class="package-details-description"></p>
+          <p
+            id="packageDescription"
+            class="package-details-description"
+          ></p>
 
           <div class="package-highlights">
+
             <div class="highlight-box">
               🕒
               <strong>Duration</strong>
-              <span id="packageDuration">-</span>
+              <span id="packageDuration">To be confirmed</span>
             </div>
 
             <div class="highlight-box">
-              💰
-              <strong>Base Price</strong>
-              <span id="packagePrice">Custom Quote</span>
+              💬
+              <strong>Quotation</strong>
+              <span>Contact us on WhatsApp</span>
             </div>
 
             <div class="highlight-box">
               🚘
               <strong>Vehicle</strong>
-              <span id="packageVehicleRequirement">Only if package requires</span>
+              <span id="packageVehicleRequirement">Based on package</span>
             </div>
 
             <div class="highlight-box">
               ✅
               <strong>Activities</strong>
-              <span>Customizable</span>
+              <span>Customisable</span>
             </div>
+
           </div>
         </div>
 
@@ -122,29 +133,71 @@
       <div class="package-booking-column">
         <div class="booking-side-card">
 
-          <div class="side-price">
-            <small>Estimated Total</small>
-            <h2 id="sidePackagePrice">Custom Quote</h2>
+          <div class="whatsapp-enquiry-heading">
+            <small>Personalised Travel Planning</small>
+            <h2>Continue on WhatsApp</h2>
+            <p>
+              Complete the details below. Your package request will open directly
+              in WhatsApp so our team can prepare your quotation and confirm your booking.
+            </p>
           </div>
 
           <form id="packageBookingForm" class="package-booking-form">
 
-            <input type="text" id="name" placeholder="Full Name" required />
-            <input type="email" id="email" placeholder="Email Address" required />
-            <input type="text" id="phone" placeholder="WhatsApp / Phone Number" required />
-            <input type="number" id="people" placeholder="Number of People" min="1" required />
+            <input
+              type="text"
+              id="name"
+              placeholder="Full Name"
+              autocomplete="name"
+              required
+            />
+
+            <input
+              type="email"
+              id="email"
+              placeholder="Email Address"
+              autocomplete="email"
+              required
+            />
+
+            <input
+              type="tel"
+              id="phone"
+              placeholder="WhatsApp / Phone Number"
+              autocomplete="tel"
+              required
+            />
+
+            <input
+              type="number"
+              id="people"
+              placeholder="Number of People"
+              min="1"
+              required
+            />
+
+            <label class="form-field-label" for="date">
+              Preferred Travel Date
+            </label>
+
             <input type="date" id="date" required />
 
             <div id="packageActivitiesAnchor"></div>
 
-            <div id="packageVehicleSection" class="vehicle-selection-box">
-              <h4 id="vehicleSectionTitle">Vehicle for This Package</h4>
+            <div
+              id="packageVehicleSection"
+              class="vehicle-selection-box"
+            >
+              <h4 id="vehicleSectionTitle">Preferred Vehicle</h4>
 
               <p id="vehicleSectionText">
-                Select your preferred vehicle only if this package includes transport options.
+                Select the vehicle you prefer. Final availability will be confirmed on WhatsApp.
               </p>
 
-              <div id="packageVehiclesGrid" class="vehicle-options-list">
+              <div
+                id="packageVehiclesGrid"
+                class="vehicle-options-list"
+              >
                 <div class="vehicle-empty">
                   Loading vehicles...
                 </div>
@@ -153,32 +206,35 @@
               <div
                 id="selectedVehicleDetails"
                 class="selected-vehicle-details"
-                style="display:none;">
-              </div>
+                style="display:none;"
+              ></div>
             </div>
 
-            <div class="booking-total-box">
-              <span>Total Estimate</span>
-              <strong id="bookingEstimatedTotal">Custom Quote</strong>
-              <small>
-                Final confirmation will be reviewed by admin. Optional activities and package vehicle choices may affect the final price.
-                Transfer to this account number: 000.
-              </small>
-            </div>
-
-            <label class="upload-label" for="paymentProof">
-              Upload Payment Proof
+            <label class="form-field-label" for="specialRequests">
+              Special Requests
             </label>
 
-            <input type="file" id="paymentProof" accept="image/*,.pdf" required />
+            <textarea
+              id="specialRequests"
+              rows="5"
+              placeholder="Hotel, airport transfer, children, accessibility, dietary needs or anything else we should know..."
+            ></textarea>
 
-            <button type="submit" class="btn full-width-btn">
-              Submit Booking
+            <div class="whatsapp-booking-note">
+              <strong>No online payment is required.</strong>
+              <span>
+                Our team will discuss the itinerary, quotation, availability,
+                payment instructions and final confirmation with you on WhatsApp.
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              id="continueWhatsappBtn"
+              class="btn full-width-btn"
+            >
+              Continue on WhatsApp
             </button>
-
-            <a id="packageWhatsappBtn" href="#" target="_blank" class="btn-outline full-width-btn">
-              Ask on WhatsApp
-            </a>
 
           </form>
 
@@ -203,6 +259,7 @@
   class="whatsapp-float"
   href="https://wa.me/23059066404"
   target="_blank"
+  rel="noopener noreferrer"
 >
   WhatsApp
 </a>
