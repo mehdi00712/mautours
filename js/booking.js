@@ -1,33 +1,20 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getFirestore,
   collection,
-  doc,
-  setDoc,
-  getDocs,
-  serverTimestamp
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
 
-let currentUser = null;
+const WHATSAPP_NUMBER = "23059066404";
+
 let selectedTrip = null;
 let selectedVehicle = null;
 let allVehicles = [];
@@ -38,22 +25,278 @@ const closeModal = document.getElementById("closeModal");
 const bookingForm = document.getElementById("bookingForm");
 const selectedPackageInput = document.getElementById("selectedPackage");
 const vehicleOptionsList = document.getElementById("vehicleOptionsList");
-const bookingEstimatedTotal = document.getElementById("bookingEstimatedTotal");
 const vehicleSelectionBox = document.getElementById("vehicleSelectionBox");
+const selectedQuickVehicleDetails = document.getElementById(
+  "selectedQuickVehicleDetails"
+);
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
 const popupMessage = document.getElementById("popupMessage");
 const popupBtn = document.getElementById("popupBtn");
 
-onAuthStateChanged(auth, (user) => {
-  currentUser = user;
-});
+function injectBookingStyles() {
+  if (document.getElementById("bookingWhatsappStyles")) return;
 
-function showPopup(title, message, redirect = null) {
+  const style = document.createElement("style");
+  style.id = "bookingWhatsappStyles";
+
+  style.textContent = `
+    .package-card-quotation {
+      display: block;
+      margin-top: 14px;
+      color: var(--gold, #c9a227);
+      font-weight: 900;
+      font-size: 1.02rem;
+    }
+
+    .whatsapp-enquiry-heading {
+      margin-bottom: 22px;
+    }
+
+    .whatsapp-enquiry-heading small {
+      display: block;
+      color: var(--gold, #c9a227);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 7px;
+    }
+
+    .whatsapp-enquiry-heading h3 {
+      color: var(--darkblue, #071827);
+      margin-bottom: 9px;
+    }
+
+    .whatsapp-enquiry-heading p {
+      color: var(--muted, #6b7280);
+      line-height: 1.6;
+    }
+
+    .form-field-label {
+      display: block;
+      margin: 4px 0 -4px;
+      color: var(--darkblue, #071827);
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+
+    #bookingForm textarea {
+      width: 100%;
+      resize: vertical;
+      min-height: 120px;
+      font: inherit;
+    }
+
+    .activity-options-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .activity-option-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      background: #fff;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .activity-option-card:hover {
+      border-color: var(--gold, #c9a227);
+      background: #fffdf5;
+    }
+
+    .activity-option-card input {
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      accent-color: var(--gold, #c9a227);
+    }
+
+    .activity-option-card span {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .activity-option-card strong {
+      color: var(--darkblue, #071827);
+    }
+
+    .activity-option-card small {
+      color: var(--muted, #6b7280);
+    }
+
+    .vehicle-options-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .vehicle-option-card {
+      width: 100%;
+      overflow: hidden;
+      padding: 0;
+      border: 2px solid #e5e7eb;
+      border-radius: 18px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.22s ease;
+    }
+
+    .vehicle-option-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold, #c9a227);
+      box-shadow: 0 12px 28px rgba(7, 24, 39, 0.1);
+    }
+
+    .vehicle-option-card.selected {
+      border-color: var(--gold, #c9a227);
+      background: #fffdf5;
+      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.16);
+    }
+
+    .vehicle-option-card img,
+    .vehicle-placeholder {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--sand, #f4efe4);
+      font-size: 2.5rem;
+    }
+
+    .vehicle-option-info {
+      padding: 15px;
+    }
+
+    .vehicle-option-info strong {
+      display: block;
+      color: var(--darkblue, #071827);
+      font-size: 1.05rem;
+      margin-bottom: 5px;
+    }
+
+    .vehicle-option-info span {
+      display: block;
+      color: var(--gold, #c9a227);
+      font-weight: 800;
+      margin-bottom: 7px;
+    }
+
+    .vehicle-option-info small {
+      display: block;
+      color: var(--muted, #6b7280);
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    .selected-vehicle-details {
+      margin-top: 16px;
+      padding: 16px;
+      border: 2px solid var(--gold, #c9a227);
+      border-radius: 17px;
+      background: #fffdf5;
+    }
+
+    .selected-vehicle-card {
+      display: grid;
+      grid-template-columns: 115px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .selected-vehicle-card img,
+    .selected-vehicle-placeholder {
+      width: 115px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--sand, #f4efe4);
+      font-size: 2rem;
+    }
+
+    .selected-vehicle-card strong {
+      display: block;
+      color: var(--darkblue, #071827);
+      margin-bottom: 5px;
+    }
+
+    .selected-vehicle-card p,
+    .selected-vehicle-card small {
+      color: var(--muted, #6b7280);
+      line-height: 1.5;
+      margin: 3px 0;
+    }
+
+    .whatsapp-booking-note {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 16px;
+      border-left: 4px solid #25d366;
+      border-radius: 14px;
+      background: #f0fdf4;
+      color: #4b5563;
+      line-height: 1.55;
+    }
+
+    .whatsapp-booking-note strong {
+      color: #166534;
+    }
+
+    #bookingForm button[type="submit"] {
+      width: 100%;
+      background: #25d366;
+      border-color: #25d366;
+    }
+
+    #bookingForm button[type="submit"]:hover {
+      background: #1fb85a;
+      border-color: #1fb85a;
+    }
+
+    @media (max-width: 768px) {
+      .vehicle-options-list {
+        grid-template-columns: 1fr;
+      }
+
+      .vehicle-option-card img,
+      .vehicle-placeholder {
+        height: 205px;
+      }
+
+      .selected-vehicle-card {
+        grid-template-columns: 1fr;
+      }
+
+      .selected-vehicle-card img,
+      .selected-vehicle-placeholder {
+        width: 100%;
+        height: 205px;
+      }
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function showPopup(title, message) {
   if (!popup || !popupTitle || !popupMessage || !popupBtn) {
     alert(`${title}\n\n${message}`);
-    if (redirect) window.location.href = redirect;
     return;
   }
 
@@ -63,7 +306,6 @@ function showPopup(title, message, redirect = null) {
 
   popupBtn.onclick = () => {
     popup.classList.remove("show");
-    if (redirect) window.location.href = redirect;
   };
 }
 
@@ -76,13 +318,13 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function formatPrice(trip) {
-  const price = Number(trip.price || 0);
-
-  if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
-  if (trip.priceType === "Fixed") return `€ ${price.toLocaleString()}`;
-
-  return `${trip.priceType || "Starting From"} € ${price.toLocaleString()}`;
+function normalizeBool(value) {
+  return (
+    value === true ||
+    value === "true" ||
+    value === 1 ||
+    value === "1"
+  );
 }
 
 function formatIncludes(includes) {
@@ -95,44 +337,21 @@ function formatIncludes(includes) {
 }
 
 function getTripTime(trip) {
-  if (trip.createdAt && typeof trip.createdAt.toMillis === "function") {
+  if (
+    trip.createdAt &&
+    typeof trip.createdAt.toMillis === "function"
+  ) {
     return trip.createdAt.toMillis();
   }
 
-  if (trip.updatedAt && typeof trip.updatedAt.toMillis === "function") {
+  if (
+    trip.updatedAt &&
+    typeof trip.updatedAt.toMillis === "function"
+  ) {
     return trip.updatedAt.toMillis();
   }
 
   return 0;
-}
-
-function getDurationDays(durationText) {
-  const text = String(durationText || "").toLowerCase();
-
-  if (text.includes("half")) return 1;
-  if (text.includes("full")) return 1;
-
-  const match = text.match(/\d+/);
-  if (!match) return 1;
-
-  return Math.max(Number(match[0]), 1);
-}
-
-function addDaysToDate(dateString, daysToAdd) {
-  const date = new Date(`${dateString}T00:00:00`);
-  date.setDate(date.getDate() + daysToAdd);
-  return date.toISOString().split("T")[0];
-}
-
-function getBookingDates(startDate, durationText) {
-  const totalDays = getDurationDays(durationText);
-  const dates = [];
-
-  for (let i = 0; i < totalDays; i++) {
-    dates.push(addDaysToDate(startDate, i));
-  }
-
-  return dates;
 }
 
 function lockBodyScroll() {
@@ -144,69 +363,38 @@ function unlockBodyScroll() {
 }
 
 function closeBookingModal() {
-  if (modal) modal.classList.remove("show");
+  if (modal) {
+    modal.classList.remove("show");
+  }
+
   unlockBodyScroll();
 }
 
-function getPeopleCount() {
-  const people = Number(document.getElementById("people")?.value || 1);
-  return people > 0 ? people : 1;
+function setMinimumTravelDate() {
+  const dateInput = document.getElementById("date");
+  if (!dateInput) return;
+
+  const now = new Date();
+
+  const localDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000
+  )
+    .toISOString()
+    .split("T")[0];
+
+  dateInput.min = localDate;
 }
 
 function packageRequiresVehicle() {
-  return selectedTrip?.requiresVehicle === true;
+  return normalizeBool(selectedTrip?.requiresVehicle);
 }
 
 function getSelectedActivities() {
-  const checked = document.querySelectorAll(".quick-activity-checkbox:checked");
-
-  return Array.from(checked).map((input) => ({
-    name: input.dataset.name || "",
-    price: Number(input.dataset.price || 0)
-  }));
-}
-
-function getSelectedActivitiesTotal() {
-  return getSelectedActivities().reduce((sum, activity) => {
-    return sum + Number(activity.price || 0);
-  }, 0);
-}
-
-function updateEstimatedTotal() {
-  if (!bookingEstimatedTotal) return;
-
-  const people = getPeopleCount();
-  const basePrice = Number(selectedTrip?.price || 0);
-
-  const vehiclePrice =
-    packageRequiresVehicle()
-      ? Number(selectedVehicle?.price || 0)
-      : 0;
-
-  const activitiesTotal = getSelectedActivitiesTotal();
-
-  let pricePerPerson = 0;
-
-  if (basePrice > 0) pricePerPerson += basePrice;
-  if (vehiclePrice > 0) pricePerPerson += vehiclePrice;
-  if (activitiesTotal > 0) pricePerPerson += activitiesTotal;
-
-  const total = pricePerPerson > 0 ? pricePerPerson * people : 0;
-
-  bookingEstimatedTotal.textContent =
-    total > 0 ? `€ ${total.toLocaleString()}` : "Custom Quote";
-}
-
-function setSelectedVehicle(vehicle, card = null) {
-  selectedVehicle = vehicle;
-
-  document.querySelectorAll(".vehicle-option-card").forEach((item) => {
-    item.classList.remove("selected");
-  });
-
-  if (card) card.classList.add("selected");
-
-  updateEstimatedTotal();
+  return Array.from(
+    document.querySelectorAll(".quick-activity-checkbox:checked")
+  )
+    .map((input) => input.dataset.name || "")
+    .filter(Boolean);
 }
 
 function renderActivityOptions() {
@@ -219,58 +407,113 @@ function renderActivityOptions() {
     ? selectedTrip.activities
     : [];
 
-  if (activities.length === 0) {
-    updateEstimatedTotal();
-    return;
-  }
+  const activityNames = activities
+    .map((activity) => {
+      if (typeof activity === "string") {
+        return activity.trim();
+      }
+
+      return String(activity?.name || "").trim();
+    })
+    .filter(Boolean);
+
+  if (activityNames.length === 0) return;
 
   const box = document.createElement("div");
   box.id = "quickActivitiesBox";
   box.className = "vehicle-selection-box";
 
   box.innerHTML = `
-    <h4>Choose Activities</h4>
-    <p>Select only the activities you want. The total updates automatically.</p>
+    <h4>Optional Activities</h4>
+
+    <p>
+      Select the activities you are interested in. Availability and details
+      will be confirmed on WhatsApp.
+    </p>
 
     <div class="activity-options-list">
-      ${activities
-        .filter((activity) => activity && activity.name)
-        .map((activity) => {
-          const name = activity.name || "";
-          const price = Number(activity.price || 0);
-
-          return `
+      ${activityNames
+        .map(
+          (name) => `
             <label class="activity-option-card">
               <input
                 type="checkbox"
                 class="quick-activity-checkbox"
                 data-name="${escapeHtml(name)}"
-                data-price="${price}"
-              />
+              >
+
               <span>
                 <strong>${escapeHtml(name)}</strong>
-                <small>${price > 0 ? `+ € ${price.toLocaleString()} per person` : "Included / Free"}</small>
+                <small>Select if interested</small>
               </span>
             </label>
-          `;
-        })
+          `
+        )
         .join("")}
     </div>
   `;
 
-  if (vehicleSelectionBox) {
+  const anchor = document.getElementById(
+    "quickActivitiesAnchor"
+  );
+
+  if (anchor) {
+    anchor.insertAdjacentElement("afterend", box);
+  } else if (vehicleSelectionBox) {
     bookingForm.insertBefore(box, vehicleSelectionBox);
-  } else if (bookingEstimatedTotal) {
-    bookingForm.insertBefore(box, bookingEstimatedTotal.parentElement);
   } else {
     bookingForm.appendChild(box);
   }
+}
 
-  document.querySelectorAll(".quick-activity-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", updateEstimatedTotal);
+function setSelectedVehicle(vehicle, card = null) {
+  selectedVehicle = vehicle;
+
+  document.querySelectorAll(".vehicle-option-card").forEach((item) => {
+    item.classList.remove("selected");
   });
 
-  updateEstimatedTotal();
+  if (card) {
+    card.classList.add("selected");
+  }
+
+  if (!selectedQuickVehicleDetails) return;
+
+  const capacity = Number(vehicle.capacity || 0);
+
+  selectedQuickVehicleDetails.style.display = "block";
+  selectedQuickVehicleDetails.innerHTML = `
+    <div class="selected-vehicle-card">
+      ${
+        vehicle.imageUrl
+          ? `
+            <img
+              src="${escapeHtml(vehicle.imageUrl)}"
+              alt="${escapeHtml(vehicle.name || "Vehicle")}"
+            >
+          `
+          : `<div class="selected-vehicle-placeholder">🚘</div>`
+      }
+
+      <div>
+        <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+
+        <p>${escapeHtml(vehicle.category || "Vehicle")}</p>
+
+        ${
+          capacity > 0
+            ? `<p>Up to ${capacity} passengers</p>`
+            : ""
+        }
+
+        ${
+          vehicle.description
+            ? `<small>${escapeHtml(vehicle.description)}</small>`
+            : ""
+        }
+      </div>
+    </div>
+  `;
 }
 
 function renderVehicleOptions() {
@@ -278,13 +521,17 @@ function renderVehicleOptions() {
 
   selectedVehicle = null;
 
+  if (selectedQuickVehicleDetails) {
+    selectedQuickVehicleDetails.style.display = "none";
+    selectedQuickVehicleDetails.innerHTML = "";
+  }
+
   if (!packageRequiresVehicle()) {
     if (vehicleSelectionBox) {
       vehicleSelectionBox.style.display = "none";
     }
 
     vehicleOptionsList.innerHTML = "";
-    updateEstimatedTotal();
     return;
   }
 
@@ -292,22 +539,24 @@ function renderVehicleOptions() {
     vehicleSelectionBox.style.display = "block";
   }
 
-  const visibleVehicles = allVehicles.filter((vehicle) => vehicle.active !== false);
+  const visibleVehicles = allVehicles.filter(
+    (vehicle) => vehicle.active !== false
+  );
 
   if (visibleVehicles.length === 0) {
     vehicleOptionsList.innerHTML = `
       <div class="vehicle-empty">
-        No vehicles available yet. Please contact us before booking.
+        No vehicle options are currently listed.
+        Please continue on WhatsApp and our team will assist you.
       </div>
     `;
-    updateEstimatedTotal();
+
     return;
   }
 
   vehicleOptionsList.innerHTML = "";
 
-  visibleVehicles.forEach((vehicle, index) => {
-    const price = Number(vehicle.price || 0);
+  visibleVehicles.forEach((vehicle) => {
     const capacity = Number(vehicle.capacity || 0);
 
     const card = document.createElement("button");
@@ -317,16 +566,31 @@ function renderVehicleOptions() {
     card.innerHTML = `
       ${
         vehicle.imageUrl
-          ? `<img src="${escapeHtml(vehicle.imageUrl)}" alt="${escapeHtml(vehicle.name)}">`
+          ? `
+            <img
+              src="${escapeHtml(vehicle.imageUrl)}"
+              alt="${escapeHtml(vehicle.name || "Vehicle")}"
+            >
+          `
           : `<div class="vehicle-placeholder">🚘</div>`
       }
 
       <div class="vehicle-option-info">
         <strong>${escapeHtml(vehicle.name || "Vehicle")}</strong>
+
         <span>${escapeHtml(vehicle.category || "Vehicle")}</span>
-        ${capacity > 0 ? `<small>${capacity} passengers</small>` : ""}
-        ${vehicle.description ? `<small>${escapeHtml(vehicle.description)}</small>` : ""}
-        <b>${price > 0 ? `€ ${price.toLocaleString()}` : "Custom Quote"}</b>
+
+        ${
+          capacity > 0
+            ? `<small>Up to ${capacity} passengers</small>`
+            : ""
+        }
+
+        ${
+          vehicle.description
+            ? `<small>${escapeHtml(vehicle.description)}</small>`
+            : ""
+        }
       </div>
     `;
 
@@ -335,10 +599,6 @@ function renderVehicleOptions() {
     });
 
     vehicleOptionsList.appendChild(card);
-
-    if (index === 0) {
-      setSelectedVehicle(vehicle, card);
-    }
   });
 }
 
@@ -381,7 +641,7 @@ async function loadTrips() {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
           <h3>No Packages Available</h3>
-          <p>The admin has not added any packages yet.</p>
+          <p>No packages have been added yet.</p>
         </div>
       `;
       return;
@@ -396,9 +656,11 @@ async function loadTrips() {
 
       trips.push({
         id: docSnap.id,
-        requiresVehicle: trip.requiresVehicle === true,
-        activities: Array.isArray(trip.activities) ? trip.activities : [],
-        ...trip
+        ...trip,
+        requiresVehicle: normalizeBool(trip.requiresVehicle),
+        activities: Array.isArray(trip.activities)
+          ? trip.activities
+          : []
       });
     });
 
@@ -408,7 +670,7 @@ async function loadTrips() {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
           <h3>No Active Packages</h3>
-          <p>No packages are currently visible to customers.</p>
+          <p>No packages are currently available.</p>
         </div>
       `;
       return;
@@ -417,23 +679,52 @@ async function loadTrips() {
     dynamicTrips.innerHTML = "";
 
     trips.forEach((trip) => {
-      const title = escapeHtml(trip.title || "Untitled Package");
-      const category = escapeHtml(trip.category || "Package");
-      const description = escapeHtml(trip.description || "");
-      const duration = escapeHtml(trip.duration || "");
-      const imageUrl = escapeHtml(trip.imageUrl || "assets/ile.jpg");
+      const title = escapeHtml(
+        trip.title || "Mauritius Holiday Package"
+      );
+      const category = escapeHtml(
+        trip.category || "Package"
+      );
+      const description = escapeHtml(
+        trip.description || ""
+      );
+      const duration = escapeHtml(
+        trip.duration || ""
+      );
+      const imageUrl = escapeHtml(
+        trip.imageUrl || "assets/ile.jpg"
+      );
       const includes = formatIncludes(trip.includes);
-      const priceText = escapeHtml(formatPrice(trip));
-      const galleryCount = Array.isArray(trip.galleryImages) ? trip.galleryImages.length : 0;
-      const activitiesCount = Array.isArray(trip.activities) ? trip.activities.length : 0;
 
-      const vehicleBadge = trip.requiresVehicle === true
-        ? `<p><strong>Vehicle:</strong> Required</p>`
+      const galleryCount = Array.isArray(trip.galleryImages)
+        ? trip.galleryImages.filter(Boolean).length
+        : 0;
+
+      const activitiesCount = Array.isArray(trip.activities)
+        ? trip.activities.filter((activity) => {
+            if (typeof activity === "string") {
+              return activity.trim() !== "";
+            }
+
+            return Boolean(
+              String(activity?.name || "").trim()
+            );
+          }).length
+        : 0;
+
+      const vehicleBadge = trip.requiresVehicle
+        ? `<p><strong>Vehicle:</strong> Selection available</p>`
         : `<p><strong>Vehicle:</strong> Not required</p>`;
 
-      const activitiesBadge = activitiesCount > 0
-        ? `<p><strong>Optional Activities:</strong> ${activitiesCount} available</p>`
-        : "";
+      const activitiesBadge =
+        activitiesCount > 0
+          ? `
+            <p>
+              <strong>Optional Activities:</strong>
+              ${activitiesCount} available
+            </p>
+          `
+          : "";
 
       const card = document.createElement("div");
       card.className = "booking-card package-premium";
@@ -445,14 +736,35 @@ async function loadTrips() {
         <h3>${title}</h3>
         <p>${description}</p>
 
-        ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ""}
+        ${
+          duration
+            ? `<p><strong>Duration:</strong> ${duration}</p>`
+            : ""
+        }
+
         ${vehicleBadge}
         ${activitiesBadge}
-        ${galleryCount > 0 ? `<p><strong>Pictures:</strong> ${galleryCount + 1} photos</p>` : ""}
 
-        ${includes ? `<ul class="package-includes">${includes}</ul>` : ""}
+        ${
+          galleryCount > 0
+            ? `
+              <p>
+                <strong>Pictures:</strong>
+                ${galleryCount + 1} photos
+              </p>
+            `
+            : ""
+        }
 
-        <strong>${priceText}</strong>
+        ${
+          includes
+            ? `<ul class="package-includes">${includes}</ul>`
+            : ""
+        }
+
+        <span class="package-card-quotation">
+          Personalised quotation on WhatsApp
+        </span>
 
         <div class="package-card-actions">
           <a class="btn" href="package-details.html?id=${trip.id}">
@@ -460,16 +772,20 @@ async function loadTrips() {
           </a>
 
           <button class="btn-outline book-btn" data-id="${trip.id}">
-            Quick Book
+            Enquire on WhatsApp
           </button>
         </div>
       `;
 
       dynamicTrips.appendChild(card);
 
-      card.querySelector(".book-btn").addEventListener("click", () => {
-        openBookingModal(trip);
-      });
+      const enquireButton = card.querySelector(".book-btn");
+
+      if (enquireButton) {
+        enquireButton.addEventListener("click", () => {
+          openBookingModal(trip);
+        });
+      }
     });
   } catch (error) {
     console.error("Load Trips Error:", error);
@@ -477,37 +793,38 @@ async function loadTrips() {
     dynamicTrips.innerHTML = `
       <div class="loading-card">
         <h3>Could Not Load Packages</h3>
-        <p>${escapeHtml(error.message || "Please try again later.")}</p>
+        <p>${escapeHtml(
+          error.message || "Please try again later."
+        )}</p>
       </div>
     `;
   }
 }
 
 function openBookingModal(trip) {
-  if (!currentUser) {
-    showPopup(
-      "Login Required",
-      "Please sign in before making a booking.",
-      "login.html?redirect=booking.html"
-    );
-    return;
-  }
-
   selectedTrip = {
-    requiresVehicle: trip.requiresVehicle === true,
-    activities: Array.isArray(trip.activities) ? trip.activities : [],
-    ...trip
+    ...trip,
+    requiresVehicle: normalizeBool(trip.requiresVehicle),
+    activities: Array.isArray(trip.activities)
+      ? trip.activities
+      : []
   };
 
   selectedVehicle = null;
 
+  if (bookingForm) {
+    bookingForm.reset();
+  }
+
+  setMinimumTravelDate();
+
   if (selectedPackageInput) {
-    selectedPackageInput.value = trip.title || "";
+    selectedPackageInput.value =
+      selectedTrip.title || "Mauritius Holiday Package";
   }
 
   renderActivityOptions();
   renderVehicleOptions();
-  updateEstimatedTotal();
 
   if (modal) {
     modal.classList.add("show");
@@ -515,10 +832,72 @@ function openBookingModal(trip) {
   }
 }
 
-const peopleInput = document.getElementById("people");
+function buildWhatsAppMessage() {
+  const name =
+    document.getElementById("name")?.value.trim() || "";
+  const email =
+    document.getElementById("email")?.value.trim() || "";
+  const phone =
+    document.getElementById("phone")?.value.trim() || "";
+  const people = Number(
+    document.getElementById("people")?.value || 0
+  );
+  const date =
+    document.getElementById("date")?.value || "";
+  const specialRequests =
+    document.getElementById("specialRequests")?.value.trim() || "";
 
-if (peopleInput) {
-  peopleInput.addEventListener("input", updateEstimatedTotal);
+  const activities = getSelectedActivities();
+
+  const activitiesText =
+    activities.length > 0
+      ? activities.map((activity) => `• ${activity}`).join("\n")
+      : "• No optional activities selected";
+
+  const vehicleName =
+    selectedVehicle?.name || "To be discussed";
+  const vehicleCategory =
+    selectedVehicle?.category || "Not specified";
+
+  const requestText =
+    specialRequests || "No special requests provided";
+
+  const message = `
+Hello Mautour Holidays,
+
+I would like to enquire about and book the following Mauritius holiday package.
+
+*PACKAGE*
+${selectedTrip?.title || "Mauritius Holiday Package"}
+
+*DURATION*
+${selectedTrip?.duration || "To be confirmed"}
+
+*TRAVEL DETAILS*
+Preferred date: ${date}
+Number of people: ${people}
+
+*CUSTOMER DETAILS*
+Name: ${name}
+Email: ${email}
+WhatsApp / Phone: ${phone}
+
+*PREFERRED VEHICLE*
+${vehicleName}
+Category: ${vehicleCategory}
+
+*OPTIONAL ACTIVITIES*
+${activitiesText}
+
+*SPECIAL REQUESTS*
+${requestText}
+
+Please send me the full details, availability, personalised quotation, payment instructions and booking confirmation.
+
+Thank you.
+  `.trim();
+
+  return encodeURIComponent(message);
 }
 
 if (closeModal) {
@@ -526,58 +905,50 @@ if (closeModal) {
 }
 
 if (modal) {
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) {
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
       closeBookingModal();
     }
   });
 }
 
 if (bookingForm) {
-  bookingForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  bookingForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-    if (!currentUser) {
-      showPopup("Login Required", "Please sign in first.", "login.html?redirect=booking.html");
+    if (!selectedTrip) {
+      showPopup(
+        "No Package Selected",
+        "Please choose a package first."
+      );
       return;
     }
 
-    if (!selectedTrip || !selectedTrip.id) {
-      showPopup("No Package Selected", "Please select a package first.");
-      return;
-    }
+    const name =
+      document.getElementById("name")?.value.trim() || "";
+    const email =
+      document.getElementById("email")?.value.trim() || "";
+    const phone =
+      document.getElementById("phone")?.value.trim() || "";
+    const people = Number(
+      document.getElementById("people")?.value || 0
+    );
+    const date =
+      document.getElementById("date")?.value || "";
 
-    const submitBtn = bookingForm.querySelector("button[type='submit']");
-    const originalBtnText = submitBtn.textContent;
-
-    if (packageRequiresVehicle() && !selectedVehicle) {
-      showPopup("Vehicle Required", "Please choose a vehicle before submitting your booking.");
-      return;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const people = Number(document.getElementById("people").value);
-    const date = document.getElementById("date").value.trim();
-
-    const proofInput = document.getElementById("paymentProof");
-    const proofFile = proofInput && proofInput.files ? proofInput.files[0] : null;
-
-    if (!name || !email || !phone || !people || !date || !proofFile) {
-      showPopup("Incomplete Form", "Please fill in all fields and upload payment proof.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+    if (!name || !email || !phone || !people || !date) {
+      showPopup(
+        "Missing Information",
+        "Please complete your name, email, phone number, number of people and preferred travel date."
+      );
       return;
     }
 
     if (people < 1) {
-      showPopup("Invalid Number", "Please enter at least 1 person.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      showPopup(
+        "Invalid Number",
+        "Please enter at least one traveller."
+      );
       return;
     }
 
@@ -586,130 +957,55 @@ if (bookingForm) {
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-      showPopup("Invalid Date", "Please select today or a future date.");
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      showPopup(
+        "Invalid Date",
+        "Please choose today or a future travel date."
+      );
       return;
     }
 
-    try {
-      const bookingDates = getBookingDates(date, selectedTrip.duration);
-      const endDate = bookingDates[bookingDates.length - 1] || date;
+    const visibleVehicles = allVehicles.filter(
+      (vehicle) => vehicle.active !== false
+    );
 
-      const bookingRef = doc(collection(db, "bookings"));
-      const bookingId = bookingRef.id;
-
-      const safeFileName = proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-
-      const storageRef = ref(
-        storage,
-        `payment_proofs/${currentUser.uid}/${bookingId}_${safeFileName}`
-      );
-
-      const uploadResult = await uploadBytes(storageRef, proofFile);
-      const paymentProofUrl = await getDownloadURL(uploadResult.ref);
-
-      const basePrice = Number(selectedTrip.price || 0);
-
-      const vehiclePrice =
-        packageRequiresVehicle()
-          ? Number(selectedVehicle?.price || 0)
-          : 0;
-
-      const selectedActivities = getSelectedActivities();
-      const activitiesTotal = getSelectedActivitiesTotal();
-
-      const pricePerPerson =
-        basePrice + vehiclePrice + activitiesTotal > 0
-          ? basePrice + vehiclePrice + activitiesTotal
-          : 0;
-
-      const totalPrice =
-        pricePerPerson > 0
-          ? pricePerPerson * people
-          : 0;
-
-      await setDoc(bookingRef, {
-        bookingType: "package_booking",
-
-        userId: currentUser.uid,
-        userEmail: currentUser.email || "",
-
-        tripId: selectedTrip.id,
-        package: selectedTrip.title || "",
-        requiresVehicle: packageRequiresVehicle(),
-
-        name,
-        email,
-        phone,
-        people,
-
-        date,
-        startDate: date,
-        endDate,
-        reservedDates: bookingDates,
-        duration: selectedTrip.duration || "",
-        durationDays: bookingDates.length,
-        bookingPeriod: `${date} → ${endDate}`,
-
-        vehicleId: selectedVehicle?.id || "",
-        vehicleName: selectedVehicle?.name || "",
-        vehicleCategory: selectedVehicle?.category || "",
-        vehiclePrice,
-        vehicleCapacity: Number(selectedVehicle?.capacity || 0),
-        vehicleImageUrl: selectedVehicle?.imageUrl || "",
-        vehicleDescription: selectedVehicle?.description || "",
-
-        selectedActivities,
-        activitiesTotal,
-
-        basePackagePrice: basePrice,
-        pricePerPerson,
-        totalPrice,
-        priceType: selectedTrip.priceType || "Custom Quote",
-
-        paymentMethod: "Bank Transfer",
-        paymentStatus: "Proof Uploaded",
-        paymentProofUrl,
-
-        adminDecision: "Pending",
-        bookingStatus: "Awaiting Admin Validation",
-
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
-
-      closeBookingModal();
-      bookingForm.reset();
-      selectedTrip = null;
-      selectedVehicle = null;
-
+    if (
+      packageRequiresVehicle() &&
+      visibleVehicles.length > 0 &&
+      !selectedVehicle
+    ) {
       showPopup(
-        "Booking Submitted ✅",
-        "Your booking and payment proof have been submitted. Admin will validate your payment and confirm your booking.",
-        "index.html"
+        "Choose a Vehicle",
+        "Please select your preferred vehicle before continuing on WhatsApp."
       );
-    } catch (error) {
-      console.error("Booking Error:", error);
-
-      showPopup(
-        "Booking Error",
-        error.message || "There was an error submitting your booking. Please try again."
-      );
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText;
+      return;
     }
+
+    const message = buildWhatsAppMessage();
+
+    const whatsappUrl =
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+
+    window.open(
+      whatsappUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
   });
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modal && modal.classList.contains("show")) {
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    modal &&
+    modal.classList.contains("show")
+  ) {
     closeBookingModal();
   }
 });
 
 async function init() {
+  injectBookingStyles();
+  setMinimumTravelDate();
   await loadVehicles();
   await loadTrips();
 }
