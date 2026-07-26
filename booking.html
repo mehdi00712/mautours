@@ -3,33 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Mautour Holidays | Mauritius Luxury Packages</title>
-
-  <meta
-    name="description"
-    content="Explore Mauritius luxury packages, private tours, airport transfers and honeymoon experiences, then continue directly on WhatsApp for a personalised quotation and booking."
-  />
-
+  <meta name="description" content="Explore Mauritius luxury packages, private tours, airport transfers and honeymoon experiences, then continue directly on WhatsApp for a personalised quotation and booking." />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-
 <header class="site-header">
   <div class="nav-container">
     <h1 class="logo">Mautour Holidays</h1>
-
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html" class="active">Packages</a>
       <a href="index.html#about">About</a>
       <a href="index.html#contact">Contact</a>
     </nav>
-
     <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </div>
   </div>
 </header>
@@ -39,41 +28,85 @@
     <source src="mauvid2.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
-
   <div class="hero-content">
     <span class="hero-badge">Private Tours + Personalised Planning</span>
-
     <h2>Luxury Mauritius Experiences</h2>
-
-    <p>
-      Explore our packages, choose the experience that suits you, and continue
-      directly on WhatsApp for availability, a personalised quotation and booking confirmation.
-    </p>
-
+    <p>Explore our packages, choose the experience that suits you, and continue directly on WhatsApp for availability, a personalised quotation and booking confirmation.</p>
     <div class="hero-actions">
       <a href="#packages" class="btn">Explore Packages</a>
-
-      <a
-        href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package."
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-outline hero-outline"
-      >
-        Contact on WhatsApp
-      </a>
+      <a href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package." target="_blank" rel="noopener noreferrer" class="btn-outline hero-outline">Contact on WhatsApp</a>
     </div>
   </div>
 </section>
 
 <section class="container booking-intro">
   <span class="section-label center-label">Available Experiences</span>
-
   <h2>Choose Your Mauritius Experience</h2>
+  <p class="center section-subtitle">Browse our latest tours and luxury experiences. Every quotation, itinerary, payment arrangement and final booking confirmation is handled personally on WhatsApp.</p>
+</section>
 
-  <p class="center section-subtitle">
-    Browse our latest tours and luxury experiences. Every quotation, itinerary,
-    payment arrangement and final booking confirmation is handled personally on WhatsApp.
-  </p>
+<section class="container package-filter-section" aria-label="Package filters">
+  <div class="package-filter-panel">
+    <div class="package-filter-top">
+      <div class="package-search-wrapper">
+        <span class="package-search-icon" aria-hidden="true">⌕</span>
+        <input type="search" id="packageSearch" class="package-search-input" placeholder="Search tours, transfers, activities..." autocomplete="off" aria-label="Search packages" />
+        <button type="button" id="clearSearchBtn" class="package-search-clear" aria-label="Clear search" style="display:none;">×</button>
+      </div>
+      <div class="package-sort-wrapper">
+        <label for="packageSort">Sort by</label>
+        <select id="packageSort" class="package-sort-select">
+          <option value="newest">Newest</option>
+          <option value="title-asc">Name A–Z</option>
+          <option value="title-desc">Name Z–A</option>
+          <option value="duration-short">Shortest Duration</option>
+          <option value="duration-long">Longest Duration</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="package-filter-group">
+      <div class="package-filter-heading">
+        <span>Experience Type</span>
+        <button type="button" id="clearFiltersBtn" class="clear-package-filters">Clear filters</button>
+      </div>
+      <div id="categoryFilterChips" class="package-filter-chips" role="group" aria-label="Filter by experience type">
+        <button type="button" class="package-filter-chip active" data-category="all" aria-pressed="true">All</button>
+        <button type="button" class="package-filter-chip" data-category="tour" aria-pressed="false">🏝 Tours</button>
+        <button type="button" class="package-filter-chip" data-category="transfer" aria-pressed="false">🚘 Transfers</button>
+        <button type="button" class="package-filter-chip" data-category="activity" aria-pressed="false">🎯 Activities</button>
+        <button type="button" class="package-filter-chip" data-category="adventure" aria-pressed="false">🪂 Adventure</button>
+        <button type="button" class="package-filter-chip" data-category="family" aria-pressed="false">👨‍👩‍👧 Family</button>
+        <button type="button" class="package-filter-chip" data-category="luxury" aria-pressed="false">✨ Luxury</button>
+        <button type="button" class="package-filter-chip" data-category="honeymoon" aria-pressed="false">❤️ Honeymoon</button>
+        <button type="button" class="package-filter-chip" data-category="nature" aria-pressed="false">🌿 Nature</button>
+      </div>
+    </div>
+
+    <div class="package-filter-bottom">
+      <div class="package-secondary-filter">
+        <label for="vehicleFilter">Vehicle</label>
+        <select id="vehicleFilter">
+          <option value="all">All packages</option>
+          <option value="required">Vehicle selection available</option>
+          <option value="not-required">No vehicle required</option>
+        </select>
+      </div>
+      <div class="package-secondary-filter">
+        <label for="durationFilter">Duration</label>
+        <select id="durationFilter">
+          <option value="all">Any duration</option>
+          <option value="half-day">Half day</option>
+          <option value="full-day">Full day</option>
+          <option value="multi-day">Multi-day</option>
+        </select>
+      </div>
+      <div class="package-results-summary">
+        <strong id="packageResultsCount">0</strong>
+        <span id="packageResultsText">experiences found</span>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section id="packages" class="container">
@@ -83,106 +116,45 @@
       <p>Please wait while we load the latest tours and packages.</p>
     </div>
   </div>
+  <div id="noPackageResults" class="loading-card package-no-results" style="display:none;">
+    <h3>No Matching Experiences</h3>
+    <p>Try another search or remove some filters to see more Mauritius experiences.</p>
+    <button type="button" id="resetNoResultsBtn" class="btn">Show All Packages</button>
+  </div>
 </section>
 
 <div id="bookingModal" class="modal">
   <div class="modal-content luxury-modal">
     <span id="closeModal" class="close">&times;</span>
-
     <div class="whatsapp-enquiry-heading">
       <small>Personalised Travel Planning</small>
       <h3>Continue on WhatsApp</h3>
-      <p>
-        Complete the details below. Your selected package and preferences will
-        be added automatically to a WhatsApp message.
-      </p>
+      <p>Complete the details below. Your selected package and preferences will be added automatically to a WhatsApp message.</p>
     </div>
-
     <form id="bookingForm">
-      <input
-        type="text"
-        id="name"
-        placeholder="Full Name"
-        autocomplete="name"
-        required
-      />
-
-      <input
-        type="email"
-        id="email"
-        placeholder="Email Address"
-        autocomplete="email"
-        required
-      />
-
-      <input
-        type="tel"
-        id="phone"
-        placeholder="WhatsApp / Phone Number"
-        autocomplete="tel"
-        required
-      />
-
-      <input
-        type="number"
-        id="people"
-        placeholder="Number of People"
-        min="1"
-        required
-      />
-
-      <label class="form-field-label" for="date">
-        Preferred Travel Date
-      </label>
-
+      <input type="text" id="name" placeholder="Full Name" autocomplete="name" required />
+      <input type="email" id="email" placeholder="Email Address" autocomplete="email" required />
+      <input type="tel" id="phone" placeholder="WhatsApp / Phone Number" autocomplete="tel" required />
+      <input type="number" id="people" placeholder="Number of People" min="1" required />
+      <label class="form-field-label" for="date">Preferred Travel Date</label>
       <input type="date" id="date" required />
-
       <input type="text" id="selectedPackage" readonly />
-
       <div id="quickActivitiesAnchor"></div>
-
       <div id="vehicleSelectionBox" class="vehicle-selection-box">
         <h4>Preferred Vehicle</h4>
-
-        <p>
-          Select your preferred vehicle when transport is part of the package.
-          Availability will be confirmed on WhatsApp.
-        </p>
-
+        <p>Select your preferred vehicle when transport is part of the package. Availability will be confirmed on WhatsApp.</p>
         <div id="vehicleOptionsList" class="vehicle-options-list">
-          <div class="vehicle-empty">
-            Vehicle options will appear only for packages that include transport.
-          </div>
+          <div class="vehicle-empty">Vehicle options will appear only for packages that include transport.</div>
         </div>
-
-        <div
-          id="selectedQuickVehicleDetails"
-          class="selected-vehicle-details"
-          style="display:none;"
-        ></div>
+        <div id="selectedQuickVehicleDetails" class="selected-vehicle-details" style="display:none;"></div>
       </div>
-
-      <label class="form-field-label" for="specialRequests">
-        Special Requests
-      </label>
-
-      <textarea
-        id="specialRequests"
-        rows="5"
-        placeholder="Hotel, airport transfer, children, accessibility, dietary needs or anything else we should know..."
-      ></textarea>
-
+      <label class="form-field-label" for="specialRequests">Special Requests</label>
+      <textarea id="specialRequests" rows="5" placeholder="Hotel, airport transfer, children, accessibility, dietary needs or anything else we should know..."></textarea>
       <div class="whatsapp-booking-note">
         <strong>No online payment is required.</strong>
-        <span>
-          Our team will discuss availability, itinerary, quotation, payment
-          instructions and final confirmation with you directly on WhatsApp.
-        </span>
+        <span>Our team will discuss availability, itinerary, quotation, payment instructions and final confirmation with you directly on WhatsApp.</span>
       </div>
-
-      <button type="submit" class="btn full-width-btn">
-        Continue on WhatsApp
-      </button>
+      <button type="submit" class="btn full-width-btn">Continue on WhatsApp</button>
     </form>
   </div>
 </div>
@@ -195,14 +167,7 @@
   </div>
 </div>
 
-<a
-  class="whatsapp-float"
-  href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package."
-  target="_blank"
-  rel="noopener noreferrer"
->
-  WhatsApp
-</a>
+<a class="whatsapp-float" href="https://wa.me/23059066404?text=Hi%2C%20I%20would%20like%20help%20choosing%20a%20Mauritius%20holiday%20package." target="_blank" rel="noopener noreferrer">WhatsApp</a>
 
 <footer class="footer">
   <p>&copy; 2026 Mautour Holidays. All Rights Reserved.</p>
@@ -210,6 +175,5 @@
 
 <script src="js/main.js"></script>
 <script type="module" src="js/booking.js"></script>
-
 </body>
 </html>
