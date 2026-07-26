@@ -18,6 +18,15 @@ const WHATSAPP_NUMBER = "23059066404";
 let selectedTrip = null;
 let selectedVehicle = null;
 let allVehicles = [];
+let allTrips = [];
+
+const packageFilterState = {
+  search: "",
+  category: "all",
+  vehicle: "all",
+  duration: "all",
+  sort: "newest"
+};
 
 const dynamicTrips = document.getElementById("dynamicTrips");
 const modal = document.getElementById("bookingModal");
@@ -29,6 +38,18 @@ const vehicleSelectionBox = document.getElementById("vehicleSelectionBox");
 const selectedQuickVehicleDetails = document.getElementById(
   "selectedQuickVehicleDetails"
 );
+
+const packageSearch = document.getElementById("packageSearch");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
+const packageSort = document.getElementById("packageSort");
+const categoryFilterChips = document.getElementById("categoryFilterChips");
+const vehicleFilter = document.getElementById("vehicleFilter");
+const durationFilter = document.getElementById("durationFilter");
+const clearFiltersBtn = document.getElementById("clearFiltersBtn");
+const packageResultsCount = document.getElementById("packageResultsCount");
+const packageResultsText = document.getElementById("packageResultsText");
+const noPackageResults = document.getElementById("noPackageResults");
+const resetNoResultsBtn = document.getElementById("resetNoResultsBtn");
 
 const popup = document.getElementById("popup");
 const popupTitle = document.getElementById("popupTitle");
@@ -269,7 +290,223 @@ function injectBookingStyles() {
       border-color: #1fb85a;
     }
 
+
+    .package-filter-section {
+      position: relative;
+      z-index: 5;
+      margin-bottom: 32px;
+    }
+
+    .package-filter-panel {
+      padding: 22px;
+      border: 1px solid rgba(7, 24, 39, 0.1);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 16px 45px rgba(7, 24, 39, 0.09);
+    }
+
+    .package-filter-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .package-search-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .package-search-icon {
+      position: absolute;
+      left: 17px;
+      z-index: 1;
+      color: var(--muted, #6b7280);
+      font-size: 1.35rem;
+      pointer-events: none;
+    }
+
+    .package-search-input {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 48px 0 48px !important;
+      border: 1px solid #dfe3e8 !important;
+      border-radius: 16px !important;
+      background: #fff !important;
+      color: var(--darkblue, #071827);
+      font: inherit;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .package-search-input:focus {
+      border-color: var(--gold, #c9a227) !important;
+      box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.14);
+    }
+
+    .package-search-clear {
+      position: absolute;
+      right: 12px;
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 50%;
+      background: #f3f4f6;
+      color: var(--darkblue, #071827);
+      cursor: pointer;
+      font-size: 1.25rem;
+      line-height: 1;
+    }
+
+    .package-sort-wrapper,
+    .package-secondary-filter {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .package-sort-wrapper label,
+    .package-secondary-filter label {
+      color: var(--darkblue, #071827);
+      font-size: 0.82rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .package-sort-select,
+    .package-secondary-filter select {
+      min-height: 54px;
+      padding: 0 14px;
+      border: 1px solid #dfe3e8;
+      border-radius: 14px;
+      background: #fff;
+      color: var(--darkblue, #071827);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .package-filter-group {
+      margin-top: 22px;
+    }
+
+    .package-filter-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .package-filter-heading > span {
+      color: var(--darkblue, #071827);
+      font-weight: 900;
+    }
+
+    .clear-package-filters {
+      border: 0;
+      background: transparent;
+      color: var(--gold, #c9a227);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .package-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .package-filter-chip {
+      min-height: 42px;
+      padding: 0 17px;
+      border: 1px solid #dfe3e8;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--darkblue, #071827);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.2s ease;
+    }
+
+    .package-filter-chip:hover {
+      transform: translateY(-1px);
+      border-color: var(--gold, #c9a227);
+    }
+
+    .package-filter-chip.active {
+      border-color: var(--gold, #c9a227);
+      background: var(--gold, #c9a227);
+      color: #071827;
+      box-shadow: 0 8px 20px rgba(201, 162, 39, 0.23);
+    }
+
+    .package-filter-bottom {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 240px)) 1fr;
+      gap: 16px;
+      align-items: end;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eceff2;
+    }
+
+    .package-results-summary {
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+      gap: 6px;
+      padding-bottom: 14px;
+      color: var(--muted, #6b7280);
+    }
+
+    .package-results-summary strong {
+      color: var(--darkblue, #071827);
+      font-size: 1.4rem;
+    }
+
+    .package-no-results {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .package-no-results .btn {
+      margin-top: 14px;
+    }
+
     @media (max-width: 768px) {
+      .package-filter-panel {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .package-filter-top,
+      .package-filter-bottom {
+        grid-template-columns: 1fr;
+      }
+
+      .package-results-summary {
+        justify-content: flex-start;
+        padding-bottom: 0;
+      }
+
+      .package-filter-chips {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scrollbar-width: thin;
+      }
+
+      .package-filter-chip {
+        flex: 0 0 auto;
+      }
+
       .vehicle-options-list {
         grid-template-columns: 1fr;
       }
@@ -624,6 +861,527 @@ async function loadVehicles() {
   }
 }
 
+function normalizeText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getTripCategorySearchText(trip) {
+  const activityNames = Array.isArray(trip.activities)
+    ? trip.activities
+        .map((activity) => {
+          if (typeof activity === "string") return activity;
+          return activity?.name || "";
+        })
+        .join(" ")
+    : "";
+
+  const includesText = Array.isArray(trip.includes)
+    ? trip.includes.join(" ")
+    : "";
+
+  return normalizeText(
+    [
+      trip.title,
+      trip.category,
+      trip.description,
+      trip.fullDetails,
+      trip.duration,
+      activityNames,
+      includesText
+    ].join(" ")
+  );
+}
+
+function getTripDurationGroup(trip) {
+  const duration = normalizeText(trip.duration);
+
+  if (duration.includes("half")) return "half-day";
+  if (duration.includes("full")) return "full-day";
+
+  const numberMatch = duration.match(/\d+/);
+  const durationNumber = numberMatch ? Number(numberMatch[0]) : 0;
+
+  if (
+    duration.includes("day") &&
+    durationNumber > 1
+  ) {
+    return "multi-day";
+  }
+
+  if (
+    duration.includes("night") ||
+    duration.includes("week") ||
+    duration.includes("multi")
+  ) {
+    return "multi-day";
+  }
+
+  return "other";
+}
+
+function tripMatchesCategory(trip, selectedCategory) {
+  if (selectedCategory === "all") return true;
+
+  const text = getTripCategorySearchText(trip);
+
+  const categoryKeywords = {
+    tour: [
+      "tour",
+      "sightseeing",
+      "excursion",
+      "discovery",
+      "island",
+      "south",
+      "north"
+    ],
+    transfer: [
+      "transfer",
+      "airport",
+      "transport",
+      "vehicle",
+      "taxi",
+      "shuttle",
+      "suzuki",
+      "ertiga",
+      "hiace"
+    ],
+    activity: [
+      "activity",
+      "activities",
+      "experience",
+      "zipline",
+      "quad",
+      "dolphin",
+      "diving",
+      "walk",
+      "cruise"
+    ],
+    adventure: [
+      "adventure",
+      "zipline",
+      "quad",
+      "hiking",
+      "trail",
+      "extreme",
+      "vallee",
+      "vallée"
+    ],
+    family: [
+      "family",
+      "children",
+      "kids",
+      "child"
+    ],
+    luxury: [
+      "luxury",
+      "premium",
+      "private",
+      "exclusive",
+      "vip"
+    ],
+    honeymoon: [
+      "honeymoon",
+      "romantic",
+      "couple",
+      "wedding"
+    ],
+    nature: [
+      "nature",
+      "natural",
+      "forest",
+      "waterfall",
+      "garden",
+      "mountain",
+      "lake",
+      "lagoon",
+      "beach"
+    ]
+  };
+
+  const keywords = categoryKeywords[selectedCategory] || [
+    selectedCategory
+  ];
+
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function sortTrips(trips, sortValue) {
+  const sortedTrips = [...trips];
+
+  switch (sortValue) {
+    case "title-asc":
+      sortedTrips.sort((a, b) =>
+        String(a.title || "").localeCompare(
+          String(b.title || "")
+        )
+      );
+      break;
+
+    case "title-desc":
+      sortedTrips.sort((a, b) =>
+        String(b.title || "").localeCompare(
+          String(a.title || "")
+        )
+      );
+      break;
+
+    case "duration-short":
+      sortedTrips.sort(
+        (a, b) =>
+          getDurationSortValue(a.duration) -
+          getDurationSortValue(b.duration)
+      );
+      break;
+
+    case "duration-long":
+      sortedTrips.sort(
+        (a, b) =>
+          getDurationSortValue(b.duration) -
+          getDurationSortValue(a.duration)
+      );
+      break;
+
+    case "newest":
+    default:
+      sortedTrips.sort(
+        (a, b) => getTripTime(b) - getTripTime(a)
+      );
+      break;
+  }
+
+  return sortedTrips;
+}
+
+function getDurationSortValue(durationText) {
+  const duration = normalizeText(durationText);
+
+  if (duration.includes("half")) return 0.5;
+
+  const numberMatch = duration.match(/\d+/);
+  const number = numberMatch ? Number(numberMatch[0]) : 1;
+
+  if (duration.includes("week")) return number * 7;
+  if (duration.includes("night")) return number + 1;
+
+  return Math.max(number, 1);
+}
+
+function updateResultsSummary(count) {
+  if (packageResultsCount) {
+    packageResultsCount.textContent = count;
+  }
+
+  if (packageResultsText) {
+    packageResultsText.textContent =
+      count === 1
+        ? "experience found"
+        : "experiences found";
+  }
+}
+
+function createTripCard(trip) {
+  const title = escapeHtml(
+    trip.title || "Mauritius Holiday Package"
+  );
+  const category = escapeHtml(
+    trip.category || "Package"
+  );
+  const description = escapeHtml(
+    trip.description || ""
+  );
+  const duration = escapeHtml(
+    trip.duration || ""
+  );
+  const imageUrl = escapeHtml(
+    trip.imageUrl || "assets/ile.jpg"
+  );
+  const includes = formatIncludes(trip.includes);
+
+  const galleryCount = Array.isArray(trip.galleryImages)
+    ? trip.galleryImages.filter(Boolean).length
+    : 0;
+
+  const activitiesCount = Array.isArray(trip.activities)
+    ? trip.activities.filter((activity) => {
+        if (typeof activity === "string") {
+          return activity.trim() !== "";
+        }
+
+        return Boolean(
+          String(activity?.name || "").trim()
+        );
+      }).length
+    : 0;
+
+  const vehicleBadge = trip.requiresVehicle
+    ? `<p><strong>Vehicle:</strong> Selection available</p>`
+    : `<p><strong>Vehicle:</strong> Not required</p>`;
+
+  const activitiesBadge =
+    activitiesCount > 0
+      ? `
+        <p>
+          <strong>Optional Activities:</strong>
+          ${activitiesCount} available
+        </p>
+      `
+      : "";
+
+  const card = document.createElement("div");
+  card.className = "booking-card package-premium";
+
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="${title}" loading="lazy">
+
+    <span>${category}</span>
+    <h3>${title}</h3>
+    <p>${description}</p>
+
+    ${
+      duration
+        ? `<p><strong>Duration:</strong> ${duration}</p>`
+        : ""
+    }
+
+    ${vehicleBadge}
+    ${activitiesBadge}
+
+    ${
+      galleryCount > 0
+        ? `
+          <p>
+            <strong>Pictures:</strong>
+            ${galleryCount + 1} photos
+          </p>
+        `
+        : ""
+    }
+
+    ${
+      includes
+        ? `<ul class="package-includes">${includes}</ul>`
+        : ""
+    }
+
+    <span class="package-card-quotation">
+      Personalised quotation on WhatsApp
+    </span>
+
+    <div class="package-card-actions">
+      <a class="btn" href="package-details.html?id=${trip.id}">
+        View Details
+      </a>
+
+      <button class="btn-outline book-btn" data-id="${trip.id}">
+        Enquire on WhatsApp
+      </button>
+    </div>
+  `;
+
+  const enquireButton = card.querySelector(".book-btn");
+
+  if (enquireButton) {
+    enquireButton.addEventListener("click", () => {
+      openBookingModal(trip);
+    });
+  }
+
+  return card;
+}
+
+function renderFilteredTrips() {
+  if (!dynamicTrips) return;
+
+  const searchValue = normalizeText(
+    packageFilterState.search
+  );
+
+  let filteredTrips = allTrips.filter((trip) => {
+    const searchText = getTripCategorySearchText(trip);
+
+    const matchesSearch =
+      !searchValue || searchText.includes(searchValue);
+
+    const matchesCategory = tripMatchesCategory(
+      trip,
+      packageFilterState.category
+    );
+
+    const matchesVehicle =
+      packageFilterState.vehicle === "all" ||
+      (
+        packageFilterState.vehicle === "required" &&
+        normalizeBool(trip.requiresVehicle)
+      ) ||
+      (
+        packageFilterState.vehicle === "not-required" &&
+        !normalizeBool(trip.requiresVehicle)
+      );
+
+    const matchesDuration =
+      packageFilterState.duration === "all" ||
+      getTripDurationGroup(trip) ===
+        packageFilterState.duration;
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesVehicle &&
+      matchesDuration
+    );
+  });
+
+  filteredTrips = sortTrips(
+    filteredTrips,
+    packageFilterState.sort
+  );
+
+  updateResultsSummary(filteredTrips.length);
+
+  dynamicTrips.innerHTML = "";
+
+  if (filteredTrips.length === 0) {
+    if (noPackageResults) {
+      noPackageResults.style.display = "block";
+    }
+
+    return;
+  }
+
+  if (noPackageResults) {
+    noPackageResults.style.display = "none";
+  }
+
+  filteredTrips.forEach((trip) => {
+    dynamicTrips.appendChild(createTripCard(trip));
+  });
+}
+
+function setActiveCategoryChip(category) {
+  document
+    .querySelectorAll(".package-filter-chip")
+    .forEach((chip) => {
+      const isActive = chip.dataset.category === category;
+
+      chip.classList.toggle("active", isActive);
+      chip.setAttribute(
+        "aria-pressed",
+        isActive ? "true" : "false"
+      );
+    });
+}
+
+function resetPackageFilters() {
+  packageFilterState.search = "";
+  packageFilterState.category = "all";
+  packageFilterState.vehicle = "all";
+  packageFilterState.duration = "all";
+  packageFilterState.sort = "newest";
+
+  if (packageSearch) packageSearch.value = "";
+  if (clearSearchBtn) clearSearchBtn.style.display = "none";
+  if (vehicleFilter) vehicleFilter.value = "all";
+  if (durationFilter) durationFilter.value = "all";
+  if (packageSort) packageSort.value = "newest";
+
+  setActiveCategoryChip("all");
+  renderFilteredTrips();
+}
+
+function setupPackageFilters() {
+  if (packageSearch) {
+    packageSearch.addEventListener("input", () => {
+      packageFilterState.search = packageSearch.value;
+
+      if (clearSearchBtn) {
+        clearSearchBtn.style.display =
+          packageSearch.value.trim()
+            ? "inline-flex"
+            : "none";
+      }
+
+      renderFilteredTrips();
+    });
+  }
+
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener("click", () => {
+      packageFilterState.search = "";
+
+      if (packageSearch) {
+        packageSearch.value = "";
+        packageSearch.focus();
+      }
+
+      clearSearchBtn.style.display = "none";
+      renderFilteredTrips();
+    });
+  }
+
+  if (categoryFilterChips) {
+    categoryFilterChips.addEventListener(
+      "click",
+      (event) => {
+        const chip = event.target.closest(
+          ".package-filter-chip"
+        );
+
+        if (!chip) return;
+
+        packageFilterState.category =
+          chip.dataset.category || "all";
+
+        setActiveCategoryChip(
+          packageFilterState.category
+        );
+
+        renderFilteredTrips();
+      }
+    );
+  }
+
+  if (vehicleFilter) {
+    vehicleFilter.addEventListener("change", () => {
+      packageFilterState.vehicle =
+        vehicleFilter.value || "all";
+
+      renderFilteredTrips();
+    });
+  }
+
+  if (durationFilter) {
+    durationFilter.addEventListener("change", () => {
+      packageFilterState.duration =
+        durationFilter.value || "all";
+
+      renderFilteredTrips();
+    });
+  }
+
+  if (packageSort) {
+    packageSort.addEventListener("change", () => {
+      packageFilterState.sort =
+        packageSort.value || "newest";
+
+      renderFilteredTrips();
+    });
+  }
+
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener(
+      "click",
+      resetPackageFilters
+    );
+  }
+
+  if (resetNoResultsBtn) {
+    resetNoResultsBtn.addEventListener(
+      "click",
+      resetPackageFilters
+    );
+  }
+}
+
 async function loadTrips() {
   if (!dynamicTrips) return;
 
@@ -637,158 +1395,43 @@ async function loadTrips() {
   try {
     const snapshot = await getDocs(collection(db, "trips"));
 
-    if (snapshot.empty) {
-      dynamicTrips.innerHTML = `
-        <div class="loading-card">
-          <h3>No Packages Available</h3>
-          <p>No packages have been added yet.</p>
-        </div>
-      `;
-      return;
-    }
-
-    const trips = [];
+    allTrips = [];
 
     snapshot.forEach((docSnap) => {
       const trip = docSnap.data();
 
       if (trip.active === false) return;
 
-      trips.push({
+      allTrips.push({
         id: docSnap.id,
         ...trip,
-        requiresVehicle: normalizeBool(trip.requiresVehicle),
+        requiresVehicle: normalizeBool(
+          trip.requiresVehicle
+        ),
         activities: Array.isArray(trip.activities)
           ? trip.activities
           : []
       });
     });
 
-    trips.sort((a, b) => getTripTime(b) - getTripTime(a));
-
-    if (trips.length === 0) {
+    if (allTrips.length === 0) {
       dynamicTrips.innerHTML = `
         <div class="loading-card">
-          <h3>No Active Packages</h3>
-          <p>No packages are currently available.</p>
+          <h3>No Packages Available</h3>
+          <p>No active packages are currently available.</p>
         </div>
       `;
+
+      updateResultsSummary(0);
       return;
     }
 
-    dynamicTrips.innerHTML = "";
-
-    trips.forEach((trip) => {
-      const title = escapeHtml(
-        trip.title || "Mauritius Holiday Package"
-      );
-      const category = escapeHtml(
-        trip.category || "Package"
-      );
-      const description = escapeHtml(
-        trip.description || ""
-      );
-      const duration = escapeHtml(
-        trip.duration || ""
-      );
-      const imageUrl = escapeHtml(
-        trip.imageUrl || "assets/ile.jpg"
-      );
-      const includes = formatIncludes(trip.includes);
-
-      const galleryCount = Array.isArray(trip.galleryImages)
-        ? trip.galleryImages.filter(Boolean).length
-        : 0;
-
-      const activitiesCount = Array.isArray(trip.activities)
-        ? trip.activities.filter((activity) => {
-            if (typeof activity === "string") {
-              return activity.trim() !== "";
-            }
-
-            return Boolean(
-              String(activity?.name || "").trim()
-            );
-          }).length
-        : 0;
-
-      const vehicleBadge = trip.requiresVehicle
-        ? `<p><strong>Vehicle:</strong> Selection available</p>`
-        : `<p><strong>Vehicle:</strong> Not required</p>`;
-
-      const activitiesBadge =
-        activitiesCount > 0
-          ? `
-            <p>
-              <strong>Optional Activities:</strong>
-              ${activitiesCount} available
-            </p>
-          `
-          : "";
-
-      const card = document.createElement("div");
-      card.className = "booking-card package-premium";
-
-      card.innerHTML = `
-        <img src="${imageUrl}" alt="${title}" loading="lazy">
-
-        <span>${category}</span>
-        <h3>${title}</h3>
-        <p>${description}</p>
-
-        ${
-          duration
-            ? `<p><strong>Duration:</strong> ${duration}</p>`
-            : ""
-        }
-
-        ${vehicleBadge}
-        ${activitiesBadge}
-
-        ${
-          galleryCount > 0
-            ? `
-              <p>
-                <strong>Pictures:</strong>
-                ${galleryCount + 1} photos
-              </p>
-            `
-            : ""
-        }
-
-        ${
-          includes
-            ? `<ul class="package-includes">${includes}</ul>`
-            : ""
-        }
-
-        <span class="package-card-quotation">
-          Personalised quotation on WhatsApp
-        </span>
-
-        <div class="package-card-actions">
-          <a class="btn" href="package-details.html?id=${trip.id}">
-            View Details
-          </a>
-
-          <button class="btn-outline book-btn" data-id="${trip.id}">
-            Enquire on WhatsApp
-          </button>
-        </div>
-      `;
-
-      dynamicTrips.appendChild(card);
-
-      const enquireButton = card.querySelector(".book-btn");
-
-      if (enquireButton) {
-        enquireButton.addEventListener("click", () => {
-          openBookingModal(trip);
-        });
-      }
-    });
+    renderFilteredTrips();
   } catch (error) {
     console.error("Load Trips Error:", error);
+
+    allTrips = [];
+    updateResultsSummary(0);
 
     dynamicTrips.innerHTML = `
       <div class="loading-card">
@@ -1006,6 +1649,7 @@ document.addEventListener("keydown", (event) => {
 async function init() {
   injectBookingStyles();
   setMinimumTravelDate();
+  setupPackageFilters();
   await loadVehicles();
   await loadTrips();
 }
