@@ -1295,7 +1295,9 @@ function setActiveCategoryChip(category) {
   document
     .querySelectorAll(".package-filter-chip")
     .forEach((chip) => {
-      const isActive = chip.dataset.category === category;
+      const isActive =
+        String(chip.dataset.category || "").toLowerCase() ===
+        String(category || "").toLowerCase();
 
       chip.classList.toggle("active", isActive);
       chip.setAttribute(
@@ -1334,8 +1336,7 @@ function setupPackageFilters() {
             : "none";
       }
 
-      renderCategoryChips();
-    renderFilteredTrips();
+      renderFilteredTrips();
     });
   }
 
@@ -1461,6 +1462,7 @@ async function loadTrips() {
       return;
     }
 
+    renderCategoryChips();
     renderFilteredTrips();
   } catch (error) {
     console.error("Load Trips Error:", error);
