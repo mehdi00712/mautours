@@ -1189,6 +1189,40 @@ function createTripCard(trip) {
   return card;
 }
 
+
+function renderCategoryChips() {
+  if (!categoryFilterChips) return;
+
+  const categories = [
+    ...new Set(
+      allTrips
+        .map(trip => String(trip.category || "").trim())
+        .filter(Boolean)
+    )
+  ].sort((a,b)=>a.localeCompare(b));
+
+  categoryFilterChips.innerHTML = `
+    <button
+      type="button"
+      class="package-filter-chip active"
+      data-category="all"
+      aria-pressed="true">
+      All
+    </button>
+  `;
+
+  categories.forEach(category => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "package-filter-chip";
+    btn.dataset.category = category;
+    btn.setAttribute("aria-pressed","false");
+    btn.textContent = category;
+    categoryFilterChips.appendChild(btn);
+  });
+}
+
+
 function renderFilteredTrips() {
   if (!dynamicTrips) return;
 
@@ -1202,10 +1236,10 @@ function renderFilteredTrips() {
     const matchesSearch =
       !searchValue || searchText.includes(searchValue);
 
-    const matchesCategory = tripMatchesCategory(
-      trip,
-      packageFilterState.category
-    );
+    const matchesCategory =
+      packageFilterState.category === "all" ||
+      String(trip.category || "").trim().toLowerCase() ===
+      packageFilterState.category.toLowerCase();
 
     const matchesVehicle =
       packageFilterState.vehicle === "all" ||
@@ -1300,7 +1334,8 @@ function setupPackageFilters() {
             : "none";
       }
 
-      renderFilteredTrips();
+      renderCategoryChips();
+    renderFilteredTrips();
     });
   }
 
