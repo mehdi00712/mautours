@@ -13,7 +13,7 @@ import {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const WHATSAPP_NUMBER = "23059066404";
+const WHATSAPP_NUMBER = "23052542792";
 
 let selectedTrip = null;
 let selectedVehicle = null;
