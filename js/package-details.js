@@ -15,7 +15,7 @@ import {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const WHATSAPP_NUMBER = "23059066404";
+const WHATSAPP_NUMBER = "23052542792";
 
 const params = new URLSearchParams(window.location.search);
 const packageId = params.get("id");
