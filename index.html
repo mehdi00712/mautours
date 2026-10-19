@@ -4,32 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Mautour Holidays | Luxury Private Tours in Mauritius</title>
-  <meta
-    name="description"
-    content="Luxury private tours, airport transfers, honeymoon packages and premium Mauritius experiences for UAE, Saudi, Qatar and GCC travellers."
-  />
+  <title>Mautour Holidays | Private Tours, Transfers & Activities in Mauritius</title>
+  <meta name="description" content="Private tours, airport transfers, catamaran and island trips, helicopter flights and tailor-made holidays in Mauritius. Prices in euros, all taxes included." />
 
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/site-v2.css" />
 </head>
 <body>
-
 <header class="site-header">
   <div class="nav-container">
-    <h1 class="logo" id="siteBusinessName">Mautour Holidays</h1>
+    <h1 class="logo"><a href="index.html" id="siteBusinessName">Mautour Holidays</a></h1>
 
     <nav class="nav" id="nav">
       <a href="index.html" class="active">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="#why">Why Us</a>
-      <a href="#reviews">Reviews</a>
+      <a href="services.html">Services</a>
       <a href="travel-info.html">Travel Info</a>
       <a href="payment.html">Pay Online</a>
-      <a href="#contact">Contact</a>
-      <a href="login.html">Sign In</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="https://wa.me/23059066404?text=Hi%20Mautour%20Holidays%2C%20I%20would%20like%20to%20plan%20a%20trip%20to%20Mauritius" target="_blank" rel="noopener" class="nav-cta" data-wa-link>Book on WhatsApp</a>
     </nav>
 
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
       <span></span>
       <span></span>
       <span></span>
@@ -37,268 +33,303 @@
   </div>
 </header>
 
-<section class="hero home-hero" id="homeHero">
+<section class="hero home-hero v2-hero" id="homeHero">
   <video autoplay muted loop playsinline class="hero-video" id="heroVideo">
     <source src="mauvid1.mp4" type="video/mp4" />
   </video>
 
   <div class="hero-content luxury-hero-content">
-    <span class="hero-badge" id="homeHeroBadge">
-      Serving UAE, Saudi, Qatar & GCC Travellers
-    </span>
+    <span class="hero-badge" id="homeHeroBadge">Private Tours · Transfers · Island Experiences</span>
 
-    <h2 id="homeHeroTitle">
-      Luxury Private Tours & Experiences in Mauritius
-    </h2>
+    <h2 id="homeHeroTitle">Discover Mauritius, Your Way</h2>
 
-    <p id="homeHeroSubtitle">
-      Tailor-made holidays, airport transfers, honeymoon escapes and unforgettable island adventures with private transport included where needed.
+    <p class="v2-hero-sub" id="homeHeroSubtitle">
+      Private tours with your own chauffeur, island escapes, dolphins, helicopter flights and tailor-made holidays – planned by a local team.
     </p>
 
     <div class="hero-actions">
-      <a id="heroWhatsappBtn" href="#" target="_blank" class="btn">
-        Book on WhatsApp
-      </a>
+      <a href="booking.html" class="btn">Explore Packages</a>
+      <a id="heroWhatsappBtn" href="https://wa.me/23059066404" target="_blank" rel="noopener" class="btn-outline hero-outline">Plan on WhatsApp</a>
+    </div>
 
-      <a href="booking.html" class="btn-outline hero-outline">
-        Explore Packages
-      </a>
+    <div class="v2-trust">
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Private chauffeur</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Licensed local partners</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Prices in € incl. taxes</span>
+      <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Clear 48h cancellation policy</span>
     </div>
   </div>
 </section>
 
-<section class="mobile-stats">
-  <div onclick="document.getElementById('reviews').scrollIntoView({behavior:'smooth'})">
-    <strong id="statClients">500+</strong>
-    <span>Happy Clients</span>
-  </div>
+<div class="v2-facts">
+  <div><strong>30+</strong><span>Tours &amp; activities</span></div>
+  <div><strong>Island-wide</strong><span>Pick-up anywhere</span></div>
+  <div><strong>From €25</strong><span>Transfers &amp; rentals</span></div>
+  <div><strong>7 days</strong><span>a week on WhatsApp</span></div>
+</div>
 
-  <div onclick="document.getElementById('packages-preview').scrollIntoView({behavior:'smooth'})">
-    <strong id="statExperiences">9+</strong>
-    <span>Premium Experiences</span>
-  </div>
-
-  <div onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-    <strong>24/7</strong>
-    <span>WhatsApp Support</span>
-  </div>
-</section>
-
-<section id="why" class="container">
-  <span class="section-label center-label">Why Choose Us</span>
-  <h2>Private, Comfortable and Built for GCC Travellers</h2>
-
-  <div class="service-grid">
-    <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
-      🏝️
-      <h3>Local Experts</h3>
-      <p>Explore our hand-picked Mauritius packages and island experiences.</p>
-      <span class="card-action">View Packages →</span>
-    </div>
-
-    <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
-      🚘
-      <h3>Private Transport Included</h3>
-      <p>Vehicle options are available inside selected packages when transport is required.</p>
-      <span class="card-action">Choose a Package →</span>
-    </div>
-
-    <div class="service-card clickable-card" onclick="window.open(document.getElementById('heroWhatsappBtn').href,'_blank')">
-      ✨
-      <h3>Tailor-Made Experiences</h3>
-      <p>Need a custom trip? Message us and we will plan it for you.</p>
-      <span class="card-action">Plan on WhatsApp →</span>
-    </div>
-
-    <div class="service-card clickable-card" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">
-      💬
-      <h3>24/7 Support</h3>
-      <p>Contact our team for help before and during your trip.</p>
-      <span class="card-action">Contact Us →</span>
-    </div>
-  </div>
-</section>
-
-<section id="packages-preview" class="container">
-  <span class="section-label center-label">Featured Packages</span>
-  <h2>Choose Your Mauritius Experience</h2>
-
-  <p class="center section-subtitle">
-    Click a package to view full details, photos, inclusions, optional activities and vehicle options when required.
-  </p>
-
-  <div id="homeTripsGrid" class="experience-grid">
-    <div class="loading-card">
-      <h3>Loading Featured Packages...</h3>
-      <p>Please wait while we load selected packages.</p>
-    </div>
-  </div>
-
-  <div class="center" style="margin-top: 2rem;">
-    <a href="booking.html" class="btn">View All Packages</a>
-  </div>
-</section>
-
-<section class="services-section">
+<section class="v2-section" id="services">
   <div class="container">
-    <span class="section-label center-label">Featured Experiences</span>
-    <h2>Activities We Arrange</h2>
+    <div class="v2-head">
+      <span class="v2-eyebrow">What we offer</span>
+      <h2>Everything for Your Stay in Mauritius</h2>
+      <p>From the moment you land to your last sunset – transfers, tours, sea and land adventures, all in one place.</p>
+    </div>
 
-    <div id="homeExperiencesGrid" class="service-grid">
-      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
-        🌈
-        <h3>23 Colours Nature Park</h3>
-        <p>Zipline, quad biking, Nepalese bridge, waterfall zipline and more.</p>
-        <span class="card-action">See Packages →</span>
+    <div class="v2-grid cols-4">
+      <a class="v2-card" href="services.html#transfers">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
+        <h3>Transfers &amp; Car Hire</h3>
+        <p>Comfortable private transport anywhere on the island, with professional local chauffeurs.</p>
+        <div class="v2-from">From <strong>€25</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#tours">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></div>
+        <h3>Island Tours</h3>
+        <p>Full-day private tours (8 hours) with a local driver/guide in an air-conditioned SUV.</p>
+        <div class="v2-from">From <strong>€100</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#islands">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 18H2a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4Z"/><path d="M21 14 10 2 3 14h18Z"/><path d="M10 2v16"/></svg></div>
+        <h3>Islands Escape</h3>
+        <p>Catamaran cruises and speedboat trips to the most beautiful islets of Mauritius.</p>
+        <div class="v2-from">From <strong>€40</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#marine">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z"/><path d="M18 12v.5"/><path d="M16 17.93a9.77 9.77 0 0 1 0-11.86"/><path d="M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33"/></svg></div>
+        <h3>Marine &amp; Fishing</h3>
+        <p>Dolphins, whales, the deep blue and the best water sports on the island.</p>
+        <div class="v2-from">From <strong>€70</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#land">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg></div>
+        <h3>Land &amp; Nature</h3>
+        <p>Adventure parks, quad biking, hiking trails and horse riding in the wild south.</p>
+        <div class="v2-from">From <strong>€30</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#aerial">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></div>
+        <h3>Aerial Exploration</h3>
+        <p>See Le Morne&#x27;s famous underwater waterfall and the Chamarel falls from the sky.</p>
+        <div class="v2-from">From <strong>€235</strong></div>
+        <span class="v2-link">View services &amp; prices →</span>
+      </a>
+      <a class="v2-card" href="services.html#shopping">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+        <h3>Shopping &amp; Local Markets</h3>
+        <p>Malls, craft markets and local food markets all around the island, with a private driver.</p>
+        <div class="v2-from"><strong>Price on request</strong></div>
+        <span class="v2-link">See destinations →</span>
+      </a>
+      <a class="v2-card" href="services.html#tailor-made">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+        <h3>Tailor-Made Holidays</h3>
+        <p>Family holidays, adventure trips, honeymoon escapes and weekend getaways planned around you.</p>
+        <div class="v2-from"><strong>Custom quote</strong></div>
+        <span class="v2-link">Plan my trip →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="v2-section v2-sand" id="packages-preview">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Featured packages</span>
+      <h2>Our Most Popular Experiences</h2>
+      <p>Open a package to see photos, what's included, optional extras and prices.</p>
+    </div>
+
+    <div id="homeTripsGrid" class="experience-grid"></div>
+
+    <div class="v2-center-actions">
+      <a href="booking.html" class="btn">View All Packages</a>
+    </div>
+  </div>
+</section>
+
+<section class="v2-section v2-navy">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Signature itinerary</span>
+      <h2>7 Days of Mauritius Activities</h2>
+      <p>Our complete week of adventures – book it all, or pick the days you like.</p>
+    </div>
+
+    <div class="v2-itin">
+      <div class="v2-day"><b>Day 1</b><h4>23 Colours Adventure Park</h4><p>Ziplines, quad biking, Nepalese bridge and luge kart.</p></div>
+      <div class="v2-day"><b>Day 2</b><h4>The Wild South</h4><p>Black River Gorges, tea factory, Chamarel &amp; Seven Coloured Earth.</p></div>
+      <div class="v2-day"><b>Day 3</b><h4>Dolphins &amp; Helicopter</h4><p>Private boat with dolphins, then a scenic helicopter flight.</p></div>
+      <div class="v2-day"><b>Day 4</b><h4>Casela Nature Parks</h4><p>Safari, Walk with Lions and animal encounters.</p></div>
+      <div class="v2-day"><b>Day 5</b><h4>Île aux Cerfs</h4><p>Private boat, waterfall visit and water sports.</p></div>
+      <div class="v2-day"><b>Day 6</b><h4>Port Louis &amp; North</h4><p>Market, Citadel, Caudan Waterfront and Pamplemousses.</p></div>
+      <div class="v2-day"><b>Day 7</b><h4>Ocean Adventure</h4><p>Big-game fishing or a catamaran cruise.</p></div>
+    </div>
+
+    <div class="v2-center-actions">
+      <a href="booking.html?q=7-Day" class="btn">See the 7-Day Package</a>
+      <a href="services.html" class="btn-outline hero-outline">Services &amp; Prices</a>
+    </div>
+  </div>
+</section>
+
+<section class="v2-section" id="why">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Why choose us</span>
+      <h2>Travel With Local Experts</h2>
+    </div>
+
+    <div class="v2-why">
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg></div>
+        <h3>Chauffeur-driven comfort</h3>
+        <p>Professional local drivers and clean, air-conditioned vehicles for your safety and comfort.</p>
       </div>
-
-      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
-        🐬
-        <h3>Dolphins & Whale Watching</h3>
-        <p>Boat trips with dolphin watching and optional swimming experience.</p>
-        <span class="card-action">See Packages →</span>
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>Island-wide coverage</h3>
+        <p>From the airport to remote beaches, we take you anywhere in Mauritius.</p>
       </div>
-
-      <div class="service-card clickable-card" onclick="window.location.href='booking.html'">
-        🦁
-        <h3>Casela Safari Park</h3>
-        <p>Safari, giraffe, zebra, wild cat interaction and walk with lions by advance booking.</p>
-        <span class="card-action">See Packages →</span>
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Flexible for every group</h3>
+        <p>Solo travellers, couples, families and large groups – private or shared options.</p>
+      </div>
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Licensed local partners</h3>
+        <p>Every activity and vehicle is provided by licensed, insured service providers.</p>
+      </div>
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <h3>Reliable & punctual</h3>
+        <p>On-time pick-ups so you never miss a flight, a boat or a booking.</p>
+      </div>
+      <div>
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+        <h3>Clear prices, no surprises</h3>
+        <p>Prices in euros with all taxes included, and a clear 48-hour cancellation policy.</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="container">
-  <span class="section-label center-label">Gallery</span>
-  <h2>Experience Mauritius</h2>
-
-  <div id="homeGalleryGrid" class="experience-grid">
-    <div class="loading-card">
-      <h3>Loading Gallery...</h3>
-      <p>Images will appear here once added by admin.</p>
+<section class="v2-section tight v2-sand v2-hidden">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Gallery</span>
+      <h2>Moments in Mauritius</h2>
     </div>
+    <div id="homeGalleryGrid" class="experience-grid"></div>
   </div>
 </section>
 
-<section id="reviews" class="container">
-  <span class="section-label center-label">Guest Reviews</span>
-  <h2>What Our Guests Say</h2>
-
-  <div id="homeReviewsGrid">
-    <div class="review-slider">
-      <div class="review-slide active">
-        <div class="review-stars">★★★★★</div>
-        <h3>Ahmed, UAE</h3>
-        <p>Very smooth private tour experience. Everything was arranged through WhatsApp.</p>
-      </div>
-
-      <div class="review-slide">
-        <div class="review-stars">★★★★★</div>
-        <h3>Fatima, Saudi Arabia</h3>
-        <p>The team was very helpful and the private transfer was comfortable.</p>
-      </div>
-
-      <div class="review-slide">
-        <div class="review-stars">★★★★★</div>
-        <h3>Khalid, Qatar</h3>
-        <p>Professional service, clean vehicle and beautiful Mauritius experience.</p>
-      </div>
-
-      <div class="review-dots">
-        <button class="review-dot active" type="button" data-review="0"></button>
-        <button class="review-dot" type="button" data-review="1"></button>
-        <button class="review-dot" type="button" data-review="2"></button>
-      </div>
+<section class="v2-section tight v2-hidden" id="reviews">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Guest reviews</span>
+      <h2>What Our Guests Say</h2>
     </div>
+    <div id="homeReviewsGrid"></div>
   </div>
 </section>
 
-<section class="cta-section">
-  <div class="cta-content">
-    <span class="section-label">Ready to Visit Mauritius?</span>
-    <h2>Book Your Luxury Mauritius Experience Today</h2>
-    <p>Choose your package, select optional activities, and start planning your private Mauritius trip.</p>
-
+<section class="v2-section tight">
+  <div class="v2-cta">
+    <span class="v2-eyebrow">Ready when you are</span>
+    <h2>Plan Your Mauritius Holiday Today</h2>
+    <p>Tell us your dates and what you love – we reply on WhatsApp with availability and a clear price in euros, all taxes included.</p>
     <div class="hero-actions">
-      <a id="ctaWhatsappBtn" href="#" target="_blank" class="btn">
-        Book on WhatsApp
-      </a>
-
-      <a href="booking.html" class="btn-outline hero-outline">
-        View Packages
-      </a>
+      <a id="ctaWhatsappBtn" href="https://wa.me/23059066404" target="_blank" rel="noopener" class="btn">Plan on WhatsApp</a>
+      <a href="payment.html" class="btn-outline hero-outline">Pay for a Booking</a>
     </div>
   </div>
 </section>
 
-<section id="contact" class="container">
-  <span class="section-label center-label">Contact</span>
-  <h2>Speak With Our Travel Team</h2>
+<section class="v2-section" id="contact">
+  <div class="container">
+    <div class="v2-head">
+      <span class="v2-eyebrow">Contact</span>
+      <h2>Speak With Our Travel Team</h2>
+      <p>Serving travellers from <span id="contactRegions">the UAE, Saudi Arabia, Qatar, Kuwait and worldwide</span>.</p>
+    </div>
 
-  <div class="contact-info center">
-    <p><strong>Email:</strong> <span id="contactEmail">mautourholidays@gmail.com</span></p>
-    <p><strong>Phone:</strong> <span id="contactPhone">+230 5906 6404</span></p>
-    <p><strong>Mobile:</strong> <span id="contactMobile">+230 5254 2792</span></p>
-    <p><strong>Serving:</strong> <span id="contactRegions">UAE 🇦🇪 Saudi Arabia 🇸🇦 Qatar 🇶🇦 Kuwait 🇰🇼</span></p>
-  </div>
-
-  <div class="center" style="margin-top: 2rem;">
-    <a id="contactWhatsappBtn" href="#" target="_blank" class="btn">Message on WhatsApp</a>
+    <div class="v2-contact">
+      <a class="v2-card" id="contactWhatsappCard" href="https://wa.me/23059066404" target="_blank" rel="noopener">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <h3>WhatsApp</h3>
+        <p>Fastest way to book and ask questions.</p>
+      </a>
+      <div class="v2-card">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></div>
+        <h3>Email</h3>
+        <p><strong id="contactEmail">mautourholidays@gmail.com</strong></p>
+      </div>
+      <div class="v2-card">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <h3>Phone</h3>
+        <p><strong id="contactPhone">+230 5906 6404</strong><br><span id="contactMobile">+230 5254 2792</span></p>
+      </div>
+      <div class="v2-card">
+        <div class="v2-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        <h3>Based in Mauritius</h3>
+        <p>Local team · pick-up anywhere on the island</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<a id="floatingWhatsappBtn" class="whatsapp-float" href="#" target="_blank">
-  WhatsApp
-</a>
+<a id="floatingWhatsappBtn" class="whatsapp-float" href="https://wa.me/23059066404" target="_blank" rel="noopener">WhatsApp</a>
 
-<footer class="footer">
-  <p>&copy; 2026 <span id="footerBusinessName">Mautour Holidays</span>. All Rights Reserved. · <a href="travel-info.html">Travel Info &amp; Policies</a></p>
+<footer class="v2-footer">
+  <div class="v2-footer-grid">
+    <div>
+      <span class="logo">Mautour Holidays</span>
+      <p>Private tours, transfers, island trips and tailor-made holidays across Mauritius, with every service provided through licensed local partners.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="booking.html">All Packages</a></li>
+        <li><a href="services.html">Services &amp; Prices</a></li>
+        <li><a href="services.html#transfers">Transfers &amp; Car Hire</a></li>
+        <li><a href="services.html#islands">Island Trips</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Information</h4>
+      <ul>
+        <li><a href="travel-info.html">Travel Info</a></li>
+        <li><a href="travel-info.html#payment">Payment Terms</a></li>
+        <li><a href="travel-info.html#cancellation">Cancellation Policy</a></li>
+        <li><a href="payment.html">Pay Online</a></li>
+        <li><a href="login.html">My Account</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:mautourholidays@gmail.com">mautourholidays@gmail.com</a></li>
+        <li><a href="tel:+23059066404">+230 5906 6404</a></li>
+        <li><a href="tel:+23052542792">+230 5254 2792</a></li>
+        <li><a href="https://wa.me/23059066404" target="_blank" rel="noopener" data-wa-link>WhatsApp us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="v2-footer-bottom">
+    <span>&copy; 2026 <span id="footerBusinessName">Mautour Holidays</span>. All rights reserved.</span>
+    <span>All prices in euros, taxes included · <a href="travel-info.html#cancellation">Cancellation policy</a></span>
+  </div>
 </footer>
 
 <script src="js/main.js"></script>
 <script type="module" src="js/home.js"></script>
-
-<script>
-  window.addEventListener("load", () => {
-    const heroWhatsapp = document.getElementById("heroWhatsappBtn");
-    const contactWhatsapp = document.getElementById("contactWhatsappBtn");
-
-    if (heroWhatsapp && contactWhatsapp) {
-      contactWhatsapp.href = heroWhatsapp.href;
-    }
-  });
-
-  const reviewSlides = document.querySelectorAll(".review-slide");
-  const reviewDots = document.querySelectorAll(".review-dot");
-  let currentReview = 0;
-
-  function showReview(index) {
-    reviewSlides.forEach((slide) => slide.classList.remove("active"));
-    reviewDots.forEach((dot) => dot.classList.remove("active"));
-
-    currentReview = index;
-
-    if (reviewSlides[currentReview]) {
-      reviewSlides[currentReview].classList.add("active");
-    }
-
-    if (reviewDots[currentReview]) {
-      reviewDots[currentReview].classList.add("active");
-    }
-  }
-
-  reviewDots.forEach((dot) => {
-    dot.addEventListener("click", () => {
-      showReview(Number(dot.dataset.review));
-    });
-  });
-
-  setInterval(() => {
-    const nextReview = currentReview + 1 >= reviewSlides.length ? 0 : currentReview + 1;
-    showReview(nextReview);
-  }, 5000);
-</script>
 
 </body>
 </html>
