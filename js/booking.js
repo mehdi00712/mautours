@@ -1509,7 +1509,7 @@ function openBookingModal(trip) {
 
   renderActivityOptions();
   renderVehicleOptions();
-  applyPaymentLink(db, selectedTrip.paymentLink);
+  applyPaymentLink(db, selectedTrip.paymentLink, selectedTrip.id);
 
   if (modal) {
     modal.classList.add("show");

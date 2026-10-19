@@ -797,7 +797,7 @@ async function loadPackageDetails() {
     renderIncludes(data.includes);
     renderGallery(data);
     renderActivities(currentPackage.activities);
-    applyPaymentLink(db, data.paymentLink);
+    applyPaymentLink(db, data.paymentLink, snapshot.id);
 
     if (packageLoading) {
       packageLoading.style.display = "none";
