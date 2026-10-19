@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mautour Holidays | Secure Payment</title>
+
+  <meta
+    name="description"
+    content="Pay for your confirmed Mautour Holidays booking securely online."
+  />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .pay-page { padding: 120px 0 60px; }
+    .pay-wrap { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+    .pay-card {
+      background: #fff;
+      border: 1px solid var(--line, #e7e1d4);
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .pay-card h3 { margin-bottom: 10px; color: var(--darkblue, #071827); }
+    .pay-card p { line-height: 1.6; color: var(--muted, #5f6b76); }
+    .pay-steps { padding-left: 20px; margin: 10px 0 0; line-height: 1.7; }
+    .pay-form label { display: block; font-weight: 700; margin: 14px 0 6px; }
+    .pay-form input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line, #e7e1d4);
+      font: inherit;
+    }
+    .pay-check { display: flex; gap: 10px; align-items: flex-start; margin: 18px 0; font-size: 0.93rem; line-height: 1.5; }
+    .pay-check input { width: auto; margin-top: 4px; }
+    .pay-status {
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+    .pay-status.soon { background: #fff7e0; border: 1px solid #f0d58a; }
+    .pay-status.ready { background: #eaf7ee; border: 1px solid #a9dbb7; }
+    .pay-secure { font-size: 0.85rem; color: var(--muted, #5f6b76); margin-top: 12px; }
+    .pay-btn { width: 100%; text-align: center; }
+    .pay-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo">Mautour Holidays</h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="travel-info.html">Travel Info</a>
+      <a href="payment.html" class="active">Pay Online</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<main class="pay-page">
+  <div class="pay-wrap">
+
+    <span class="section-label">Secure Payment</span>
+    <h2>Pay for Your Booking</h2>
+    <p style="color: var(--muted); margin-bottom: 24px;">
+      Pay online once our team has confirmed your booking and the final price on WhatsApp.
+    </p>
+
+    <div id="payStatus" class="pay-status soon">
+      Checking online payment availability...
+    </div>
+
+    <div class="pay-card">
+      <h3>How it works</h3>
+      <ol class="pay-steps">
+        <li>Choose your package and send your request on WhatsApp.</li>
+        <li>We confirm availability and the final price (in euros, all taxes included).</li>
+        <li>Fill in the form below and pay securely on our bank's payment page.</li>
+        <li>You receive a receipt for your payment.</li>
+      </ol>
+    </div>
+
+    <form id="payForm" class="pay-card pay-form">
+      <h3>Your booking</h3>
+
+      <label for="payName">Full name</label>
+      <input id="payName" type="text" required autocomplete="name" />
+
+      <label for="payEmail">Email</label>
+      <input id="payEmail" type="email" required autocomplete="email" />
+
+      <label for="payPackage">Package</label>
+      <input id="payPackage" type="text" required placeholder="Example: Île aux Cerfs Private Boat Experience" />
+
+      <label for="payAmount">Confirmed amount (€)</label>
+      <input id="payAmount" type="number" min="1" step="0.01" required placeholder="Amount confirmed by our team" />
+
+      <label class="pay-check">
+        <input id="payTerms" type="checkbox" required />
+        <span>
+          I have read and accept the
+          <a href="travel-info.html#cancellation" target="_blank">cancellation policy</a>
+          and <a href="travel-info.html#payment" target="_blank">payment terms</a>.
+        </span>
+      </label>
+
+      <button id="payBtn" type="submit" class="btn pay-btn">Proceed to Secure Payment</button>
+
+      <p class="pay-secure">
+        🔒 Card details are entered only on our bank's secure payment page. Mautour Holidays never sees or stores your card details.
+      </p>
+    </form>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <p>&copy; 2026 Mautour Holidays. All Rights Reserved. · <a href="travel-info.html">Travel Info &amp; Policies</a></p>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/payment.js"></script>
+
+</body>
+</html>
