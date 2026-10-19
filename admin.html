@@ -259,6 +259,12 @@
         </div>
 
         <div class="form-group">
+          <label>Package Payment Link (optional)</label>
+          <input type="url" id="tripPaymentLink" placeholder="https://... (only if this package has its own payment link)" />
+          <small>Leave empty to use the general payment link from Settings.</small>
+        </div>
+
+        <div class="form-group">
           <label>What Is Included?</label>
           <textarea id="tripIncludes" placeholder="Write one item per line. Example: Private transfer"></textarea>
         </div>
@@ -441,6 +447,12 @@
         <div class="form-group">
           <label>Regions Served</label>
           <input type="text" id="servedRegions" placeholder="UAE, Saudi Arabia, Qatar, Kuwait" />
+        </div>
+
+        <div class="form-group">
+          <label>Online Payment Link</label>
+          <input type="url" id="paymentLink" placeholder="https://... (link from your bank / payment provider)" />
+          <small>Leave empty until your bank sends the payment portal link. When filled in, a "Pay Online" button appears on every package page.</small>
         </div>
 
         <button type="submit" class="btn">Save Settings</button>
