@@ -299,3 +299,23 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
   .v2-price small { text-align: left; }
   .v2-cta { padding: 2.6rem 1.3rem; border-radius: 22px; }
 }
+
+/* ---------- Fixes ---------- */
+.logo a { font-family: "Playfair Display", Georgia, serif; }
+
+/* Package cards: compact "Duration: Full day" lines instead of big gold headings */
+.booking-card > p:not(.package-card-price) {
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.booking-card > p:not(.package-card-price) strong {
+  display: inline;
+  font-size: inherit;
+  color: var(--darkblue);
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+}
+.booking-card > p { flex-grow: 0 !important; }
+.booking-card > p.package-card-price { margin-top: auto; padding-top: 0.6rem; }
