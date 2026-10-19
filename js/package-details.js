@@ -12,6 +12,9 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+import { applyPaymentLink } from "./payment-link.js";
+import { formatPackagePrice, activityPriceLabel } from "./price-format.js";
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -515,7 +518,7 @@ function renderActivities(activities) {
 
               <span>
                 <strong>${escapeHtml(name)}</strong>
-                <small>Select if interested</small>
+                <small>${escapeHtml(activityPriceLabel(activities, name))}</small>
               </span>
             </label>
           `
@@ -773,6 +776,11 @@ async function loadPackageDetails() {
         data.duration || "To be confirmed";
     }
 
+    const packagePriceEl = document.getElementById("packagePrice");
+    if (packagePriceEl) {
+      packagePriceEl.textContent = formatPackagePrice(data);
+    }
+
     if (packageVehicleRequirement) {
       packageVehicleRequirement.textContent =
         currentPackage.requiresVehicle
@@ -789,6 +797,7 @@ async function loadPackageDetails() {
     renderIncludes(data.includes);
     renderGallery(data);
     renderActivities(currentPackage.activities);
+    applyPaymentLink(db, data.paymentLink);
 
     if (packageLoading) {
       packageLoading.style.display = "none";

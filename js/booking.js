@@ -10,6 +10,9 @@ import {
   getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+import { applyPaymentLink } from "./payment-link.js";
+import { formatPackagePrice, activityPriceLabel, TAX_NOTE } from "./price-format.js";
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -681,7 +684,7 @@ function renderActivityOptions() {
 
               <span>
                 <strong>${escapeHtml(name)}</strong>
-                <small>Select if interested</small>
+                <small>${escapeHtml(activityPriceLabel(activities, name))}</small>
               </span>
             </label>
           `
@@ -1163,9 +1166,10 @@ function createTripCard(trip) {
         : ""
     }
 
-    <span class="package-card-quotation">
-      Personalised quotation on WhatsApp
-    </span>
+    <p class="package-card-price">
+      <strong>${formatPackagePrice(trip)}</strong>
+      <small>${TAX_NOTE}</small>
+    </p>
 
     <div class="package-card-actions">
       <a class="btn" href="package-details.html?id=${trip.id}">
@@ -1505,6 +1509,7 @@ function openBookingModal(trip) {
 
   renderActivityOptions();
   renderVehicleOptions();
+  applyPaymentLink(db, selectedTrip.paymentLink);
 
   if (modal) {
     modal.classList.add("show");

@@ -606,6 +606,7 @@ if (websiteSettingsForm) {
           mobileNumber: document.getElementById("mobileNumber")?.value.trim() || "",
           businessEmail: document.getElementById("businessEmail")?.value.trim() || "",
           servedRegions: document.getElementById("servedRegions")?.value.trim() || "",
+          paymentLink: document.getElementById("paymentLink")?.value.trim() || "",
           updatedAt: serverTimestamp()
         },
         { merge: true }
@@ -645,6 +646,10 @@ async function loadWebsiteSettings() {
 
     if (document.getElementById("servedRegions")) {
       document.getElementById("servedRegions").value = data.servedRegions || "";
+    }
+
+    if (document.getElementById("paymentLink")) {
+      document.getElementById("paymentLink").value = data.paymentLink || "";
     }
   } catch (error) {
     console.error("Load Settings Error:", error);
@@ -1011,6 +1016,7 @@ if (tripForm) {
         duration: document.getElementById("tripDuration")?.value.trim() || "",
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
+        paymentLink: document.getElementById("tripPaymentLink")?.value.trim() || "",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
         activities,
         featured: document.getElementById("tripFeatured")?.checked || false,
@@ -1199,6 +1205,9 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripDuration").value = data.duration || "";
       document.getElementById("tripPrice").value = data.price || 0;
       document.getElementById("tripPriceType").value = data.priceType || "Custom Quote";
+      if (document.getElementById("tripPaymentLink")) {
+        document.getElementById("tripPaymentLink").value = data.paymentLink || "";
+      }
 
       document.getElementById("tripIncludes").value = Array.isArray(data.includes)
         ? data.includes.join("\n")

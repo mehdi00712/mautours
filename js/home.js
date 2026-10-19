@@ -1,4 +1,5 @@
 import { firebaseConfig } from "./firebase-config.js";
+import { formatPackagePrice } from "./price-format.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
@@ -49,12 +50,7 @@ function getDocTime(data) {
 }
 
 function formatPrice(trip) {
-  const price = Number(trip.price || 0);
-
-  if (price <= 0 || trip.priceType === "Custom Quote") return "Custom Quote";
-  if (trip.priceType === "Fixed") return `Rs ${price.toLocaleString()}`;
-
-  return `${trip.priceType || "Starting From"} Rs ${price.toLocaleString()}`;
+  return formatPackagePrice(trip);
 }
 
 function setWhatsappButtons(link) {
