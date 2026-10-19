@@ -3538,3 +3538,27 @@ h2::after {
     height: 205px;
   }
 }
+
+/* Booking policy note (package page) */
+.booking-policy-note {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line, #e7e1d4);
+  background: #fffaf0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.booking-policy-note strong { display: block; margin-bottom: 4px; }
+.booking-policy-note a { font-weight: 700; color: var(--gold, #c9a227); }
+.footer a { color: inherit; text-decoration: underline; }
+
+/* Package price on cards */
+.package-card-price { margin: 10px 0 14px; }
+.package-card-price strong { display: block; font-size: 1.25rem; color: var(--darkblue, #071827); }
+.package-card-price small { color: var(--muted, #5f6b76); font-size: 0.8rem; }
+
+/* Package price on cards */
+.package-card-price { margin: 10px 0 14px; }
+.package-card-price strong { display: block; font-size: 1.25rem; color: var(--darkblue, #071827); }
+.package-card-price small { color: var(--muted, #5f6b76); font-size: 0.8rem; }
