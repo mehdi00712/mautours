@@ -13,7 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 import { applyPaymentLink } from "./payment-link.js";
-import { formatPackagePrice, activityPriceLabel } from "./price-format.js";
+import { formatPackagePrice, activityPriceLabel, placeholderImage } from "./price-format.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -398,7 +398,7 @@ function renderGallery(packageData) {
   }
 
   if (images.length === 0) {
-    images.push("assets/ile.jpg");
+    images.push(placeholderImage(packageData.title, packageData.category));
   }
 
   if (photoCount) {

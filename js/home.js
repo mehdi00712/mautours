@@ -1,5 +1,5 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { formatPackagePrice } from "./price-format.js";
+import { formatPackagePrice, packageImage } from "./price-format.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
@@ -58,7 +58,8 @@ function setWhatsappButtons(link) {
     "heroWhatsappBtn",
     "ctaWhatsappBtn",
     "floatingWhatsappBtn",
-    "contactWhatsappBtn"
+    "contactWhatsappBtn",
+    "contactWhatsappCard"
   ];
 
   ids.forEach((id) => {
@@ -227,7 +228,7 @@ async function loadFeaturedTrips() {
       grid.innerHTML += `
         <div class="experience-card clickable-card" onclick="window.location.href='package-details.html?id=${trip.id}'">
           <img
-            src="${escapeHtml(trip.imageUrl || "assets/ile.jpg")}"
+            src="${escapeHtml(packageImage(trip))}"
             alt="${escapeHtml(trip.title || "Mauritius package")}"
             loading="lazy"
           />
@@ -270,12 +271,7 @@ async function loadGallery() {
   const grid = $("homeGalleryGrid");
   if (!grid) return;
 
-  grid.innerHTML = `
-    <div class="loading-card">
-      <h3>Loading Gallery...</h3>
-      <p>Please wait while we load the latest images.</p>
-    </div>
-  `;
+  grid.innerHTML = "";
 
   try {
     const snapshot = await getDocs(collection(db, "gallery"));
@@ -298,14 +294,11 @@ async function loadGallery() {
     const latestImages = images.slice(0, 6);
 
     if (latestImages.length === 0) {
-      grid.innerHTML = `
-        <div class="loading-card">
-          <h3>No Gallery Images Yet</h3>
-          <p>Upload gallery images from the admin dashboard.</p>
-        </div>
-      `;
+      grid.closest("section")?.classList.add("v2-hidden");
       return;
     }
+
+    grid.closest("section")?.classList.remove("v2-hidden");
 
     grid.innerHTML = "";
 
@@ -323,12 +316,7 @@ async function loadGallery() {
   } catch (error) {
     console.error("Load gallery error:", error);
 
-    grid.innerHTML = `
-      <div class="loading-card">
-        <h3>Could Not Load Gallery</h3>
-        <p>${escapeHtml(error.message || "Please try again later.")}</p>
-      </div>
-    `;
+    grid.closest("section")?.classList.add("v2-hidden");
   }
 }
 
@@ -403,9 +391,11 @@ async function loadTestimonials() {
     const latestTestimonials = testimonials.slice(0, 5);
 
     if (latestTestimonials.length === 0) {
-      startReviewSlider();
+      grid.closest("section")?.classList.add("v2-hidden");
       return;
     }
+
+    grid.closest("section")?.classList.remove("v2-hidden");
 
     const slides = latestTestimonials
       .map((review, index) => {
@@ -439,7 +429,7 @@ async function loadTestimonials() {
     startReviewSlider();
   } catch (error) {
     console.error("Load testimonials error:", error);
-    startReviewSlider();
+    grid.closest("section")?.classList.add("v2-hidden");
   }
 }
 

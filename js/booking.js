@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 import { applyPaymentLink } from "./payment-link.js";
-import { formatPackagePrice, activityPriceLabel, TAX_NOTE } from "./price-format.js";
+import { formatPackagePrice, activityPriceLabel, TAX_NOTE, packageImage } from "./price-format.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -1095,9 +1095,7 @@ function createTripCard(trip) {
   const duration = escapeHtml(
     trip.duration || ""
   );
-  const imageUrl = escapeHtml(
-    trip.imageUrl || "assets/ile.jpg"
-  );
+  const imageUrl = escapeHtml(packageImage(trip));
   const includes = formatIncludes(trip.includes);
 
   const galleryCount = Array.isArray(trip.galleryImages)
@@ -1694,6 +1692,19 @@ async function init() {
   setupPackageFilters();
   await loadVehicles();
   await loadTrips();
+  applySearchFromUrl();
+}
+
+// Allow links such as booking.html?q=Catamaran to open the list pre-filtered.
+function applySearchFromUrl() {
+  const q = new URLSearchParams(window.location.search).get("q");
+  if (!q || !packageSearch) return;
+
+  packageSearch.value = q;
+  packageSearch.dispatchEvent(new Event("input", { bubbles: true }));
+
+  const section = document.getElementById("packages");
+  if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 init();
