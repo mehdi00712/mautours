@@ -479,3 +479,110 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
 .veh-card-img { overflow: hidden; }
 .veh-card-img img { position: absolute; inset: 0; }
 .vd-desc { white-space: pre-line; }
+
+/* =========================================================
+   Header icons, cart, toast
+   ========================================================= */
+.nav .nav-icon { display: inline-flex; align-items: center; gap: 0.35rem; position: relative; }
+.nav .nav-icon svg { width: 20px; height: 20px; }
+.nav .nav-icon::after { display: none; }
+.nav-icon-label { display: none; }
+.nav-cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--darkblue);
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.nav-cart-count[hidden] { display: none; }
+@media (max-width: 768px) {
+  .nav-icon-label { display: inline; }
+  .nav-cart-count { position: static; margin-left: 4px; }
+}
+
+.cart-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 140%);
+  background: var(--darkblue);
+  color: #fff;
+  padding: 0.9rem 1.2rem;
+  border-radius: 14px;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  z-index: 6000;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+  max-width: calc(100% - 32px);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.cart-toast.show { transform: translate(-50%, 0); }
+.cart-toast a { color: var(--gold); font-weight: 800; white-space: nowrap; text-decoration: none; }
+
+.cart-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 2rem; align-items: start; }
+.cart-list { display: grid; gap: 1rem; }
+.cart-item { display: grid; grid-template-columns: 150px 1fr; gap: 1.2rem; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 1rem; }
+.cart-item > img { width: 150px; height: 110px; object-fit: cover; border-radius: 14px; background: var(--darkblue); }
+.cart-item.has-error { border-color: #f0d58a; }
+.cart-item-top { display: flex; justify-content: space-between; gap: 1rem; }
+.cart-item-top .v2-eyebrow { margin-bottom: 0.2rem; font-size: 0.7rem; }
+.cart-item h3 { color: var(--darkblue); font-size: 1.15rem; margin-bottom: 0.2rem; }
+.cart-item p { font-size: 0.86rem; line-height: 1.5; margin: 0; }
+.cart-item-total { font-weight: 900; color: var(--darkblue); font-size: 1.15rem; white-space: nowrap; }
+.cart-lines { list-style: none; padding: 0; margin: 0.7rem 0 0; }
+.cart-lines li { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.86rem; padding: 0.3rem 0; border-bottom: 1px dashed var(--line); color: var(--muted); }
+.cart-lines li:last-child { border-bottom: 0; }
+.cart-lines strong { color: var(--darkblue); white-space: nowrap; }
+.cart-item-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 0.7rem; gap: 1rem; }
+.cart-qty { display: inline-flex; align-items: center; gap: 0.5rem; }
+.cart-qty button { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; font-weight: 900; cursor: pointer; font-size: 1rem; line-height: 1; }
+.cart-qty button:hover { border-color: var(--gold); }
+.cart-qty small { color: var(--muted); }
+.cart-remove { background: none; border: 0; color: #b45309; font-weight: 700; cursor: pointer; font-size: 0.86rem; margin-left: auto; }
+.cart-warning { margin-top: 0.7rem; background: #fff7e0; border: 1px solid #f0d58a; border-radius: 12px; padding: 0.7rem 0.9rem; font-size: 0.86rem; }
+.cart-warning a { font-weight: 800; color: var(--darkblue); }
+.cart-side { position: sticky; top: 92px; display: grid; gap: 1rem; }
+.cart-box { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 1.4rem; }
+.cart-box h3 { color: var(--darkblue); font-size: 1.3rem; margin-bottom: 0.6rem; }
+.cart-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.9rem; padding-top: 0.9rem; border-top: 2px solid var(--darkblue); }
+.cart-total span { font-weight: 800; color: var(--darkblue); }
+.cart-total strong { font-size: 1.6rem; color: var(--darkblue); }
+.cart-signed { font-size: 0.88rem; }
+.cart-empty { text-align: center; background: #fff; border: 1px dashed var(--line); border-radius: 20px; padding: 3rem 1.5rem; }
+.cart-empty h3 { color: var(--darkblue); margin-bottom: 0.4rem; }
+.add-cart-btn { display: flex; width: 100%; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 12px; }
+.secondary-wa-btn { background: transparent !important; color: var(--darkblue) !important; border: 2px solid var(--gold) !important; box-shadow: none !important; }
+@media (max-width: 900px) {
+  .cart-layout { grid-template-columns: 1fr; }
+  .cart-side { position: static; }
+}
+@media (max-width: 560px) {
+  .cart-item { grid-template-columns: 1fr; }
+  .cart-item > img { width: 100%; height: 160px; }
+}
+
+/* Account */
+.acct-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.acct-actions { display: flex; gap: 0.6rem; }
+.acct-list { display: grid; gap: 1rem; }
+.acct-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 1.3rem 1.4rem; }
+.acct-card-top { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.acct-card h3 { color: var(--darkblue); font-size: 1.2rem; }
+.acct-card p { font-size: 0.9rem; margin: 0.4rem 0 0; }
+.acct-card-foot { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
+.acct-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.chip { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: var(--gold-soft); color: var(--gold-dark); white-space: nowrap; }
+.chip.ok { background: #e8f6ec; color: #1e7b3c; }
+.chip.bad { background: #fff1e6; color: #b45309; }
