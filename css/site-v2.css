@@ -586,3 +586,4 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
 .chip { display: inline-block; padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 800; background: var(--gold-soft); color: var(--gold-dark); white-space: nowrap; }
 .chip.ok { background: #e8f6ec; color: #1e7b3c; }
 .chip.bad { background: #fff1e6; color: #b45309; }
+.cart-list { padding: 0; }
