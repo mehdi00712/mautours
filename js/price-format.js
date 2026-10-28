@@ -8,11 +8,18 @@ export function formatPackagePrice(trip = {}) {
 
   if (price <= 0 || type === "Custom Quote") return "Custom Quote";
 
-  const amount = `€ ${price.toLocaleString()}`;
+  const unit = { person: " per person", couple: " per couple", booking: "" }[trip.priceUnit] || "";
+  const amount = `€ ${price.toLocaleString()}${unit}`;
 
   if (type === "Fixed") return amount;
   if (type === "Vehicle Based") return `From ${amount} + vehicle`;
   return `From ${amount}`;
+}
+
+// Only allow redirects to pages on this site (prevents open-redirect abuse).
+export function safeRedirect(value, fallback = "my-bookings.html") {
+  const v = String(value || "");
+  return /^[a-z0-9-]+\.html(\?[^#]*)?(#.*)?$/i.test(v) ? v : fallback;
 }
 
 export function activityPriceLabel(activities, name) {

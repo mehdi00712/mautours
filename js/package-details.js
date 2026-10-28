@@ -1,8 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getFirestore,
@@ -24,8 +22,10 @@ import {
   openPendingTab,
   sendTabTo
 } from "./booking-store.js";
+import { addToCart, cartToast } from "./cart.js";
+import { pricePackageItem, isPurchasablePackage } from "./pricing.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const WHATSAPP_NUMBER = "23052542792";
@@ -1014,6 +1014,87 @@ if (packageBookingForm) {
   });
 }
 
+
+/* =========================
+   ADD TO CART
+========================= */
+
+function currentCartItem() {
+  return {
+    type: "package",
+    refId: currentPackage?.id,
+    title: currentPackage?.title || "Package",
+    date: document.getElementById("date")?.value || "",
+    people: Math.max(1, Number(document.getElementById("people")?.value || 1)),
+    activities: getSelectedActivities(),
+    vehicleId: selectedVehicle?.id || "",
+    vehicleName: selectedVehicle?.name || "",
+    notes: document.getElementById("specialRequests")?.value.trim() || ""
+  };
+}
+
+function updateCartButton() {
+  const btn = document.getElementById("addToCartBtn");
+  if (!btn || !currentPackage) return;
+  const result = pricePackageItem(currentCartItem(), currentPackage, selectedVehicle);
+  btn.querySelector("span").textContent = result.ok ? `Add to Cart – € ${result.total.toLocaleString()}` : "Add to Cart";
+}
+
+function setupAddToCart() {
+  if (!packageBookingForm || !currentPackage || document.getElementById("addToCartBtn")) return;
+  const submit = packageBookingForm.querySelector('button[type="submit"]');
+
+  if (!isPurchasablePackage(currentPackage)) {
+    if (submit) submit.textContent = "Request a Quote on WhatsApp";
+    return;
+  }
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = "addToCartBtn";
+  btn.className = "btn add-cart-btn";
+  btn.innerHTML = "<span>Add to Cart</span>";
+  packageBookingForm.insertBefore(btn, submit);
+
+  if (submit) {
+    submit.classList.add("secondary-wa-btn");
+    submit.textContent = "Or Request on WhatsApp";
+  }
+
+  packageBookingForm.addEventListener("input", updateCartButton);
+  packageBookingForm.addEventListener("change", updateCartButton);
+  packageBookingForm.addEventListener("click", () => setTimeout(updateCartButton, 0));
+  updateCartButton();
+
+  btn.addEventListener("click", async () => {
+    const item = currentCartItem();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!item.date || new Date(`${item.date}T00:00:00`) < today) {
+      showPopup("Choose a Date", "Please choose your travel date (today or later) before adding to your cart.");
+      return;
+    }
+    if (currentPackage.requiresVehicle && allVehicles.length > 0 && !selectedVehicle) {
+      showPopup("Choose a Vehicle", "Please select your preferred vehicle first.");
+      return;
+    }
+
+    const result = pricePackageItem(item, currentPackage, selectedVehicle);
+    if (!result.ok) {
+      showPopup("Price on Request", result.error);
+      return;
+    }
+
+    try {
+      await addToCart(item);
+      cartToast(`Added to cart – € ${result.total.toLocaleString()}`);
+    } catch (error) {
+      showPopup("Cart", error.message);
+    }
+  });
+}
+
 async function init() {
   injectPackageStyles();
   setMinimumTravelDate();
@@ -1022,6 +1103,7 @@ async function init() {
     "pk"
   );
   await loadPackageDetails();
+  setupAddToCart();
 }
 
 init();

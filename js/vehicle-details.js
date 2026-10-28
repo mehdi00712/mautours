@@ -3,7 +3,7 @@
 // that saves the booking (with Tourism Authority record details) and opens WhatsApp.
 
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getFirestore,
   doc,
@@ -21,8 +21,10 @@ import {
   openPendingTab,
   sendTabTo
 } from "./booking-store.js";
+import { addToCart, cartToast } from "./cart.js";
+import { priceVehicleItem } from "./pricing.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const id = new URLSearchParams(location.search).get("id");
@@ -135,6 +137,7 @@ async function load() {
 
     $("vdLoading").style.display = "none";
     $("vdContent").style.display = "grid";
+    setupVehicleCart();
   } catch (error) {
     console.error("Vehicle load error:", error);
     $("vdLoading").innerHTML = `<h3>Could not load this vehicle</h3><p>Please refresh the page or contact us on WhatsApp.</p>`;
@@ -250,6 +253,75 @@ $("vdForm").addEventListener("submit", async (e) => {
     btn.textContent = original;
   }
 });
+
+
+/* ---------- Add to cart ---------- */
+
+function vehicleCartItem() {
+  const v = (x) => $(x).value.trim();
+  return {
+    type: "vehicle",
+    refId: vehicle.id,
+    title: `${vehicle.name} – ${SERVICE_TYPES.find((s) => s.key === $("vdService").value)?.label || "Trip"}`,
+    service: $("vdService").value,
+    date: v("vdDate"),
+    time: v("vdTime"),
+    pickup: v("vdPickup"),
+    dropoff: v("vdDropoff"),
+    passengers: Number(v("vdPassengers") || 0),
+    bags: Number(v("vdBags") || 0),
+    flight: v("vdFlight"),
+    notes: v("vdNotes")
+  };
+}
+
+function refreshCartButton() {
+  const btn = $("vdAddCart");
+  if (!btn || !vehicle) return;
+  const r = priceVehicleItem({ service: $("vdService").value }, vehicle);
+  btn.style.display = r.ok ? "" : "none";
+  btn.textContent = r.ok ? `Add to Cart – € ${r.total.toLocaleString()}` : "Add to Cart";
+  $("vdSubmit").textContent = r.ok ? "Or Request on WhatsApp" : "Request a Quote on WhatsApp";
+  $("vdSubmit").classList.toggle("secondary-wa-btn", r.ok);
+}
+
+function setupVehicleCart() {
+  if ($("vdAddCart")) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.id = "vdAddCart";
+  btn.className = "btn full-width-btn";
+  $("vdSubmit").before(btn);
+  $("vdService").addEventListener("change", refreshCartButton);
+  refreshCartButton();
+
+  btn.addEventListener("click", async () => {
+    const item = vehicleCartItem();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (!item.date || new Date(`${item.date}T00:00:00`) < today || !item.time || !item.pickup || !item.passengers) {
+      showMessage("Missing information", "Please choose the date, pick-up time, pick-up location and number of passengers.");
+      return;
+    }
+    if (vehicle.capacity && item.passengers > Number(vehicle.capacity)) {
+      showMessage("Too many passengers", `This vehicle takes up to ${vehicle.capacity} passengers.`);
+      return;
+    }
+    const r = priceVehicleItem(item, vehicle);
+    if (!r.ok) {
+      showMessage("Price on request", r.error);
+      return;
+    }
+    try {
+      await addToCart(item);
+      $("vdMessage").style.display = "none";
+      cartToast(`Added to cart – € ${r.total.toLocaleString()}`);
+    } catch (error) {
+      showMessage("Cart", error.message);
+    }
+  });
+}
 
 insertTravellerFields($("vdNotesLabel"), "vd");
 setMinDate();

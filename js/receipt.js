@@ -1,13 +1,14 @@
 // js/receipt.js – shows the verified payment receipt after Absa / CyberSource.
 
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getFunctions,
   httpsCallable
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
+import { clearCart, getCart } from "./cart.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const getPaymentStatus = httpsCallable(getFunctions(app, "us-central1"), "getPaymentStatus");
 
 const p = new URLSearchParams(location.search);
@@ -54,6 +55,9 @@ async function init() {
       $("rcTxn").textContent = data.transactionId || "–";
       $("rcPaidAt").textContent = data.paidAt ? new Date(data.paidAt).toLocaleString("en-GB", { timeZone: "Indian/Mauritius" }) + " (Mauritius time)" : "–";
       $("rcList").style.display = "grid";
+      if (getCart().length && data.item && getCart().every((i) => data.item.includes(i.title.split(" – ")[0]))) {
+        clearCart();
+      }
       $("rcPrint").style.display = "inline-flex";
       return;
     } catch (error) {

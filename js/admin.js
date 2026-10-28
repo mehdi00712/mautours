@@ -1,5 +1,5 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getAuth,
@@ -29,7 +29,7 @@ import {
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -1029,6 +1029,7 @@ if (tripForm) {
         duration: document.getElementById("tripDuration")?.value.trim() || "",
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
+        priceUnit: document.getElementById("tripPriceUnit")?.value || "person",
         paymentLink: document.getElementById("tripPaymentLink")?.value.trim() || "",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
         activities,
@@ -1164,7 +1165,7 @@ async function loadTrips() {
 
         <p><strong>Category:</strong> ${escapeHtml(data.category || "-")}</p>
         <p><strong>Duration:</strong> ${escapeHtml(data.duration || "-")}</p>
-        <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))}</p>
+        <p><strong>Price:</strong> ${escapeHtml(formatPrice(data))} <small>(${escapeHtml({ person: "per person", couple: "per couple", booking: "per booking" }[data.priceUnit] || "unit not set")})</small></p>
         <p><strong>Status:</strong> ${data.active ? "Active" : "Disabled"}</p>
         <p><strong>Featured:</strong> ${data.featured ? "Yes" : "No"}</p>
         <p><strong>Vehicle:</strong> ${escapeHtml(vehicleText)}</p>
@@ -1218,6 +1219,9 @@ function bindTripButtons(snapshot) {
       document.getElementById("tripDuration").value = data.duration || "";
       document.getElementById("tripPrice").value = data.price || 0;
       document.getElementById("tripPriceType").value = data.priceType || "Custom Quote";
+      if (document.getElementById("tripPriceUnit")) {
+        document.getElementById("tripPriceUnit").value = data.priceUnit || "person";
+      }
       if (document.getElementById("tripPaymentLink")) {
         document.getElementById("tripPaymentLink").value = data.paymentLink || "";
       }
@@ -1640,8 +1644,12 @@ async function loadBookings() {
         <td>${escapeHtml(data.phone || "-")}</td>
         <td>${escapeHtml(data.email || "-")}</td>
         <td>
-          ${escapeHtml(packageText)}
-          <br><small><strong>Activities:</strong> ${escapeHtml(activitiesText)}</small>
+          ${Array.isArray(data.items) && data.items.length
+            ? `<strong>Cart order</strong><ul style="margin:4px 0 0 16px;padding:0;">${data.items
+                .map((it) => `<li><small>${escapeHtml(it.title || "")} – ${escapeHtml(it.date || "")}${it.people ? ` · ${escapeHtml(it.people)} pax` : ""}${it.passengers ? ` · ${escapeHtml(it.passengers)} pax` : ""}${it.pickup ? ` · ${escapeHtml(it.pickup)}` : ""}${it.activities && it.activities.length ? ` · ${escapeHtml(it.activities.join(", "))}` : ""} – <strong>€ ${Number(it.total || 0).toLocaleString()}</strong></small></li>`)
+                .join("")}</ul>`
+            : `${escapeHtml(packageText)}
+          <br><small><strong>Activities:</strong> ${escapeHtml(activitiesText)}</small>`}
         </td>
         <td>${escapeHtml(vehicleText)}</td>
         <td>${escapeHtml(dateText)}${data.time ? `<br><small>${escapeHtml(data.time)} · ${escapeHtml(data.pickup || "")}</small>` : ""}</td>

@@ -1,12 +1,13 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { safeRedirect } from "./price-format.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getAuth,
   signInWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const adminUIDs = [
@@ -36,9 +37,16 @@ loginForm.addEventListener("submit", async (e) => {
       return;
     }
 
-    window.location.href = redirect || "my-bookings.html";
+    window.location.href = safeRedirect(redirect);
   } catch (error) {
     loginMessage.textContent = error.message;
     loginMessage.style.color = "red";
   }
 });
+
+// Keep the redirect when the customer chooses "Create an Account".
+if (redirect) {
+  document.querySelectorAll('a[href="register.html"]').forEach((a) => {
+    a.href = `register.html?redirect=${encodeURIComponent(safeRedirect(redirect))}`;
+  });
+}

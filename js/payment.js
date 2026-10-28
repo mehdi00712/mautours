@@ -5,7 +5,7 @@
 // Card details are entered only on that page.
 
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import {
   getFunctions,
@@ -13,7 +13,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
 import { getWhatsappNumber } from "./booking-store.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const functions = getFunctions(app, "us-central1");
 const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");

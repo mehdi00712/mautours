@@ -2,7 +2,7 @@
 // Public list of chauffeur vehicles (Firestore collection "vehicles").
 
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import {
   getFirestore,
   collection,
@@ -11,7 +11,7 @@ import {
 import { placeholderImage } from "./price-format.js";
 import { vehicleFromPrice, vehicleFeatures } from "./vehicle-utils.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const grid = document.getElementById("vehiclesGrid");

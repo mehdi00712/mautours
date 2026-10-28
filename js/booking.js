@@ -1,8 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
 
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getFirestore,
@@ -23,7 +21,7 @@ import {
   sendTabTo
 } from "./booking-store.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const WHATSAPP_NUMBER = "23052542792";

@@ -1,5 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { safeRedirect } from "./price-format.js";
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
   getAuth,
@@ -14,7 +15,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -48,7 +49,7 @@ registerForm.addEventListener("submit", async (e) => {
       updatedAt: serverTimestamp()
     });
 
-    window.location.href = "my-bookings.html";
+    window.location.href = safeRedirect(new URLSearchParams(location.search).get("redirect"));
   } catch (error) {
     registerMessage.textContent = error.message;
     registerMessage.style.color = "red";
