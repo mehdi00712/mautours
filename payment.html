@@ -49,6 +49,7 @@
     .pay-secure { font-size: 0.85rem; color: var(--muted, #5f6b76); margin-top: 12px; }
     .pay-btn { width: 100%; text-align: center; }
     .pay-btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+    .pay-hint { display:block; color: var(--muted, #5f6b76); font-size: 0.82rem; margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -60,6 +61,7 @@
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
       <a href="services.html">Services</a>
       <a href="travel-info.html">Travel Info</a>
       <a href="payment.html" class="active">Pay Online</a>
@@ -91,27 +93,25 @@
     <div class="pay-card">
       <h3>How it works</h3>
       <ol class="pay-steps">
-        <li>Choose your package and send your request on WhatsApp.</li>
-        <li>We confirm availability and the final price (in euros, all taxes included).</li>
-        <li>Fill in the form below and pay securely on our bank's payment page.</li>
-        <li>You receive a receipt for your payment.</li>
+        <li>Send your booking request – you receive a <strong>booking reference</strong> (e.g. MT261028-AB3CD).</li>
+        <li>We confirm availability and the final price in euros, all taxes included.</li>
+        <li>Enter your reference and email below and pay on Absa's secure payment page.</li>
+        <li>You receive a receipt number straight away – keep it for your records.</li>
       </ol>
     </div>
 
     <form id="payForm" class="pay-card pay-form">
       <h3>Your booking</h3>
 
-      <label for="payName">Full name</label>
-      <input id="payName" type="text" required autocomplete="name" />
+      <label for="payRef">Booking reference</label>
+      <input id="payRef" type="text" required autocomplete="off" placeholder="MT261028-AB3CD" style="text-transform:uppercase" />
 
-      <label for="payEmail">Email</label>
+      <label for="payEmail">Email used for the booking</label>
       <input id="payEmail" type="email" required autocomplete="email" />
 
-      <label for="payPackage">Package</label>
-      <input id="payPackage" type="text" required placeholder="Example: Île aux Cerfs Private Boat Experience" />
-
-      <label for="payAmount">Confirmed amount (€)</label>
-      <input id="payAmount" type="number" min="1" step="0.01" required placeholder="Amount confirmed by our team" />
+      <label for="payAmount">Amount confirmed by our team (€)</label>
+      <input id="payAmount" type="number" min="1" step="0.01" placeholder="e.g. 207" />
+      <small class="pay-hint">If we have already set the price on your booking, that amount is used automatically.</small>
 
       <label class="pay-check">
         <input id="payTerms" type="checkbox" required />
@@ -122,11 +122,12 @@
         </span>
       </label>
 
-      <button id="payBtn" type="submit" class="btn pay-btn">Proceed to Secure Payment</button>
+      <button id="payBtn" type="submit" class="btn pay-btn">Pay Securely with Absa</button>
 
       <p class="pay-secure">
-        🔒 Card details are entered only on our bank's secure payment page. Mautour Holidays never sees or stores your card details.
+        🔒 You enter your card details only on the secure Absa / CyberSource payment page. Mautour Holidays never sees or stores your card details.
       </p>
+      <p class="pay-secure">No booking reference? <a href="booking.html">Book a package</a>, <a href="vehicles.html">book a vehicle</a> or <a href="#" data-wa-help>ask us on WhatsApp</a>.</p>
     </form>
 
   </div>
@@ -143,6 +144,7 @@
       <ul>
         <li><a href="booking.html">All Packages</a></li>
         <li><a href="services.html">Services &amp; Prices</a></li>
+        <li><a href="vehicles.html">Chauffeur Vehicles</a></li>
         <li><a href="services.html#transfers">Transfers &amp; Car Hire</a></li>
         <li><a href="services.html#islands">Island Trips</a></li>
       </ul>

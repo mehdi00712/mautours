@@ -3,14 +3,114 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Payment Successful | Mautours</title>
+
+  <title>Payment Receipt | Mautour Holidays</title>
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Your Mautour Holidays payment receipt." />
+
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/site-v2.css" />
 </head>
 <body>
-  <div class="container center fade-in" style="padding: 4rem 0;">
-    <h2>🎉 Payment Successful!</h2>
-    <p>Thank you for booking with <strong>Mautours</strong>. We’ll contact you soon with all details.</p>
-    <a href="index.html" class="btn">Back to Home</a>
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo"><a href="index.html" id="siteBusinessName">Mautour Holidays</a></h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="vehicles.html">Vehicles</a>
+      <a href="services.html">Services</a>
+      <a href="travel-info.html">Travel Info</a>
+      <a href="payment.html">Pay Online</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="https://wa.me/23059066404?text=Hi%20Mautour%20Holidays%2C%20I%20would%20like%20to%20plan%20a%20trip%20to%20Mauritius" target="_blank" rel="noopener" class="nav-cta" data-wa-link>Book on WhatsApp</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </div>
+</header>
+
+<main class="vd-page">
+  <div class="container">
+    <div class="rc-wrap">
+      <div class="rc-card" id="rcCard">
+        <div class="v2-icon rc-icon" id="rcIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <span class="v2-eyebrow" id="rcEyebrow">Payment</span>
+        <h2 id="rcTitle">Checking your payment…</h2>
+        <p id="rcText">Please wait a moment.</p>
+
+        <dl class="rc-list" id="rcList" style="display:none">
+          <div><dt>Receipt number</dt><dd id="rcReceipt">–</dd></div>
+          <div><dt>Booking reference</dt><dd id="rcRef">–</dd></div>
+          <div><dt>Name</dt><dd id="rcName">–</dd></div>
+          <div><dt>Booking</dt><dd id="rcItem">–</dd></div>
+          <div><dt>Travel date</dt><dd id="rcDate">–</dd></div>
+          <div><dt>Amount paid</dt><dd id="rcAmount">–</dd></div>
+          <div><dt>Transaction ID</dt><dd id="rcTxn">–</dd></div>
+          <div><dt>Paid on</dt><dd id="rcPaidAt">–</dd></div>
+        </dl>
+
+        <div class="v2-center-actions rc-actions">
+          <button type="button" class="btn" id="rcPrint" style="display:none">Print / Save as PDF</button>
+          <a class="btn-outline" href="payment.html" id="rcRetry" style="display:none">Try again</a>
+          <a class="btn-outline" href="index.html">Back to Home</a>
+        </div>
+        <p class="v2-note rc-note">Mautour Holidays · mautourholidays@gmail.com · +230 5906 6404 · All prices include taxes.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="v2-footer">
+  <div class="v2-footer-grid">
+    <div>
+      <span class="logo">Mautour Holidays</span>
+      <p>Private tours, transfers, island trips and tailor-made holidays across Mauritius, with every service provided through licensed local partners.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="booking.html">All Packages</a></li>
+        <li><a href="services.html">Services &amp; Prices</a></li>
+        <li><a href="vehicles.html">Chauffeur Vehicles</a></li>
+        <li><a href="services.html#transfers">Transfers &amp; Car Hire</a></li>
+        <li><a href="services.html#islands">Island Trips</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Information</h4>
+      <ul>
+        <li><a href="travel-info.html">Travel Info</a></li>
+        <li><a href="travel-info.html#payment">Payment Terms</a></li>
+        <li><a href="travel-info.html#cancellation">Cancellation Policy</a></li>
+        <li><a href="payment.html">Pay Online</a></li>
+        <li><a href="login.html">My Account</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:mautourholidays@gmail.com">mautourholidays@gmail.com</a></li>
+        <li><a href="tel:+23059066404">+230 5906 6404</a></li>
+        <li><a href="tel:+23052542792">+230 5254 2792</a></li>
+        <li><a href="https://wa.me/23059066404" target="_blank" rel="noopener" data-wa-link>WhatsApp us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="v2-footer-bottom">
+    <span>&copy; 2026 <span id="footerBusinessName">Mautour Holidays</span>. All rights reserved.</span>
+    <span>All prices in euros, taxes included · <a href="travel-info.html#cancellation">Cancellation policy</a></span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/receipt.js"></script>
+<script type="module" src="js/site-links.js"></script>
+
 </body>
 </html>

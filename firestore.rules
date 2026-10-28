@@ -1,9 +1,48 @@
 rules_version = '2';
+
+// Mautour Holidays – Firestore security rules
+// Deploy with:  firebase deploy --only firestore:rules
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /bookings/{docId} {
-      allow read, write: if request.auth != null && request.auth.token.email == "mbhoyroo246@gmail.com";
-      allow create: if true; // Anyone can create booking
+
+    function isAdmin() {
+      return request.auth != null && request.auth.uid in [
+        'd6IRCgOfwhZrKyRIoP6siAM8EOf2',
+        'OeS88yW5sjSPxSk9kUlVjPeoZeY2'
+      ];
+    }
+
+    // Public website content: anyone can read, only admins can change.
+    match /trips/{id}        { allow read: if true; allow write: if isAdmin(); }
+    match /vehicles/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /siteContent/{id}  { allow read: if true; allow write: if isAdmin(); }
+    match /gallery/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /experiences/{id}  { allow read: if true; allow write: if isAdmin(); }
+    match /testimonials/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // Bookings contain passport/NIC details: customers can create one,
+    // but never read other people's bookings or set prices/payment results.
+    match /bookings/{id} {
+      allow create: if request.resource.data.bookingRef == id
+        && request.resource.data.bookingStatus == 'Pending'
+        && request.resource.data.paymentStatus == 'Unpaid'
+        && !request.resource.data.keys().hasAny(['confirmedAmount', 'paidAmount', 'receiptNumber', 'transactionId'])
+        && (!request.resource.data.keys().hasAny(['userId']) || request.resource.data.userId == request.auth.uid);
+      allow read: if isAdmin()
+        || (request.auth != null && resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    // Payment records are written only by the Cloud Functions (admin SDK).
+    match /payments/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // Customer profiles.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if isAdmin();
     }
   }
 }

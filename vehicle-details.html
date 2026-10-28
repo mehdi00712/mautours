@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Vehicle with Chauffeur | Mautour Holidays</title>
+  <meta name="description" content="Book this vehicle with a professional chauffeur in Mauritius – airport transfers, half-day and full-day hire." />
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/site-v2.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="nav-container">
+    <h1 class="logo"><a href="index.html" id="siteBusinessName">Mautour Holidays</a></h1>
+
+    <nav class="nav" id="nav">
+      <a href="index.html">Home</a>
+      <a href="booking.html">Packages</a>
+      <a href="vehicles.html" class="active">Vehicles</a>
+      <a href="services.html">Services</a>
+      <a href="travel-info.html">Travel Info</a>
+      <a href="payment.html">Pay Online</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="https://wa.me/23059066404?text=Hi%20Mautour%20Holidays%2C%20I%20would%20like%20to%20plan%20a%20trip%20to%20Mauritius" target="_blank" rel="noopener" class="nav-cta" data-wa-link>Book on WhatsApp</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+</header>
+
+<main class="vd-page">
+  <div class="container">
+    <div class="breadcrumb vd-crumbs">
+      <a href="index.html">Home</a><span>›</span><a href="vehicles.html">Vehicles</a><span>›</span><span id="vdCrumb">Vehicle</span>
+    </div>
+
+    <div id="vdLoading" class="veh-empty">Loading vehicle…</div>
+
+    <div id="vdContent" class="vd-layout" style="display:none">
+      <div class="vd-main">
+        <div class="vd-gallery">
+          <img id="vdMainImage" alt="">
+          <div class="vd-thumbs" id="vdThumbs"></div>
+        </div>
+
+        <span class="v2-eyebrow" id="vdCategory">Vehicle</span>
+        <h2 class="vd-title" id="vdTitle">Vehicle</h2>
+
+        <div class="vd-specs">
+          <div><span>Passengers</span><strong id="vdCapacity">–</strong></div>
+          <div><span>Luggage</span><strong id="vdLuggage">–</strong></div>
+          <div><span>Price</span><strong id="vdFrom">–</strong></div>
+          <div><span>Driver</span><strong>Included</strong></div>
+        </div>
+
+        <h3 class="vd-h3">About this vehicle</h3>
+        <p class="vd-desc" id="vdDescription"></p>
+
+        <h3 class="vd-h3">Features</h3>
+        <ul class="vd-features" id="vdFeatures"></ul>
+
+        <h3 class="vd-h3">Prices <small>(all taxes included)</small></h3>
+        <ul class="vd-prices" id="vdPrices"></ul>
+        <p class="v2-note">Prices are "from" prices for the vehicle with chauffeur. The final price depends on distance, timing and itinerary, and is confirmed in writing before you pay. <a href="travel-info.html#cancellation">Cancellation policy</a>.</p>
+      </div>
+
+      <aside class="vd-side">
+        <form id="vdForm" class="vd-form" novalidate>
+          <span class="v2-eyebrow">Book this vehicle</span>
+          <h3 id="vdFormVehicle">Vehicle</h3>
+
+          <label for="vdService">Service</label>
+          <select id="vdService"></select>
+
+          <div class="vd-estimate">Estimated price <strong id="vdEstimate">–</strong></div>
+
+          <div class="vd-row">
+            <div><label for="vdDate">Date</label><input id="vdDate" type="date" required></div>
+            <div><label for="vdTime">Pick-up time</label><input id="vdTime" type="time" required></div>
+          </div>
+
+          <label for="vdPickup">Pick-up location</label>
+          <input id="vdPickup" type="text" required placeholder="Airport, hotel or address">
+
+          <div id="vdDropoffWrap">
+            <label for="vdDropoff">Drop-off / itinerary</label>
+            <input id="vdDropoff" type="text" placeholder="Hotel, address or places to visit">
+          </div>
+
+          <div class="vd-row">
+            <div><label for="vdPassengers">Passengers</label><input id="vdPassengers" type="number" min="1" required></div>
+            <div><label for="vdBags">Bags</label><input id="vdBags" type="number" min="0"></div>
+          </div>
+
+          <label for="vdFlight">Flight number (airport transfers)</label>
+          <input id="vdFlight" type="text" placeholder="e.g. EK 701">
+
+          <label for="vdName">Full name</label>
+          <input id="vdName" type="text" required autocomplete="name">
+
+          <div class="vd-row">
+            <div><label for="vdEmail">Email</label><input id="vdEmail" type="email" required autocomplete="email"></div>
+            <div><label for="vdPhone">WhatsApp / phone</label><input id="vdPhone" type="tel" required autocomplete="tel"></div>
+          </div>
+
+          <label for="vdNotes" id="vdNotesLabel">Special requests</label>
+          <textarea id="vdNotes" rows="3" placeholder="Child seat, extra stops, accessibility…"></textarea>
+
+          <div id="vdMessage" class="vd-message" style="display:none"></div>
+
+          <button id="vdSubmit" type="submit" class="btn full-width-btn">Request Booking</button>
+          <p class="vd-small">You get a booking reference immediately and your request opens in WhatsApp. Pay online after we confirm.</p>
+        </form>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<a class="whatsapp-float" href="https://wa.me/23059066404" target="_blank" rel="noopener" data-wa-link>WhatsApp</a>
+
+<footer class="v2-footer">
+  <div class="v2-footer-grid">
+    <div>
+      <span class="logo">Mautour Holidays</span>
+      <p>Private tours, transfers, island trips and tailor-made holidays across Mauritius, with every service provided through licensed local partners.</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="booking.html">All Packages</a></li>
+        <li><a href="services.html">Services &amp; Prices</a></li>
+        <li><a href="vehicles.html">Chauffeur Vehicles</a></li>
+        <li><a href="services.html#transfers">Transfers &amp; Car Hire</a></li>
+        <li><a href="services.html#islands">Island Trips</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Information</h4>
+      <ul>
+        <li><a href="travel-info.html">Travel Info</a></li>
+        <li><a href="travel-info.html#payment">Payment Terms</a></li>
+        <li><a href="travel-info.html#cancellation">Cancellation Policy</a></li>
+        <li><a href="payment.html">Pay Online</a></li>
+        <li><a href="login.html">My Account</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="mailto:mautourholidays@gmail.com">mautourholidays@gmail.com</a></li>
+        <li><a href="tel:+23059066404">+230 5906 6404</a></li>
+        <li><a href="tel:+23052542792">+230 5254 2792</a></li>
+        <li><a href="https://wa.me/23059066404" target="_blank" rel="noopener" data-wa-link>WhatsApp us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="v2-footer-bottom">
+    <span>&copy; 2026 <span id="footerBusinessName">Mautour Holidays</span>. All rights reserved.</span>
+    <span>All prices in euros, taxes included · <a href="travel-info.html#cancellation">Cancellation policy</a></span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script type="module" src="js/vehicle-details.js"></script>
+<script type="module" src="js/site-links.js"></script>
+
+</body>
+</html>

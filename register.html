@@ -12,30 +12,30 @@
   />
 
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/site-v2.css" />
 </head>
 <body>
 
 <header class="site-header">
   <div class="nav-container">
-
-    <h1 class="logo">
-      Mautour Holidays
-    </h1>
+    <h1 class="logo"><a href="index.html" id="siteBusinessName">Mautour Holidays</a></h1>
 
     <nav class="nav" id="nav">
       <a href="index.html">Home</a>
       <a href="booking.html">Packages</a>
-      <a href="register.html" class="active">Register</a>
-      <a href="login.html">Sign In</a>
-      <a href="my-bookings.html">My Bookings</a>
+      <a href="vehicles.html">Vehicles</a>
+      <a href="services.html">Services</a>
+      <a href="travel-info.html">Travel Info</a>
+      <a href="payment.html">Pay Online</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="https://wa.me/23059066404?text=Hi%20Mautour%20Holidays%2C%20I%20would%20like%20to%20plan%20a%20trip%20to%20Mauritius" target="_blank" rel="noopener" class="nav-cta" data-wa-link>Book on WhatsApp</a>
     </nav>
 
-    <div class="hamburger" id="hamburger">
+    <div class="hamburger" id="hamburger" aria-label="Open navigation menu">
       <span></span>
       <span></span>
       <span></span>
     </div>
-
   </div>
 </header>
 
@@ -55,7 +55,7 @@
 
       <p>
         Register once to book luxury Mauritius packages, customise your
-        activities, upload payment proof and follow every booking from your
+        activities, pay securely online and follow every booking from your
         personal dashboard.
       </p>
 
@@ -162,7 +162,7 @@
 
       <p class="login-note">
         After creating your account you will be able to book packages,
-        customise activities, upload payment proof and manage all your
+        customise activities, pay securely online and manage all your
         reservations from <strong>My Bookings</strong>.
       </p>
 
@@ -175,13 +175,13 @@
 <section class="trust-section">
 
   <div class="trust-card">
-    <h3>500+</h3>
-    <p>Happy Travellers</p>
+    <h3>30+</h3>
+    <p>Tours &amp; Activities</p>
   </div>
 
   <div class="trust-card">
-    <h3>50+</h3>
-    <p>Destinations Covered</p>
+    <h3>Island-wide</h3>
+    <p>Pick-up Anywhere</p>
   </div>
 
   <div class="trust-card">
@@ -204,5 +204,6 @@
 <script src="js/main.js"></script>
 <script type="module" src="js/register.js"></script>
 
+<script type="module" src="js/site-links.js"></script>
 </body>
 </html>

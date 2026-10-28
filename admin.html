@@ -110,7 +110,7 @@
               <th>Date</th>
               <th>People</th>
               <th>Total</th>
-              <th>Proof</th>
+              <th>Payment</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -155,8 +155,29 @@
         </div>
 
         <div class="form-group">
-          <label>Vehicle Price (€)</label>
+          <label>Vehicle Price inside Packages (€)</label>
           <input type="number" id="vehiclePrice" placeholder="Example: 100" min="0" required />
+          <small>Extra price when a customer picks this vehicle in a package.</small>
+        </div>
+
+        <div class="form-group">
+          <label>Vehicles Page Prices (€, with chauffeur, taxes included)</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <input type="number" id="vehicleAirportPrice" min="0" placeholder="Airport transfer" />
+            <input type="number" id="vehicleHalfDayPrice" min="0" placeholder="Half day (4h)" />
+            <input type="number" id="vehicleFullDayPrice" min="0" placeholder="Full day (8h)" />
+          </div>
+          <small>Leave a box empty to show "price on request".</small>
+        </div>
+
+        <div class="form-group">
+          <label>Luggage</label>
+          <input type="text" id="vehicleLuggage" placeholder="Example: 4 large suitcases" />
+        </div>
+
+        <div class="form-group">
+          <label>Features (one per line)</label>
+          <textarea id="vehicleFeatures" placeholder="Professional chauffeur&#10;Fuel included&#10;Air conditioning"></textarea>
         </div>
 
         <div class="form-group">
