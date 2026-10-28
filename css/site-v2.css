@@ -476,3 +476,6 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
   .vd-page { padding: 0; background: #fff; }
   .rc-card { box-shadow: none; border: 0; }
 }
+.veh-card-img { overflow: hidden; }
+.veh-card-img img { position: absolute; inset: 0; }
+.vd-desc { white-space: pre-line; }
