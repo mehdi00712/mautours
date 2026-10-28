@@ -280,6 +280,16 @@
         </div>
 
         <div class="form-group">
+          <label>Price Is Charged</label>
+          <select id="tripPriceUnit">
+            <option value="person">Per person (price × number of people)</option>
+            <option value="couple">Per couple (price × couples)</option>
+            <option value="booking">Per booking / boat / vehicle (price once)</option>
+          </select>
+          <small>Used for the cart total customers pay online. Optional activities: write "(per person)" or "(per couple)" in the name to multiply them; otherwise they are charged once.</small>
+        </div>
+
+        <div class="form-group">
           <label>Package Payment Link (optional)</label>
           <input type="url" id="tripPaymentLink" placeholder="https://... (only if this package has its own payment link)" />
           <small>Leave empty to use the general payment link from Settings.</small>

@@ -39,38 +39,24 @@
   </div>
 </header>
 
-<main class="admin-main">
-
-  <section class="dashboard-container">
-
-    <span class="section-label center-label">
-      Customer Portal
-    </span>
-
-    <h2>My Bookings</h2>
-
-    <p
-      class="center section-subtitle"
-      style="margin-bottom:35px;"
-    >
-      View all your Mauritius holiday bookings, booking status,
-      selected activities, payment details and admin updates.
-    </p>
-
-    <div id="bookingsList" class="admin-trip-list">
-
-      <div class="loading-card">
-        <h3>Loading Your Bookings...</h3>
-
-        <p>
-          Please wait while we securely retrieve your bookings.
-        </p>
+<main class="vd-page">
+  <div class="container">
+    <div class="acct-head">
+      <div>
+        <span class="v2-eyebrow">My account</span>
+        <h2 class="vd-title" style="margin-bottom:.4rem">My Bookings</h2>
+        <p id="acctWho">Your bookings, payments and receipts.</p>
       </div>
-
+      <div class="acct-actions">
+        <a class="btn" href="cart.html">My Cart</a>
+        <button type="button" class="btn-outline" id="logoutBtn">Sign out</button>
+      </div>
     </div>
 
-  </section>
-
+    <div id="bookingsList" class="acct-list">
+      <div class="veh-empty">Loading your bookings…</div>
+    </div>
+  </div>
 </main>
 
 <div id="popup" class="popup">
