@@ -1,127 +1,117 @@
 // js/payment.js
-// Payment portal page. Uses the payment link saved in Admin → Settings
-// (siteContent/settings.paymentLink) or, if the customer came from a package
-// that has its own link, that package's link. Until a link exists, customers
-// are asked to arrange payment on WhatsApp.
+// Payment portal – Absa / CyberSource Secure Acceptance.
+// The browser asks the Cloud Function "createAbsaPayment" to check the booking and
+// sign the payment request, then posts the signed fields to CyberSource's hosted page.
+// Card details are entered only on that page.
 
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 import {
-  getFirestore,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  getFunctions,
+  httpsCallable
+} from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
+import { getWhatsappNumber } from "./booking-store.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const functions = getFunctions(app, "us-central1");
+const createAbsaPayment = httpsCallable(functions, "createAbsaPayment");
 
-const DEFAULT_WHATSAPP = "23052542792";
-
-const params = new URLSearchParams(window.location.search);
-const packageId = params.get("id") || "";
-
+const params = new URLSearchParams(location.search);
 const statusBox = document.getElementById("payStatus");
 const form = document.getElementById("payForm");
-const packageInput = document.getElementById("payPackage");
 const payBtn = document.getElementById("payBtn");
 
-let paymentLink = "";
-let whatsappNumber = DEFAULT_WHATSAPP;
+const refInput = document.getElementById("payRef");
+if (params.get("ref") && refInput) refInput.value = params.get("ref").toUpperCase();
 
-function isSafeHttpsUrl(value) {
-  try {
-    return new URL(String(value || "").trim()).protocol === "https:";
-  } catch {
-    return false;
-  }
+function setStatus(kind, html) {
+  statusBox.className = `pay-status ${kind}`;
+  statusBox.innerHTML = html;
+  statusBox.style.display = "block";
 }
 
-function value(id) {
-  return document.getElementById(id)?.value.trim() || "";
+setStatus(
+  "ready",
+  `<strong>Secure online payment</strong><br>Enter your booking reference and email. You will be taken to Absa's secure payment page to pay by card.`
+);
+
+if (params.get("status") === "cancel") {
+  setStatus("soon", `<strong>Payment cancelled.</strong><br>No money was taken. You can try again below whenever you are ready.`);
 }
 
-function whatsappUrl(text) {
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+async function whatsappHelp(ref = "") {
+  const number = await getWhatsappNumber(db);
+  const text = `Hello Mautour Holidays, I need help paying for my booking${ref ? ` ${ref}` : ""}.`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }
 
-function showSoon() {
-  statusBox.className = "pay-status soon";
-  statusBox.innerHTML = `
-    <strong>Online card payment is coming soon.</strong><br>
-    Fill in the form and press the button: we will send you the payment instructions on WhatsApp.
-  `;
-  payBtn.textContent = "Request Payment Instructions on WhatsApp";
-}
+document.querySelector("[data-wa-help]")?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  window.open(await whatsappHelp(refInput?.value.trim().toUpperCase()), "_blank", "noopener");
+});
 
-function showReady() {
-  statusBox.className = "pay-status ready";
-  statusBox.innerHTML = `
-    <strong>Secure online payment is available.</strong><br>
-    After filling in the form you will be taken to our bank's secure payment page.
-  `;
-  payBtn.textContent = "Proceed to Secure Payment";
-}
-
-async function init() {
-  let packageLink = "";
-
-  try {
-    const settingsSnap = await getDoc(doc(db, "siteContent", "settings"));
-    if (settingsSnap.exists()) {
-      const s = settingsSnap.data();
-      paymentLink = s.paymentLink || "";
-      if (s.whatsappNumber) whatsappNumber = String(s.whatsappNumber).replace(/\D/g, "") || DEFAULT_WHATSAPP;
-    }
-
-    if (packageId) {
-      const tripSnap = await getDoc(doc(db, "trips", packageId));
-      if (tripSnap.exists()) {
-        const trip = tripSnap.data();
-        if (packageInput && !packageInput.value) packageInput.value = trip.title || "";
-        packageLink = trip.paymentLink || "";
-      }
-    }
-  } catch (error) {
-    console.error("Payment page load error:", error);
-  }
-
-  if (isSafeHttpsUrl(packageLink)) paymentLink = packageLink.trim();
-  else if (!isSafeHttpsUrl(paymentLink)) paymentLink = "";
-
-  if (paymentLink) showReady();
-  else showSoon();
-}
-
-if (form) {
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const name = value("payName");
-    const email = value("payEmail");
-    const pkg = value("payPackage");
-    const amount = Number(value("payAmount") || 0);
-    const terms = document.getElementById("payTerms")?.checked;
-
-    if (!name || !email || !pkg || amount <= 0 || !terms) {
-      statusBox.className = "pay-status soon";
-      statusBox.textContent = "Please fill in every field and accept the cancellation policy and payment terms.";
-      return;
-    }
-
-    const summary =
-`Hello Mautour Holidays, I would like to pay for my booking.
-Name: ${name}
-Email: ${email}
-Package: ${pkg}
-Confirmed amount: € ${amount.toFixed(2)}
-I accept the cancellation policy and payment terms.`;
-
-    if (paymentLink) {
-      window.location.href = paymentLink;
-    } else {
-      window.open(whatsappUrl(summary + "\nPlease send me the payment instructions."), "_blank", "noopener,noreferrer");
-    }
+function postToCyberSource(endpoint, fields) {
+  const f = document.createElement("form");
+  f.method = "POST";
+  f.action = endpoint;
+  f.style.display = "none";
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    f.appendChild(input);
   });
+  document.body.appendChild(f);
+  f.submit();
 }
 
-init();
+const FRIENDLY = {
+  "not-found": "We could not find this booking reference. Please check it, or contact us on WhatsApp.",
+  "permission-denied": "The email does not match this booking. Please use the email you booked with.",
+  "failed-precondition": null, // use server message
+  "invalid-argument": null
+};
+
+form?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const bookingRef = refInput.value.trim().toUpperCase();
+  const email = document.getElementById("payEmail").value.trim();
+  const amount = Number(document.getElementById("payAmount").value || 0);
+  const terms = document.getElementById("payTerms").checked;
+
+  if (!bookingRef || !email || !terms) {
+    setStatus("soon", "Please enter your booking reference and email, and accept the cancellation policy and payment terms.");
+    return;
+  }
+
+  payBtn.disabled = true;
+  const original = payBtn.textContent;
+  payBtn.textContent = "Connecting to secure payment…";
+
+  try {
+    const result = await createAbsaPayment({ bookingRef, email, amount });
+    const { endpoint, fields } = result.data || {};
+    if (!endpoint || !fields) throw new Error("No payment data returned");
+
+    setStatus("ready", `<strong>Redirecting to Absa secure payment…</strong><br>Amount: ${fields.currency} ${fields.amount} · Reference ${bookingRef}`);
+    postToCyberSource(endpoint, fields);
+  } catch (error) {
+    console.error("Payment error:", error);
+    const code = String(error.code || "").replace("functions/", "");
+    const known = code in FRIENDLY ? FRIENDLY[code] || error.message : null;
+    const help = await whatsappHelp(bookingRef);
+
+    setStatus(
+      "soon",
+      known
+        ? `<strong>${known}</strong>`
+        : `<strong>Online card payment is temporarily unavailable.</strong><br>Please <a href="${help}" target="_blank" rel="noopener">message us on WhatsApp</a> and we will send you the payment instructions for booking ${bookingRef}.`
+    );
+    payBtn.disabled = false;
+    payBtn.textContent = original;
+  }
+});

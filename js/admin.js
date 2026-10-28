@@ -751,6 +751,14 @@ if (vehicleForm) {
         capacity: Number(document.getElementById("vehicleCapacity")?.value || 0),
         price: Number(document.getElementById("vehiclePrice")?.value || 0),
         description: document.getElementById("vehicleDescription")?.value.trim() || "",
+        airportPrice: Number(document.getElementById("vehicleAirportPrice")?.value || 0),
+        halfDayPrice: Number(document.getElementById("vehicleHalfDayPrice")?.value || 0),
+        fullDayPrice: Number(document.getElementById("vehicleFullDayPrice")?.value || 0),
+        luggage: document.getElementById("vehicleLuggage")?.value.trim() || "",
+        features: (document.getElementById("vehicleFeatures")?.value || "")
+          .split("\n")
+          .map((x) => x.trim())
+          .filter(Boolean),
         active: document.getElementById("vehicleActive")?.checked || false,
         updatedAt: serverTimestamp()
       };
@@ -912,6 +920,11 @@ function bindVehicleButtons(snapshot) {
       document.getElementById("vehicleCapacity").value = data.capacity || 0;
       document.getElementById("vehiclePrice").value = data.price || 0;
       document.getElementById("vehicleDescription").value = data.description || "";
+      document.getElementById("vehicleAirportPrice").value = data.airportPrice || "";
+      document.getElementById("vehicleHalfDayPrice").value = data.halfDayPrice || "";
+      document.getElementById("vehicleFullDayPrice").value = data.fullDayPrice || "";
+      document.getElementById("vehicleLuggage").value = data.luggage || "";
+      document.getElementById("vehicleFeatures").value = Array.isArray(data.features) ? data.features.join("\n") : "";
 
       if (document.getElementById("vehicleActive")) {
         document.getElementById("vehicleActive").checked = data.active !== false;
@@ -1553,16 +1566,28 @@ async function loadBookings() {
 
       totalBookings++;
 
+      if (data.paymentStatus === "Paid") {
+        totalRevenue += Number(data.paidAmount || 0);
+      }
+
       if (data.bookingStatus === "Confirmed") {
         confirmedBookings++;
-        totalRevenue += Number(data.totalPrice || 0);
+        if (data.paymentStatus !== "Paid") {
+          totalRevenue += Number(data.confirmedAmount || data.totalPrice || 0);
+        }
       } else if (data.bookingStatus === "Rejected") {
         rejectedBookings++;
       } else {
         pendingBookings++;
       }
 
-      const typeText = "Package Booking";
+      const typeText =
+        (data.type === "vehicle" ? "Vehicle Booking" : "Package Booking") +
+        (data.bookingRef ? ` · ${data.bookingRef}` : "");
+
+      const travellerText = data.idNumber
+        ? `${escapeHtml(data.nationality || "")} · ${escapeHtml(data.idType || "ID")} ${escapeHtml(data.idNumber)} · ${escapeHtml(data.gender || "")} · age ${escapeHtml(data.age || "-")}<br>${escapeHtml(data.address || "")}`
+        : "";
       const packageText = data.package || "-";
 
       const vehicleText = data.vehicleName
@@ -1578,14 +1603,28 @@ async function loadBookings() {
           ? data.selectedActivities.map((a) => `${a.name} (€ ${Number(a.price || 0).toLocaleString()})`).join(", ")
           : "-";
 
+      const shownTotal = Number(data.confirmedAmount || data.totalPrice || 0);
       const total =
-        data.totalPrice && data.totalPrice > 0
-          ? `€ ${Number(data.totalPrice).toLocaleString()}`
+        shownTotal > 0
+          ? `€ ${shownTotal.toLocaleString()}`
+          : data.estimatedFrom > 0
+          ? `from € ${Number(data.estimatedFrom).toLocaleString()}`
           : "Custom Quote";
 
+      const priceEditor = `
+        <div style="margin-top:6px;display:flex;gap:4px;align-items:center;">
+          <input type="number" min="1" step="0.01" class="confirm-amount-input" data-id="${bookingId}"
+            value="${data.confirmedAmount || ""}" placeholder="Set €" style="width:80px;padding:4px 6px;border:1px solid #ddd;border-radius:8px;">
+          <button class="confirm-amount-btn" data-id="${bookingId}" style="padding:4px 8px;">Save</button>
+        </div>`;
+
+      const paymentInfo = data.paymentStatus === "Paid"
+        ? `<strong style="color:#1e7b3c;">Paid ${escapeHtml(data.paidCurrency || "")} ${Number(data.paidAmount || 0).toLocaleString()}</strong><br><small>Receipt ${escapeHtml(data.receiptNumber || "")}</small>`
+        : `${escapeHtml(data.paymentStatus || "Unpaid")}`;
+
       const proofLink = data.paymentProofUrl
-        ? `<a href="${escapeHtml(data.paymentProofUrl)}" target="_blank" class="proof-link">View Proof</a>`
-        : "No Proof";
+        ? `${paymentInfo}<br><a href="${escapeHtml(data.paymentProofUrl)}" target="_blank" class="proof-link">View Proof</a>`
+        : paymentInfo;
 
       const statusText = data.bookingStatus || "Pending";
 
@@ -1597,7 +1636,7 @@ async function loadBookings() {
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${escapeHtml(data.name || "-")}<br><small>${escapeHtml(typeText)}</small></td>
+        <td>${escapeHtml(data.name || "-")}<br><small>${escapeHtml(typeText)}</small>${travellerText ? `<br><small style="color:#6b7280;">${travellerText}</small>` : ""}</td>
         <td>${escapeHtml(data.phone || "-")}</td>
         <td>${escapeHtml(data.email || "-")}</td>
         <td>
@@ -1605,9 +1644,9 @@ async function loadBookings() {
           <br><small><strong>Activities:</strong> ${escapeHtml(activitiesText)}</small>
         </td>
         <td>${escapeHtml(vehicleText)}</td>
-        <td>${escapeHtml(dateText)}</td>
+        <td>${escapeHtml(dateText)}${data.time ? `<br><small>${escapeHtml(data.time)} · ${escapeHtml(data.pickup || "")}</small>` : ""}</td>
         <td>${escapeHtml(peopleText)}</td>
-        <td><strong>${total}</strong></td>
+        <td><strong>${total}</strong>${data.paymentStatus === "Paid" ? "" : priceEditor}</td>
         <td>${proofLink}</td>
         <td>${escapeHtml(statusText)}${reasonText}</td>
         <td>
@@ -1647,6 +1686,29 @@ async function loadBookings() {
 }
 
 function bindBookingButtons() {
+  document.querySelectorAll(".confirm-amount-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const input = document.querySelector(`.confirm-amount-input[data-id="${btn.dataset.id}"]`);
+      const amount = Number(input?.value || 0);
+
+      if (!(amount >= 1)) {
+        showPopup("Price Needed", "Enter the confirmed price in euros (all taxes included).");
+        return;
+      }
+
+      try {
+        await updateDoc(doc(db, "bookings", btn.dataset.id), {
+          confirmedAmount: Math.round(amount * 100) / 100,
+          updatedAt: serverTimestamp()
+        });
+        showPopup("Price Saved", `The customer will pay € ${amount.toLocaleString()} on the payment page.`);
+        loadBookings();
+      } catch (error) {
+        showPopup("Save Error", error.message || "Could not save the price.");
+      }
+    });
+  });
+
   document.querySelectorAll(".approve-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
       try {

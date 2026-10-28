@@ -1,5 +1,6 @@
 import { firebaseConfig } from "./firebase-config.js";
-import { formatPackagePrice, packageImage } from "./price-format.js";
+import { formatPackagePrice, packageImage, placeholderImage } from "./price-format.js";
+import { vehicleFromPrice } from "./vehicle-utils.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 
 import {
@@ -433,7 +434,53 @@ async function loadTestimonials() {
   }
 }
 
+async function loadHomeVehicles() {
+  const grid = $("homeVehiclesGrid");
+  if (!grid) return;
+
+  try {
+    const snapshot = await getDocs(collection(db, "vehicles"));
+    const vehicles = [];
+    snapshot.forEach((d) => {
+      const v = d.data();
+      if (v.active !== false) vehicles.push({ id: d.id, ...v });
+    });
+
+    if (!vehicles.length) {
+      grid.closest("section")?.classList.add("v2-hidden");
+      return;
+    }
+
+    grid.innerHTML = vehicles
+      .slice(0, 4)
+      .map((v) => {
+        const from = vehicleFromPrice(v);
+        const img = v.imageUrl || placeholderImage(v.name, v.category || "Vehicle");
+        return `
+          <a class="veh-card compact" href="vehicle-details.html?id=${encodeURIComponent(v.id)}">
+            <div class="veh-card-img">
+              <img src="${escapeHtml(img)}" alt="${escapeHtml(v.name || "Vehicle")}" loading="lazy">
+              <span class="veh-badge">${escapeHtml(v.category || "Vehicle")}</span>
+            </div>
+            <div class="veh-card-body">
+              <h3>${escapeHtml(v.name || "Vehicle")}</h3>
+              <div class="veh-specs">${v.capacity ? `<span>Up to ${escapeHtml(v.capacity)} passengers</span>` : ""}</div>
+              <div class="veh-card-foot">
+                <div class="veh-from">${from ? `From <strong>€ ${from.toLocaleString()}</strong>` : "<strong>Price on request</strong>"}</div>
+                <span class="v2-mini-btn">View &amp; book</span>
+              </div>
+            </div>
+          </a>`;
+      })
+      .join("");
+  } catch (error) {
+    console.error("Load vehicles error:", error);
+    grid.closest("section")?.classList.add("v2-hidden");
+  }
+}
+
 loadSettings();
+loadHomeVehicles();
 loadHomepageContent();
 loadFeaturedTrips();
 loadGallery();

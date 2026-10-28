@@ -14,6 +14,16 @@ import {
 
 import { applyPaymentLink } from "./payment-link.js";
 import { formatPackagePrice, activityPriceLabel, placeholderImage } from "./price-format.js";
+import {
+  insertTravellerFields,
+  readTravellerFields,
+  travellerFieldsComplete,
+  saveBooking,
+  showBookingConfirmation,
+  getWhatsappNumber,
+  openPendingTab,
+  sendTabTo
+} from "./booking-store.js";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -881,7 +891,7 @@ Thank you.
 }
 
 if (packageBookingForm) {
-  packageBookingForm.addEventListener("submit", (event) => {
+  packageBookingForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (!currentPackage) {
@@ -892,17 +902,13 @@ if (packageBookingForm) {
       return;
     }
 
-    const name =
-      document.getElementById("name")?.value.trim() || "";
-    const email =
-      document.getElementById("email")?.value.trim() || "";
-    const phone =
-      document.getElementById("phone")?.value.trim() || "";
-    const people = Number(
-      document.getElementById("people")?.value || 0
-    );
-    const date =
-      document.getElementById("date")?.value || "";
+    const name = document.getElementById("name")?.value.trim() || "";
+    const email = document.getElementById("email")?.value.trim() || "";
+    const phone = document.getElementById("phone")?.value.trim() || "";
+    const people = Number(document.getElementById("people")?.value || 0);
+    const date = document.getElementById("date")?.value || "";
+    const specialRequests = document.getElementById("specialRequests")?.value.trim() || "";
+    const traveller = readTravellerFields("pk");
 
     if (!name || !email || !phone || !people || !date) {
       showPopup(
@@ -912,11 +918,16 @@ if (packageBookingForm) {
       return;
     }
 
-    if (people < 1) {
+    if (!travellerFieldsComplete(traveller)) {
       showPopup(
-        "Invalid Number",
-        "Please enter at least one traveller."
+        "Lead Traveller Details",
+        "Please complete the lead traveller details (address, nationality, passport/NIC, age and gender). They are required by the Tourism Authority of Mauritius."
       );
+      return;
+    }
+
+    if (people < 1) {
+      showPopup("Invalid Number", "Please enter at least one traveller.");
       return;
     }
 
@@ -925,18 +936,11 @@ if (packageBookingForm) {
     today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
-      showPopup(
-        "Invalid Date",
-        "Please choose today or a future travel date."
-      );
+      showPopup("Invalid Date", "Please choose today or a future travel date.");
       return;
     }
 
-    if (
-      currentPackage.requiresVehicle &&
-      allVehicles.length > 0 &&
-      !selectedVehicle
-    ) {
+    if (currentPackage.requiresVehicle && allVehicles.length > 0 && !selectedVehicle) {
       showPopup(
         "Choose a Vehicle",
         "Please select your preferred vehicle before continuing on WhatsApp."
@@ -944,17 +948,79 @@ if (packageBookingForm) {
       return;
     }
 
-    const message = buildWhatsAppMessage();
-    const whatsappUrl =
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+    const submitBtn = packageBookingForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.textContent : "";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Saving your request...";
+    }
 
-    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    const tab = openPendingTab();
+
+    try {
+      const activityNames = getSelectedActivities();
+      const selectedActivities = activityNames.map((n) => {
+        const match = (currentPackage.activities || []).find(
+          (a) => typeof a === "object" && String(a?.name || "").trim() === n
+        );
+        return { name: n, price: Number(match?.price || 0) };
+      });
+
+      const basePrice = Number(currentPackage.price || 0);
+      const extras = selectedActivities.reduce((sum, a) => sum + a.price, 0);
+      const vehiclePrice = Number(selectedVehicle?.price || 0);
+
+      const bookingRef = await saveBooking(db, {
+        type: "package",
+        package: currentPackage.title || "",
+        packageId: currentPackage.id || "",
+        priceType: currentPackage.priceType || "",
+        name,
+        email,
+        phone,
+        people,
+        date,
+        ...traveller,
+        vehicleName: selectedVehicle?.name || "",
+        vehiclePrice,
+        selectedActivities,
+        estimatedFrom: basePrice > 0 ? basePrice + extras + vehiclePrice : 0,
+        specialRequests
+      });
+
+      const number = await getWhatsappNumber(db);
+      const message = decodeURIComponent(buildWhatsAppMessage()).replace(
+        "Hello Mautour Holidays,",
+        `Hello Mautour Holidays,\n\nBooking reference: *${bookingRef}*`
+      );
+      const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
+      sendTabTo(tab, whatsappUrl);
+      showBookingConfirmation({ bookingRef, whatsappUrl });
+      packageBookingForm.reset();
+    } catch (error) {
+      console.error("Save booking error:", error);
+      if (tab && !tab.closed) tab.close();
+      showPopup(
+        "Could Not Save Booking",
+        "Something went wrong while saving your request. Please try again, or message us on WhatsApp."
+      );
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    }
   });
 }
 
 async function init() {
   injectPackageStyles();
   setMinimumTravelDate();
+  insertTravellerFields(
+    document.querySelector('#packageBookingForm label[for="specialRequests"]'),
+    "pk"
+  );
   await loadPackageDetails();
 }
 
