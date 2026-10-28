@@ -37,7 +37,7 @@ function shortText(text, max = 170) {
 }
 
 function vehicleCard(v) {
-  const img = v.imageUrl || placeholderImage(v.name, v.category || "Vehicle");
+  const img = v.imageUrl || placeholderImage(v.name, "Chauffeur vehicle");
   const from = vehicleFromPrice(v);
   const features = vehicleFeatures(v).slice(0, 4);
 

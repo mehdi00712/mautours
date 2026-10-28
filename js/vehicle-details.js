@@ -53,7 +53,7 @@ function renderGallery(v) {
     ...(Array.isArray(v.galleryImages) ? v.galleryImages : [])
   ].filter(Boolean);
   const unique = [...new Set(images)];
-  if (!unique.length) unique.push(placeholderImage(v.name, v.category || "Vehicle"));
+  if (!unique.length) unique.push(placeholderImage(v.name, "Chauffeur vehicle"));
 
   const main = $("vdMainImage");
   main.src = unique[0];

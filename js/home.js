@@ -455,7 +455,7 @@ async function loadHomeVehicles() {
       .slice(0, 4)
       .map((v) => {
         const from = vehicleFromPrice(v);
-        const img = v.imageUrl || placeholderImage(v.name, v.category || "Vehicle");
+        const img = v.imageUrl || placeholderImage(v.name, "Chauffeur vehicle");
         return `
           <a class="veh-card compact" href="vehicle-details.html?id=${encodeURIComponent(v.id)}">
             <div class="veh-card-img">
