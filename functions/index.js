@@ -1,22 +1,27 @@
 /**
- * Mautour Holidays – Absa / CyberSource Secure Acceptance (Hosted Checkout)
+ * Mautour Holidays – Absa payment gateway (Fiserv IPG "Checkouts" API)
  *
- * createAbsaPayment   (callable)  – checks the booking, signs the payment request
- *                                   and returns the fields the browser posts to CyberSource.
- * absaPaymentResponse (HTTP POST) – CyberSource sends the result here. The signature is
- *                                   verified, the booking is marked Paid and a receipt
- *                                   number is issued, then the customer is redirected
- *                                   to success.html.
- * getPaymentStatus    (callable)  – lets success.html show a verified receipt.
+ * createCartCheckout  (callable) – signed-in customer pays the cart. Every price is
+ *                                  re-read from the database and recalculated.
+ * createAbsaPayment   (callable) – pay an existing booking by reference + email
+ *                                  (price set in Admin → Bookings).
+ * fiservReturn        (HTTP GET) – customer comes back from the payment page; the status
+ *                                  is checked with Fiserv, then the customer is sent to
+ *                                  success.html with a receipt number.
+ * fiservWebhook       (HTTP POST)– Fiserv's server notification; the status is always
+ *                                  re-checked with Fiserv before anything is marked Paid.
+ * getPaymentStatus    (callable) – verified receipt for success.html.
  *
- * Secrets (never put these in the code or on GitHub):
- *   firebase functions:secrets:set ABSA_PROFILE_ID
- *   firebase functions:secrets:set ABSA_ACCESS_KEY
- *   firebase functions:secrets:set ABSA_SECRET_KEY
- * Parameters (asked at deploy time, or set in functions/.env):
- *   ABSA_ENV       test | live          (default test)
- *   ABSA_CURRENCY  EUR | MUR | USD …    (must match your Absa merchant account)
- *   SITE_URL       https://mautours.com
+ * Secrets (Firebase Secret Manager – never in code, GitHub or the admin page):
+ *   firebase functions:secrets:set FISERV_API_KEY
+ *   firebase functions:secrets:set FISERV_API_SECRET
+ * Settings (functions/.env):
+ *   FISERV_STORE_ID   your Store ID
+ *   ABSA_ENV          test | live
+ *   ABSA_CURRENCY     EUR | MUR | …   (must be allowed on your Absa store)
+ *   ABSA_EUR_RATE     only if currency is not EUR (units per €1)
+ *   SITE_URL          https://mautours.com
+ *   FISERV_BASE_URL   optional – only if Absa gives you a different API address
  */
 
 const crypto = require("crypto");
@@ -34,63 +39,93 @@ setGlobalOptions({
   serviceAccount: "mautours-functions-runtime@mautours-60318.iam.gserviceaccount.com"
 });
 
-const ABSA_PROFILE_ID = defineSecret("ABSA_PROFILE_ID");
-const ABSA_ACCESS_KEY = defineSecret("ABSA_ACCESS_KEY");
-const ABSA_SECRET_KEY = defineSecret("ABSA_SECRET_KEY");
+const FISERV_API_KEY = defineSecret("FISERV_API_KEY");
+const FISERV_API_SECRET = defineSecret("FISERV_API_SECRET");
 
+const FISERV_STORE_ID = defineString("FISERV_STORE_ID", { default: "" });
+const FISERV_BASE_URL = defineString("FISERV_BASE_URL", { default: "" });
 const ABSA_ENV = defineString("ABSA_ENV", { default: "test" });
 const ABSA_CURRENCY = defineString("ABSA_CURRENCY", { default: "EUR" });
 const SITE_URL = defineString("SITE_URL", { default: "https://mautours.com" });
-// Website prices are in EUR. If your Absa account charges in another currency,
+// Website prices are in EUR. If your Absa store charges in another currency,
 // set ABSA_CURRENCY (e.g. MUR) and ABSA_EUR_RATE (e.g. 53.00 = Rs per €1).
 const ABSA_EUR_RATE = defineString("ABSA_EUR_RATE", { default: "1" });
 
 const { pricePackageItem, priceVehicleItem, roundMoney } = require("./pricing");
 
-const ENDPOINTS = {
-  test: "https://testsecureacceptance.cybersource.com/pay",
-  live: "https://secureacceptance.cybersource.com/pay"
+const API_BASES = {
+  test: "https://prod.emea.api.fiservapps.com/sandbox/exp/v1",
+  live: "https://prod.emea.api.fiservapps.com/exp/v1"
 };
 
-const RESPONSE_URL =
-  "https://us-central1-mautours-60318.cloudfunctions.net/absaPaymentResponse";
+const FUNCTIONS_URL = "https://us-central1-mautours-60318.cloudfunctions.net";
+const SECRETS = [FISERV_API_KEY, FISERV_API_SECRET];
 
 /* ---------------- helpers ---------------- */
 
-function sign(fields, secretKey) {
-  const names = String(fields.signed_field_names || "").split(",");
-  const data = names.map((n) => `${n}=${fields[n] ?? ""}`).join(",");
-  return crypto.createHmac("sha256", secretKey).update(data, "utf8").digest("base64");
+function apiBase() {
+  const custom = FISERV_BASE_URL.value().trim().replace(/\/$/, "");
+  return custom || API_BASES[ABSA_ENV.value()] || API_BASES.test;
 }
 
-function safeEqual(a, b) {
-  const x = Buffer.from(String(a || ""));
-  const y = Buffer.from(String(b || ""));
-  return x.length === y.length && crypto.timingSafeEqual(x, y);
+// Fiserv message signature: Base64( HMAC-SHA256( secret, apiKey + clientRequestId + timestamp + body ) )
+function fiservSignature(apiKey, secret, clientRequestId, timestamp, body) {
+  return crypto
+    .createHmac("sha256", secret)
+    .update(apiKey + clientRequestId + timestamp + body, "utf8")
+    .digest("base64");
 }
 
-function cybersourceDate() {
-  return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
+async function fiservRequest(method, path, payload) {
+  const apiKey = FISERV_API_KEY.value();
+  const secret = FISERV_API_SECRET.value();
+  const clientRequestId = crypto.randomUUID();
+  const timestamp = String(Date.now());
+  const body = payload ? JSON.stringify(payload) : "";
+
+  const res = await fetch(`${apiBase()}${path}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Api-Key": apiKey,
+      "Client-Request-Id": clientRequestId,
+      Timestamp: timestamp,
+      "Message-Signature": fiservSignature(apiKey, secret, clientRequestId, timestamp, body)
+    },
+    body: method === "GET" ? undefined : body
+  });
+
+  const text = await res.text();
+  let data = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = { raw: text.slice(0, 500) };
+  }
+
+  if (!res.ok) {
+    logger.error("Fiserv API error", { status: res.status, path, data });
+    throw new HttpsError("unavailable", "The payment gateway is not available right now. Please try again in a few minutes.");
+  }
+  return data;
 }
 
 function clean(value, max = 60) {
-  // CyberSource rejects some characters; keep it simple and short.
   return String(value || "")
     .replace(/[^\p{L}\p{N} .,'@\-_/]/gu, "")
     .trim()
     .slice(0, max);
 }
 
-function makeReceiptNumber(bookingRef) {
+function makeReceiptNumber() {
   const d = new Date();
   const ymd = `${String(d.getUTCFullYear()).slice(2)}${String(d.getUTCMonth() + 1).padStart(2, "0")}${String(
     d.getUTCDate()
   ).padStart(2, "0")}`;
-  const rnd = crypto.randomBytes(3).toString("hex").toUpperCase();
-  return `RC${ymd}-${rnd}`;
+  return `RC${ymd}-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
-/* ---------------- shared: sign a payment for a booking ---------------- */
+/* ---------------- shared: create a Fiserv checkout for a booking ---------------- */
 
 function chargeAmount(amountEur) {
   const currency = ABSA_CURRENCY.value();
@@ -101,34 +136,43 @@ function chargeAmount(amountEur) {
 }
 
 async function signPayment({ bookingRef, amountEur, email, name, amountSource }) {
+  const storeId = FISERV_STORE_ID.value().trim();
+  if (!storeId) throw new HttpsError("failed-precondition", "Online payment is not configured yet. Please contact us.");
+
   const { amount, currency } = chargeAmount(amountEur);
-  const nameParts = clean(name, 80).split(/\s+/).filter(Boolean);
-  const forename = nameParts.shift() || "Guest";
-  const surname = nameParts.join(" ") || forename;
+  const attempt = crypto.randomBytes(3).toString("hex").toUpperCase();
+  const merchantTransactionId = `${bookingRef}-${attempt}`;
+  const back = (result) =>
+    `${FUNCTIONS_URL}/fiservReturn?ref=${encodeURIComponent(bookingRef)}&t=${encodeURIComponent(merchantTransactionId)}&result=${result}`;
 
-  const transactionUuid = crypto.randomUUID();
-  const fields = {
-    access_key: ABSA_ACCESS_KEY.value(),
-    profile_id: ABSA_PROFILE_ID.value(),
-    transaction_uuid: transactionUuid,
-    signed_date_time: cybersourceDate(),
-    locale: "en",
-    transaction_type: "sale",
-    reference_number: bookingRef,
-    amount: amount.toFixed(2),
-    currency,
-    bill_to_forename: forename,
-    bill_to_surname: surname,
-    bill_to_email: email,
-    override_custom_receipt_page: RESPONSE_URL,
-    override_custom_cancel_page: RESPONSE_URL,
-    unsigned_field_names: ""
-  };
-  fields.signed_field_names = [...Object.keys(fields), "signed_field_names"].join(",");
-  fields.signature = sign(fields, ABSA_SECRET_KEY.value());
+  const response = await fiservRequest("POST", "/checkouts", {
+    storeId,
+    merchantTransactionId,
+    transactionOrigin: "ECOM",
+    transactionType: "SALE",
+    transactionAmount: { total: amount, currency },
+    order: {
+      orderDetails: { customerId: clean(email, 60), invoiceNumber: bookingRef }
+    },
+    checkoutSettings: {
+      locale: "en_GB",
+      webHooksUrl: `${FUNCTIONS_URL}/fiservWebhook`,
+      redirectBackUrls: { successUrl: back("success"), failureUrl: back("failure") }
+    }
+  });
 
-  await db.collection("payments").doc(transactionUuid).set({
+  const checkoutId = response?.checkout?.checkoutId;
+  const redirectUrl = response?.checkout?.redirectionUrl;
+  if (!checkoutId || !redirectUrl) {
+    logger.error("Unexpected Fiserv checkout response", response);
+    throw new HttpsError("unavailable", "The payment gateway is not available right now. Please try again in a few minutes.");
+  }
+
+  await db.collection("payments").doc(merchantTransactionId).set({
     bookingRef,
+    checkoutId,
+    merchantTransactionId,
+    customerName: clean(name, 80),
     amount,
     currency,
     amountEur: roundMoney(amountEur),
@@ -141,20 +185,95 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
   await db.collection("bookings").doc(bookingRef).set(
     {
       paymentStatus: "Payment started",
-      lastTransactionUuid: transactionUuid,
-      paymentGateway: "Absa / CyberSource",
+      lastCheckoutId: checkoutId,
+      lastPaymentId: merchantTransactionId,
+      paymentGateway: "Absa / Fiserv",
       updatedAt: admin.firestore.FieldValue.serverTimestamp()
     },
     { merge: true }
   );
 
-  return { endpoint: ENDPOINTS[ABSA_ENV.value()] || ENDPOINTS.test, fields };
+  return { redirectUrl };
+}
+
+/* ---------------- shared: ask Fiserv for the real status and update the booking ---------------- */
+
+async function syncPayment(paymentId) {
+  const payRef = db.collection("payments").doc(paymentId);
+  const paySnap = await payRef.get();
+  if (!paySnap.exists) return { status: "error" };
+
+  const pay = paySnap.data();
+  if (pay.receiptNumber) return { status: "accept", receipt: pay.receiptNumber, bookingRef: pay.bookingRef };
+
+  const details = await fiservRequest("GET", `/checkouts/${encodeURIComponent(pay.checkoutId)}`);
+  const status = String(
+    details?.transactionStatus || details?.ipgTransactionDetails?.transactionStatus || ""
+  ).toUpperCase();
+  const approved = details?.approvedAmount || {};
+  const approvedTotal = Number(approved.total ?? 0);
+  const approvedCurrency = approved.currency || pay.currency;
+  const storeOk = !details?.storeId || String(details.storeId) === FISERV_STORE_ID.value().trim();
+  const amountOk = Math.abs(approvedTotal - Number(pay.amount)) < 0.01 && approvedCurrency === pay.currency;
+
+  let result;
+  let receiptNumber = "";
+
+  await db.runTransaction(async (tx) => {
+    const fresh = await tx.get(payRef);
+    if (fresh.data().receiptNumber) {
+      receiptNumber = fresh.data().receiptNumber;
+      result = "accept";
+      return;
+    }
+
+    const bookingDoc = db.collection("bookings").doc(pay.bookingRef);
+    const base = {
+      gatewayStatus: status,
+      ipgTransactionId: details?.ipgTransactionDetails?.ipgTransactionId || "",
+      approvalCode: details?.ipgTransactionDetails?.approvalCode || "",
+      checkedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    if (status === "APPROVED" && storeOk && amountOk) {
+      receiptNumber = makeReceiptNumber();
+      result = "accept";
+      tx.set(payRef, { ...base, status: "Paid", receiptNumber }, { merge: true });
+      tx.set(
+        bookingDoc,
+        {
+          paymentStatus: "Paid",
+          paidAmount: approvedTotal,
+          paidCurrency: approvedCurrency,
+          receiptNumber,
+          transactionId: base.ipgTransactionId,
+          paidAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
+    } else if (status === "APPROVED") {
+      result = "review";
+      logger.error("Approved payment does not match booking", { paymentId, approvedTotal, approvedCurrency, storeOk });
+      tx.set(payRef, { ...base, status: "Check amount" }, { merge: true });
+      tx.set(bookingDoc, { paymentStatus: "Payment under review" }, { merge: true });
+    } else if (status === "WAITING" || status === "") {
+      result = "review";
+      tx.set(payRef, { ...base, status: "Waiting" }, { merge: true });
+    } else {
+      result = "decline";
+      tx.set(payRef, { ...base, status: "Failed" }, { merge: true });
+      tx.set(bookingDoc, { paymentStatus: "Payment failed", updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    }
+  });
+
+  return { status: result, receipt: receiptNumber, bookingRef: pay.bookingRef };
 }
 
 /* ---------------- 1. create & sign payment ---------------- */
 
 exports.createAbsaPayment = onCall(
-  { secrets: [ABSA_PROFILE_ID, ABSA_ACCESS_KEY, ABSA_SECRET_KEY] },
+  { secrets: SECRETS },
   async (request) => {
     const bookingRef = String(request.data?.bookingRef || "").trim().toUpperCase();
     const email = String(request.data?.email || "").trim().toLowerCase();
@@ -219,7 +338,7 @@ function makeBookingRef() {
 const text = (v, max = 200) => String(v ?? "").trim().slice(0, max);
 
 exports.createCartCheckout = onCall(
-  { secrets: [ABSA_PROFILE_ID, ABSA_ACCESS_KEY, ABSA_SECRET_KEY] },
+  { secrets: SECRETS },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Please sign in to pay for your cart.");
@@ -358,87 +477,47 @@ exports.createCartCheckout = onCall(
   }
 );
 
-/* ---------------- 2. CyberSource response ---------------- */
+/* ---------------- 2. customer returns from the payment page ---------------- */
 
-exports.absaPaymentResponse = onRequest(
-  { secrets: [ABSA_SECRET_KEY] },
-  async (req, res) => {
-    const site = SITE_URL.value().replace(/\/$/, "");
-    const body = req.body || {};
+exports.fiservReturn = onRequest({ secrets: SECRETS }, async (req, res) => {
+  const site = SITE_URL.value().replace(/\/$/, "");
+  const ref = String(req.query.ref || "").toUpperCase();
+  const paymentId = String(req.query.t || "");
+  const back = (params) => res.redirect(303, `${site}/success.html?${new URLSearchParams(params).toString()}`);
 
-    const back = (params) =>
-      res.redirect(303, `${site}/success.html?${new URLSearchParams(params).toString()}`);
+  if (!paymentId) return back({ status: "error", ref });
 
-    if (req.method !== "POST" || !body.signed_field_names) {
-      return back({ status: "error" });
-    }
-
-    const expected = sign(body, ABSA_SECRET_KEY.value());
-    if (!safeEqual(expected, body.signature)) {
-      logger.warn("Invalid CyberSource signature", { ref: body.req_reference_number });
-      return back({ status: "error" });
-    }
-
-    const decision = String(body.decision || "ERROR").toUpperCase();
-    const bookingRef = String(body.req_reference_number || "").toUpperCase();
-    const transactionUuid = String(body.req_transaction_uuid || "");
-    const paymentDoc = transactionUuid ? db.collection("payments").doc(transactionUuid) : null;
-    const bookingDoc = bookingRef ? db.collection("bookings").doc(bookingRef) : null;
-
-    let receiptNumber = "";
-
-    try {
-      await db.runTransaction(async (tx) => {
-        const pay = paymentDoc ? await tx.get(paymentDoc) : null;
-        const already = pay?.exists && pay.data().receiptNumber;
-
-        receiptNumber = decision === "ACCEPT" ? already || makeReceiptNumber(bookingRef) : "";
-
-        const result = {
-          status: decision,
-          reasonCode: body.reason_code || "",
-          message: String(body.message || "").slice(0, 300),
-          transactionId: body.transaction_id || "",
-          authAmount: Number(body.auth_amount || body.req_amount || 0),
-          currency: body.req_currency || "",
-          cardType: body.req_card_type || "",
-          cardLast4: String(body.req_card_number || "").slice(-4),
-          receiptNumber,
-          respondedAt: admin.firestore.FieldValue.serverTimestamp()
-        };
-
-        if (paymentDoc) tx.set(paymentDoc, result, { merge: true });
-
-        if (bookingDoc) {
-          const update =
-            decision === "ACCEPT"
-              ? {
-                  paymentStatus: "Paid",
-                  paidAmount: result.authAmount,
-                  paidCurrency: result.currency,
-                  receiptNumber,
-                  transactionId: result.transactionId,
-                  paidAt: admin.firestore.FieldValue.serverTimestamp()
-                }
-              : decision === "CANCEL"
-              ? { paymentStatus: "Unpaid" }
-              : { paymentStatus: decision === "REVIEW" ? "Payment under review" : "Payment failed" };
-
-          tx.set(bookingDoc, { ...update, updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-        }
-      });
-    } catch (error) {
-      logger.error("Payment response processing failed", error);
-      return back({ status: "error", ref: bookingRef });
-    }
-
-    return back({
-      status: decision.toLowerCase(),
-      ref: bookingRef,
-      ...(receiptNumber ? { receipt: receiptNumber } : {})
-    });
+  try {
+    const r = await syncPayment(paymentId);
+    if (r.bookingRef && r.bookingRef !== ref) return back({ status: "error" });
+    return back({ status: r.status, ref, ...(r.receipt ? { receipt: r.receipt } : {}) });
+  } catch (error) {
+    logger.error("fiservReturn failed", error);
+    return back({ status: req.query.result === "failure" ? "decline" : "review", ref });
   }
-);
+});
+
+/* ---------------- 2b. Fiserv server notification (webhook) ---------------- */
+
+exports.fiservWebhook = onRequest({ secrets: SECRETS }, async (req, res) => {
+  try {
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const checkoutId = String(body.checkoutId || "");
+    const merchantId = String(body.merchantTransactionId || "");
+
+    let paymentId = merchantId;
+    if (!paymentId && checkoutId) {
+      const q = await db.collection("payments").where("checkoutId", "==", checkoutId).limit(1).get();
+      paymentId = q.empty ? "" : q.docs[0].id;
+    }
+
+    // Never trust the notification itself – syncPayment asks Fiserv for the real status.
+    if (paymentId) await syncPayment(paymentId);
+  } catch (error) {
+    logger.error("fiservWebhook failed", error);
+  }
+  res.status(200).send("OK");
+});
 
 /* ---------------- 3. verified receipt for success.html ---------------- */
 
