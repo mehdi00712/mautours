@@ -29,10 +29,11 @@ const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https")
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { defineSecret, defineString } = require("firebase-functions/params");
 const logger = require("firebase-functions/logger");
-const admin = require("firebase-admin");
+const { initializeApp } = require("firebase-admin/app");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 
-admin.initializeApp();
-const db = admin.firestore();
+initializeApp();
+const db = getFirestore();
 
 setGlobalOptions({
   region: "us-central1",
@@ -179,7 +180,7 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
     amountSource,
     status: "Initiated",
     environment: ABSA_ENV.value(),
-    createdAt: admin.firestore.FieldValue.serverTimestamp()
+    createdAt: FieldValue.serverTimestamp()
   });
 
   await db.collection("bookings").doc(bookingRef).set(
@@ -188,7 +189,7 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
       lastCheckoutId: checkoutId,
       lastPaymentId: merchantTransactionId,
       paymentGateway: "Absa / Fiserv",
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      updatedAt: FieldValue.serverTimestamp()
     },
     { merge: true }
   );
@@ -232,7 +233,7 @@ async function syncPayment(paymentId) {
       gatewayStatus: status,
       ipgTransactionId: details?.ipgTransactionDetails?.ipgTransactionId || "",
       approvalCode: details?.ipgTransactionDetails?.approvalCode || "",
-      checkedAt: admin.firestore.FieldValue.serverTimestamp()
+      checkedAt: FieldValue.serverTimestamp()
     };
 
     if (status === "APPROVED" && storeOk && amountOk) {
@@ -247,8 +248,8 @@ async function syncPayment(paymentId) {
           paidCurrency: approvedCurrency,
           receiptNumber,
           transactionId: base.ipgTransactionId,
-          paidAt: admin.firestore.FieldValue.serverTimestamp(),
-          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          paidAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp()
         },
         { merge: true }
       );
@@ -263,7 +264,7 @@ async function syncPayment(paymentId) {
     } else {
       result = "decline";
       tx.set(payRef, { ...base, status: "Failed" }, { merge: true });
-      tx.set(bookingDoc, { paymentStatus: "Payment failed", updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      tx.set(bookingDoc, { paymentStatus: "Payment failed", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
     }
   });
 
@@ -461,8 +462,8 @@ exports.createCartCheckout = onCall(
       currency: "EUR",
       bookingStatus: "Pending",
       paymentStatus: "Unpaid",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp()
     });
 
     const payment = await signPayment({
