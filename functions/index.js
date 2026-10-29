@@ -87,7 +87,9 @@ function apiBase() {
 }
 
 function ipgBases() {
-  const custom = IPG_BASE_URL.value().trim().replace(/\/$/, "");
+  let custom = IPG_BASE_URL.value().trim().replace(/\/$/, "");
+  // test.ipg-online.com / www.ipg-online.com are Absa's portal websites, not the REST API – ignore them.
+  if (/ipg-online\.com/i.test(custom)) custom = "";
   return custom ? [custom] : IPG_BASES[ABSA_ENV.value()] || IPG_BASES.test;
 }
 
