@@ -1,4 +1,4 @@
-// js/receipt.js – shows the verified payment receipt after Absa / CyberSource.
+// js/receipt.js – shows the verified payment receipt after Absa payment.
 
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";

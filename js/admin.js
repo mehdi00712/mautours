@@ -606,7 +606,6 @@ if (websiteSettingsForm) {
           mobileNumber: document.getElementById("mobileNumber")?.value.trim() || "",
           businessEmail: document.getElementById("businessEmail")?.value.trim() || "",
           servedRegions: document.getElementById("servedRegions")?.value.trim() || "",
-          paymentLink: document.getElementById("paymentLink")?.value.trim() || "",
           updatedAt: serverTimestamp()
         },
         { merge: true }
@@ -1030,7 +1029,6 @@ if (tripForm) {
         price: Number(document.getElementById("tripPrice")?.value || 0),
         priceType: document.getElementById("tripPriceType")?.value || "Custom Quote",
         priceUnit: document.getElementById("tripPriceUnit")?.value || "person",
-        paymentLink: document.getElementById("tripPaymentLink")?.value.trim() || "",
         includes: toIncludesArray(document.getElementById("tripIncludes")?.value),
         activities,
         featured: document.getElementById("tripFeatured")?.checked || false,

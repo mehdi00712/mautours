@@ -1,7 +1,7 @@
 // js/payment.js
-// Payment portal – Absa / CyberSource Secure Acceptance.
+// Payment portal – Absa payment gateway (Fiserv IPG Checkouts).
 // The browser asks the Cloud Function "createAbsaPayment" to check the booking and
-// sign the payment request, then posts the signed fields to CyberSource's hosted page.
+// create a signed payment, then sends the customer to the bank's hosted payment page.
 // Card details are entered only on that page.
 
 import { firebaseConfig } from "./firebase-config.js";
@@ -52,21 +52,6 @@ document.querySelector("[data-wa-help]")?.addEventListener("click", async (e) =>
   window.open(await whatsappHelp(refInput?.value.trim().toUpperCase()), "_blank", "noopener");
 });
 
-function postToCyberSource(endpoint, fields) {
-  const f = document.createElement("form");
-  f.method = "POST";
-  f.action = endpoint;
-  f.style.display = "none";
-  Object.entries(fields).forEach(([name, value]) => {
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = name;
-    input.value = value;
-    f.appendChild(input);
-  });
-  document.body.appendChild(f);
-  f.submit();
-}
 
 const FRIENDLY = {
   "not-found": "We could not find this booking reference. Please check it, or contact us on WhatsApp.",
@@ -94,11 +79,11 @@ form?.addEventListener("submit", async (e) => {
 
   try {
     const result = await createAbsaPayment({ bookingRef, email, amount });
-    const { endpoint, fields } = result.data || {};
-    if (!endpoint || !fields) throw new Error("No payment data returned");
+    const { redirectUrl } = result.data || {};
+    if (!redirectUrl || !/^https:\/\//.test(redirectUrl)) throw new Error("No payment data returned");
 
-    setStatus("ready", `<strong>Redirecting to Absa secure payment…</strong><br>Amount: ${fields.currency} ${fields.amount} · Reference ${bookingRef}`);
-    postToCyberSource(endpoint, fields);
+    setStatus("ready", `<strong>Redirecting to Absa secure payment…</strong><br>Reference ${bookingRef}`);
+    window.location.href = redirectUrl;
   } catch (error) {
     console.error("Payment error:", error);
     const code = String(error.code || "").replace("functions/", "");

@@ -236,21 +236,6 @@ function showCoMessage(html) {
   m.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
-function postToCyberSource(endpoint, fields) {
-  const f = document.createElement("form");
-  f.method = "POST";
-  f.action = endpoint;
-  f.style.display = "none";
-  Object.entries(fields).forEach(([k, v]) => {
-    const i = document.createElement("input");
-    i.type = "hidden";
-    i.name = k;
-    i.value = v;
-    f.appendChild(i);
-  });
-  document.body.appendChild(f);
-  f.submit();
-}
 
 function payloadItems() {
   return cartItems.map((i) => ({
@@ -296,10 +281,12 @@ async function onCheckout(e) {
       expectedTotal: shownTotal
     });
 
-    if (!data?.endpoint || !data?.fields) throw Object.assign(new Error("No payment data"), { code: "unavailable" });
+    if (!data?.redirectUrl || !/^https:\/\//.test(data.redirectUrl)) {
+      throw Object.assign(new Error("No payment data"), { code: "unavailable" });
+    }
 
     showCoMessage(`<strong>Redirecting to Absa secure payment…</strong><br>Booking reference ${esc(data.bookingRef)} · ${money(data.total)}`);
-    postToCyberSource(data.endpoint, data.fields);
+    window.location.href = data.redirectUrl;
   } catch (error) {
     console.error("Checkout error:", error);
     const code = String(error.code || "").replace("functions/", "");
