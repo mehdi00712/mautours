@@ -77,7 +77,7 @@ If you see a permission error about secrets, open Google Cloud Console → IAM a
 
 ## Two Absa routes (automatic)
 The website first tries Fiserv's **Checkouts** page. If Absa's store is not enabled for it, it automatically uses the
-**Absa payment link** (IPG REST API, `test.ipg-online.com` / `www.ipg-online.com`) with the same API Key and Secret:
+**Absa payment link** (IPG REST API at `prod.emea.api.fiservapps.com/.../ipp/payments-gateway/v2`) with the same API Key and Secret:
 the customer clicks **Open Absa secure payment**, pays in a new tab, and the website shows the receipt as soon as
 Absa approves the payment. Optional settings in `functions/.env`:
 - `ABSA_ROUTE=auto` (default), `checkouts` or `paymenturl` – force one route.
