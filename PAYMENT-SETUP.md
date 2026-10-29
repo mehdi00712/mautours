@@ -75,6 +75,14 @@ If you see a permission error about secrets, open Google Cloud Console → IAM a
 
 **Going live:** put the live keys in step 3, set `ABSA_ENV=live` (and the live Store ID), run step 5 again.
 
+## Two Absa routes (automatic)
+The website first tries Fiserv's **Checkouts** page. If Absa's store is not enabled for it, it automatically uses the
+**Absa payment link** (IPG REST API, `test.ipg-online.com` / `www.ipg-online.com`) with the same API Key and Secret:
+the customer clicks **Open Absa secure payment**, pays in a new tab, and the website shows the receipt as soon as
+Absa approves the payment. Optional settings in `functions/.env`:
+- `ABSA_ROUTE=auto` (default), `checkouts` or `paymenturl` – force one route.
+- `IPG_BASE_URL=...` – only if Absa gives you a different IPG REST API address.
+
 ## How it works
 - `createCartCheckout` – customer must be signed in; every price is re-read from the database and recalculated (`functions/pricing.js`); a Fiserv checkout is created for exactly that total.
 - `createAbsaPayment` – pays an existing booking using the price you set in Admin.
