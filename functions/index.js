@@ -1,5 +1,10 @@
 /**
- * Mautour Holidays – Absa payment gateway (Fiserv IPG "Checkouts" API)
+ * Mautour Holidays – Absa payment gateway (Fiserv IPG)
+ *
+ * Two routes, tried in this order (ABSA_ROUTE=auto):
+ *   1. "Checkouts" API  – hosted page, customer is sent back to the website automatically.
+ *   2. IPG REST "payment-url" (test.ipg-online.com) – Absa hosted payment link; the website
+ *      watches the payment with checkPayment and shows the receipt when it is approved.
  *
  * createCartCheckout  (callable) – signed-in customer pays the cart. Every price is
  *                                  re-read from the database and recalculated.
@@ -11,6 +16,7 @@
  * fiservWebhook       (HTTP POST)– Fiserv's server notification; the status is always
  *                                  re-checked with Fiserv before anything is marked Paid.
  * getPaymentStatus    (callable) – verified receipt for success.html.
+ * checkPayment        (callable) – live status while the customer pays on Absa's page.
  *
  * Secrets (Firebase Secret Manager – never in code, GitHub or the admin page):
  *   firebase functions:secrets:set FISERV_API_KEY
@@ -21,7 +27,9 @@
  *   ABSA_CURRENCY     EUR | MUR | …   (must be allowed on your Absa store)
  *   ABSA_EUR_RATE     only if currency is not EUR (units per €1)
  *   SITE_URL          https://mautours.com
- *   FISERV_BASE_URL   optional – only if Absa gives you a different API address
+ *   FISERV_BASE_URL   optional – Checkouts API address
+ *   IPG_BASE_URL      optional – IPG REST API address (default test/www.ipg-online.com)
+ *   ABSA_ROUTE        auto | checkouts | paymenturl
  */
 
 const crypto = require("crypto");
@@ -54,10 +62,19 @@ const ABSA_EUR_RATE = defineString("ABSA_EUR_RATE", { default: "1" });
 
 const { pricePackageItem, priceVehicleItem, roundMoney } = require("./pricing");
 
+// Route 1 – "Checkouts" API (hosted page with automatic return to the website)
 const API_BASES = {
   test: "https://prod.emea.api.fiservapps.com/sandbox/exp/v1",
   live: "https://prod.emea.api.fiservapps.com/exp/v1"
 };
+// Route 2 – IPG REST API "payment-url" (Absa hosted payment page link on ipg-online.com)
+const IPG_BASES = {
+  test: ["https://test.ipg-online.com/ipp/payments-gateway/v2", "https://prod.emea.api.fiservapps.com/sandbox/ipp/payments-gateway/v2"],
+  live: ["https://www.ipg-online.com/ipp/payments-gateway/v2", "https://prod.emea.api.fiservapps.com/ipp/payments-gateway/v2"]
+};
+// ABSA_ROUTE: auto (try Checkouts, then payment link) | checkouts | paymenturl
+const ABSA_ROUTE = defineString("ABSA_ROUTE", { default: "auto" });
+const IPG_BASE_URL = defineString("IPG_BASE_URL", { default: "" });
 
 const FUNCTIONS_URL = "https://us-central1-mautours-60318.cloudfunctions.net";
 const SECRETS = [FISERV_API_KEY, FISERV_API_SECRET];
@@ -69,6 +86,11 @@ function apiBase() {
   return custom || API_BASES[ABSA_ENV.value()] || API_BASES.test;
 }
 
+function ipgBases() {
+  const custom = IPG_BASE_URL.value().trim().replace(/\/$/, "");
+  return custom ? [custom] : IPG_BASES[ABSA_ENV.value()] || IPG_BASES.test;
+}
+
 // Fiserv message signature: Base64( HMAC-SHA256( secret, apiKey + clientRequestId + timestamp + body ) )
 function fiservSignature(apiKey, secret, clientRequestId, timestamp, body) {
   return crypto
@@ -77,14 +99,16 @@ function fiservSignature(apiKey, secret, clientRequestId, timestamp, body) {
     .digest("base64");
 }
 
-async function fiservRequest(method, path, payload) {
+async function fiservRequest(method, path, payload, { base = apiBase(), allow404 = false } = {}) {
   const apiKey = FISERV_API_KEY.value();
   const secret = FISERV_API_SECRET.value();
   const clientRequestId = crypto.randomUUID();
   const timestamp = String(Date.now());
   const body = payload ? JSON.stringify(payload) : "";
 
-  const res = await fetch(`${apiBase()}${path}`, {
+  let res;
+  try {
+    res = await fetch(`${base}${path}`, {
     method,
     headers: {
       "Content-Type": "application/json",
@@ -93,8 +117,15 @@ async function fiservRequest(method, path, payload) {
       Timestamp: timestamp,
       "Message-Signature": fiservSignature(apiKey, secret, clientRequestId, timestamp, body)
     },
-    body: method === "GET" ? undefined : body
+    body: method === "GET" ? undefined : body,
+    signal: AbortSignal.timeout(20000)
   });
+  } catch (error) {
+    logger.error("Fiserv API unreachable", { path, apiBase: base, message: String(error?.message || error) });
+    throw new HttpsError("unavailable", "The payment gateway is not available right now. Please try again in a few minutes.");
+  }
+
+  if (allow404 && res.status === 404) return null;
 
   const text = await res.text();
   let data = null;
@@ -108,7 +139,7 @@ async function fiservRequest(method, path, payload) {
     logger.error("Fiserv API error", {
       status: res.status,
       path,
-      apiBase: apiBase(),
+      apiBase: base,
       traceId: res.headers.get("Trace-Id") || res.headers.get("trace-id") || "",
       clientRequestId,
       data
@@ -143,6 +174,81 @@ function chargeAmount(amountEur) {
   return { amount: roundMoney(amountEur * rate), currency };
 }
 
+const GATEWAY_DOWN = "The payment gateway is not available right now. Please try again in a few minutes.";
+
+// Route 1: Fiserv "Checkouts" – hosted page that sends the customer back to the website.
+async function createViaCheckouts({ storeId, merchantTransactionId, bookingRef, amount, currency }) {
+  const back = (result) =>
+    `${FUNCTIONS_URL}/fiservReturn?ref=${encodeURIComponent(bookingRef)}&t=${encodeURIComponent(merchantTransactionId)}&result=${result}`;
+  const base = apiBase();
+  const response = await fiservRequest(
+    "POST",
+    "/checkouts",
+    {
+      storeId,
+      merchantTransactionId,
+      transactionOrigin: "ECOM",
+      transactionType: "SALE",
+      transactionAmount: { total: amount, currency },
+      checkoutSettings: {
+        locale: "en_GB",
+        webHooksUrl: `${FUNCTIONS_URL}/fiservWebhook?t=${encodeURIComponent(merchantTransactionId)}`,
+        redirectBackUrls: { successUrl: back("success"), failureUrl: back("failure") }
+      }
+    },
+    { base }
+  );
+  const checkoutId = response?.checkout?.checkoutId;
+  const redirectUrl = response?.checkout?.redirectionUrl;
+  if (!checkoutId || !/^https:\/\//.test(redirectUrl || "")) {
+    logger.error("Unexpected Fiserv checkout response", response);
+    throw new HttpsError("unavailable", GATEWAY_DOWN);
+  }
+  return { route: "checkouts", apiBase: base, checkoutId, redirectUrl, mode: "redirect" };
+}
+
+// Route 2: IPG REST API "payment-url" – Absa hosted payment page link (test.ipg-online.com).
+async function createViaPaymentUrl({ storeId, merchantTransactionId, bookingRef, amount, currency }) {
+  let lastError;
+  for (const base of ipgBases()) {
+    try {
+      const response = await fiservRequest(
+        "POST",
+        "/payment-url",
+        {
+          storeId,
+          transactionType: "SALE",
+          transactionAmount: { total: amount, currency },
+          orderId: merchantTransactionId,
+          transactionNotificationURL: `${FUNCTIONS_URL}/fiservWebhook?t=${encodeURIComponent(merchantTransactionId)}`,
+          expiration: Math.floor(Date.now() / 1000) + 2 * 3600,
+          authenticateTransaction: true,
+          invoiceNumber: bookingRef,
+          hostedPaymentPageText: `Mautour Holidays – booking ${bookingRef}`
+        },
+        { base }
+      );
+      const paymentUrl = response?.paymentUrl;
+      if (!/^https:\/\//.test(paymentUrl || "")) {
+        logger.error("Unexpected payment-url response", { apiBase: base, response });
+        throw new HttpsError("unavailable", GATEWAY_DOWN);
+      }
+      return {
+        route: "paymenturl",
+        apiBase: base,
+        checkoutId: "",
+        orderId: response.orderId || merchantTransactionId,
+        linkTransactionId: response.transactionId || "",
+        redirectUrl: paymentUrl,
+        mode: "link"
+      };
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new HttpsError("unavailable", GATEWAY_DOWN);
+}
+
 async function signPayment({ bookingRef, amountEur, email, name, amountSource }) {
   const storeId = FISERV_STORE_ID.value().trim();
   if (!storeId) throw new HttpsError("failed-precondition", "Online payment is not configured yet. Please contact us.");
@@ -150,32 +256,32 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
   const { amount, currency } = chargeAmount(amountEur);
   const attempt = crypto.randomBytes(3).toString("hex").toUpperCase();
   const merchantTransactionId = `${bookingRef}-${attempt}`;
-  const back = (result) =>
-    `${FUNCTIONS_URL}/fiservReturn?ref=${encodeURIComponent(bookingRef)}&t=${encodeURIComponent(merchantTransactionId)}&result=${result}`;
+  const args = { storeId, merchantTransactionId, bookingRef, amount, currency };
 
-  const response = await fiservRequest("POST", "/checkouts", {
-    storeId,
-    merchantTransactionId,
-    transactionOrigin: "ECOM",
-    transactionType: "SALE",
-    transactionAmount: { total: amount, currency },
-    checkoutSettings: {
-      locale: "en_GB",
-      webHooksUrl: `${FUNCTIONS_URL}/fiservWebhook`,
-      redirectBackUrls: { successUrl: back("success"), failureUrl: back("failure") }
+  const route = ABSA_ROUTE.value().trim().toLowerCase();
+  let created;
+  if (route === "paymenturl") {
+    created = await createViaPaymentUrl(args);
+  } else if (route === "checkouts") {
+    created = await createViaCheckouts(args);
+  } else {
+    try {
+      created = await createViaCheckouts(args);
+    } catch (error) {
+      logger.warn("Checkouts route failed – trying the Absa payment link route", { bookingRef });
+      created = await createViaPaymentUrl(args);
     }
-  });
-
-  const checkoutId = response?.checkout?.checkoutId;
-  const redirectUrl = response?.checkout?.redirectionUrl;
-  if (!checkoutId || !redirectUrl) {
-    logger.error("Unexpected Fiserv checkout response", response);
-    throw new HttpsError("unavailable", "The payment gateway is not available right now. Please try again in a few minutes.");
   }
+
+  logger.info("Payment created", { bookingRef, route: created.route, apiBase: created.apiBase });
 
   await db.collection("payments").doc(merchantTransactionId).set({
     bookingRef,
-    checkoutId,
+    route: created.route,
+    apiBase: created.apiBase,
+    checkoutId: created.checkoutId || "",
+    orderId: created.orderId || "",
+    linkTransactionId: created.linkTransactionId || "",
     merchantTransactionId,
     customerName: clean(name, 80),
     amount,
@@ -190,7 +296,7 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
   await db.collection("bookings").doc(bookingRef).set(
     {
       paymentStatus: "Payment started",
-      lastCheckoutId: checkoutId,
+      lastCheckoutId: created.checkoutId || created.orderId || "",
       lastPaymentId: merchantTransactionId,
       paymentGateway: "Absa / Fiserv",
       updatedAt: FieldValue.serverTimestamp()
@@ -198,10 +304,47 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
     { merge: true }
   );
 
-  return { redirectUrl };
+  return { redirectUrl: created.redirectUrl, mode: created.mode, paymentId: merchantTransactionId };
 }
 
 /* ---------------- shared: ask Fiserv for the real status and update the booking ---------------- */
+
+// Reads the gateway status in a common shape: { status, total, currency, storeId, ipgTransactionId, approvalCode }
+async function readGatewayStatus(pay) {
+  if (pay.route === "paymenturl") {
+    const order = await fiservRequest("GET", `/orders/${encodeURIComponent(pay.orderId || pay.merchantTransactionId)}`, null, {
+      base: pay.apiBase || ipgBases()[0],
+      allow404: true
+    });
+    const txs = Array.isArray(order?.transactions) ? order.transactions : [];
+    const sales = txs.filter((t) => !t.transactionType || ["SALE", "PREAUTH"].includes(String(t.transactionType).toUpperCase()));
+    const statusOf = (t) => String(t.transactionStatus || t.transactionResult || "").toUpperCase();
+    const pick = sales.find((t) => statusOf(t) === "APPROVED") || sales[sales.length - 1];
+    if (!pick) return { status: "WAITING" };
+    const amt = pick.approvedAmount || pick.transactionAmount || {};
+    return {
+      status: statusOf(pick),
+      total: Number(amt.total ?? 0),
+      currency: amt.currency || pay.currency,
+      storeId: pick.storeId || order?.storeId || "",
+      ipgTransactionId: pick.ipgTransactionId || "",
+      approvalCode: pick.approvalCode || ""
+    };
+  }
+
+  const details = await fiservRequest("GET", `/checkouts/${encodeURIComponent(pay.checkoutId)}`, null, {
+    base: pay.apiBase || apiBase()
+  });
+  const approved = details?.approvedAmount || {};
+  return {
+    status: String(details?.transactionStatus || details?.ipgTransactionDetails?.transactionStatus || "").toUpperCase(),
+    total: Number(approved.total ?? 0),
+    currency: approved.currency || pay.currency,
+    storeId: details?.storeId || "",
+    ipgTransactionId: details?.ipgTransactionDetails?.ipgTransactionId || "",
+    approvalCode: details?.ipgTransactionDetails?.approvalCode || ""
+  };
+}
 
 async function syncPayment(paymentId) {
   const payRef = db.collection("payments").doc(paymentId);
@@ -211,14 +354,11 @@ async function syncPayment(paymentId) {
   const pay = paySnap.data();
   if (pay.receiptNumber) return { status: "accept", receipt: pay.receiptNumber, bookingRef: pay.bookingRef };
 
-  const details = await fiservRequest("GET", `/checkouts/${encodeURIComponent(pay.checkoutId)}`);
-  const status = String(
-    details?.transactionStatus || details?.ipgTransactionDetails?.transactionStatus || ""
-  ).toUpperCase();
-  const approved = details?.approvedAmount || {};
-  const approvedTotal = Number(approved.total ?? 0);
-  const approvedCurrency = approved.currency || pay.currency;
-  const storeOk = !details?.storeId || String(details.storeId) === FISERV_STORE_ID.value().trim();
+  const g = await readGatewayStatus(pay);
+  const status = g.status || "";
+  const approvedTotal = Number(g.total || 0);
+  const approvedCurrency = g.currency || pay.currency;
+  const storeOk = !g.storeId || String(g.storeId) === FISERV_STORE_ID.value().trim();
   const amountOk = Math.abs(approvedTotal - Number(pay.amount)) < 0.01 && approvedCurrency === pay.currency;
 
   let result;
@@ -235,8 +375,8 @@ async function syncPayment(paymentId) {
     const bookingDoc = db.collection("bookings").doc(pay.bookingRef);
     const base = {
       gatewayStatus: status,
-      ipgTransactionId: details?.ipgTransactionDetails?.ipgTransactionId || "",
-      approvalCode: details?.ipgTransactionDetails?.approvalCode || "",
+      ipgTransactionId: g.ipgTransactionId || "",
+      approvalCode: g.approvalCode || "",
       checkedAt: FieldValue.serverTimestamp()
     };
 
@@ -262,8 +402,8 @@ async function syncPayment(paymentId) {
       logger.error("Approved payment does not match booking", { paymentId, approvedTotal, approvedCurrency, storeOk });
       tx.set(payRef, { ...base, status: "Check amount" }, { merge: true });
       tx.set(bookingDoc, { paymentStatus: "Payment under review" }, { merge: true });
-    } else if (status === "WAITING" || status === "") {
-      result = "review";
+    } else if (["WAITING", "", "PENDING", "PROCESSING"].includes(status)) {
+      result = "waiting";
       tx.set(payRef, { ...base, status: "Waiting" }, { merge: true });
     } else {
       result = "decline";
@@ -470,13 +610,26 @@ exports.createCartCheckout = onCall(
       updatedAt: FieldValue.serverTimestamp()
     });
 
-    const payment = await signPayment({
-      bookingRef,
-      amountEur: total,
-      email,
-      name: contact.name,
-      amountSource: "cart"
-    });
+    let payment;
+    try {
+      payment = await signPayment({
+        bookingRef,
+        amountEur: total,
+        email,
+        name: contact.name,
+        amountSource: "cart"
+      });
+    } catch (error) {
+      // The order is already saved – tell the website its reference so the customer can finish on WhatsApp.
+      await db.collection("bookings").doc(bookingRef).set(
+        { paymentStatus: "Unpaid", paymentNote: "Card payment unavailable – continue on WhatsApp", updatedAt: FieldValue.serverTimestamp() },
+        { merge: true }
+      );
+      throw new HttpsError(error.code === "failed-precondition" ? "failed-precondition" : "unavailable", error.message || GATEWAY_DOWN, {
+        bookingRef,
+        total
+      });
+    }
 
     return { ...payment, bookingRef, total };
   }
@@ -495,7 +648,8 @@ exports.fiservReturn = onRequest({ secrets: SECRETS }, async (req, res) => {
   try {
     const r = await syncPayment(paymentId);
     if (r.bookingRef && r.bookingRef !== ref) return back({ status: "error" });
-    return back({ status: r.status, ref, ...(r.receipt ? { receipt: r.receipt } : {}) });
+    const status = r.status === "waiting" ? "review" : r.status;
+    return back({ status, ref, ...(r.receipt ? { receipt: r.receipt } : {}) });
   } catch (error) {
     logger.error("fiservReturn failed", error);
     return back({ status: req.query.result === "failure" ? "decline" : "review", ref });
@@ -506,11 +660,19 @@ exports.fiservReturn = onRequest({ secrets: SECRETS }, async (req, res) => {
 
 exports.fiservWebhook = onRequest({ secrets: SECRETS }, async (req, res) => {
   try {
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    let body = req.body || {};
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body || "{}");
+      } catch {
+        body = Object.fromEntries(new URLSearchParams(body));
+      }
+    }
     const checkoutId = String(body.checkoutId || "");
-    const merchantId = String(body.merchantTransactionId || "");
+    // ?t= is added to our own notification URL; "oid" is the order id in IPG form notifications.
+    const merchantId = String((req.query || {}).t || body.merchantTransactionId || body.oid || body.orderId || "").slice(0, 80);
 
-    let paymentId = merchantId;
+    let paymentId = /^[A-Z0-9-]+$/i.test(merchantId) ? merchantId : "";
     if (!paymentId && checkoutId) {
       const q = await db.collection("payments").where("checkoutId", "==", checkoutId).limit(1).get();
       paymentId = q.empty ? "" : q.docs[0].id;
@@ -551,4 +713,30 @@ exports.getPaymentStatus = onCall(async (request) => {
     transactionId: b.transactionId || "",
     paidAt: b.paidAt && typeof b.paidAt.toDate === "function" ? b.paidAt.toDate().toISOString() : ""
   };
+});
+
+/* ---------------- 4. live status while the customer pays on Absa's page ---------------- */
+
+exports.checkPayment = onCall({ secrets: SECRETS }, async (request) => {
+  const bookingRef = String(request.data?.bookingRef || "").trim().toUpperCase();
+  const email = String(request.data?.email || "").trim().toLowerCase();
+  if (!/^MT\d{6}-[A-Z0-9]{5}$/.test(bookingRef)) throw new HttpsError("invalid-argument", "Missing booking reference.");
+
+  const snap = await db.collection("bookings").doc(bookingRef).get();
+  if (!snap.exists) throw new HttpsError("not-found", "Booking not found.");
+  const b = snap.data();
+
+  const isOwner = request.auth && b.userId && b.userId === request.auth.uid;
+  const emailOk = email && String(b.email || "").trim().toLowerCase() === email;
+  if (!isOwner && !emailOk) throw new HttpsError("permission-denied", "Not allowed.");
+
+  if (b.receiptNumber) return { status: "accept", receipt: b.receiptNumber, bookingRef };
+  if (!b.lastPaymentId) return { status: "waiting", bookingRef };
+
+  try {
+    const r = await syncPayment(b.lastPaymentId);
+    return { status: r.status, receipt: r.receipt || "", bookingRef };
+  } catch (error) {
+    return { status: "waiting", bookingRef };
+  }
 });
