@@ -3,7 +3,7 @@
  *
  * Two routes, tried in this order (ABSA_ROUTE=auto):
  *   1. "Checkouts" API  – hosted page, customer is sent back to the website automatically.
- *   2. IPG REST "payment-url" (test.ipg-online.com) – Absa hosted payment link; the website
+ *   2. IPG REST "payment-url" – Absa hosted payment link; the website
  *      watches the payment with checkPayment and shows the receipt when it is approved.
  *
  * createCartCheckout  (callable) – signed-in customer pays the cart. Every price is
@@ -28,7 +28,7 @@
  *   ABSA_EUR_RATE     only if currency is not EUR (units per €1)
  *   SITE_URL          https://mautours.com
  *   FISERV_BASE_URL   optional – Checkouts API address
- *   IPG_BASE_URL      optional – IPG REST API address (default test/www.ipg-online.com)
+ *   IPG_BASE_URL      optional – IPG REST API address (leave empty for the default)
  *   ABSA_ROUTE        auto | checkouts | paymenturl
  */
 
@@ -69,8 +69,8 @@ const API_BASES = {
 };
 // Route 2 – IPG REST API "payment-url" (Absa hosted payment page link on ipg-online.com)
 const IPG_BASES = {
-  test: ["https://test.ipg-online.com/ipp/payments-gateway/v2", "https://prod.emea.api.fiservapps.com/sandbox/ipp/payments-gateway/v2"],
-  live: ["https://www.ipg-online.com/ipp/payments-gateway/v2", "https://prod.emea.api.fiservapps.com/ipp/payments-gateway/v2"]
+  test: ["https://prod.emea.api.fiservapps.com/sandbox/ipp/payments-gateway/v2"],
+  live: ["https://prod.emea.api.fiservapps.com/ipp/payments-gateway/v2"]
 };
 // ABSA_ROUTE: auto (try Checkouts, then payment link) | checkouts | paymenturl
 const ABSA_ROUTE = defineString("ABSA_ROUTE", { default: "auto" });
@@ -207,7 +207,7 @@ async function createViaCheckouts({ storeId, merchantTransactionId, bookingRef, 
   return { route: "checkouts", apiBase: base, checkoutId, redirectUrl, mode: "redirect" };
 }
 
-// Route 2: IPG REST API "payment-url" – Absa hosted payment page link (test.ipg-online.com).
+// Route 2: IPG REST API "payment-url" – Absa hosted payment page link.
 async function createViaPaymentUrl({ storeId, merchantTransactionId, bookingRef, amount, currency }) {
   let lastError;
   for (const base of ipgBases()) {
