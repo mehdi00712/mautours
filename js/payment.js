@@ -12,6 +12,7 @@ import {
   httpsCallable
 } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-functions.js";
 import { getWhatsappNumber } from "./booking-store.js";
+import { watchPayment } from "./pay-watch.js";
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -79,8 +80,15 @@ form?.addEventListener("submit", async (e) => {
 
   try {
     const result = await createAbsaPayment({ bookingRef, email, amount });
-    const { redirectUrl } = result.data || {};
+    const { redirectUrl, mode } = result.data || {};
     if (!redirectUrl || !/^https:\/\//.test(redirectUrl)) throw new Error("No payment data returned");
+
+    if (mode === "link") {
+      payBtn.style.display = "none";
+      statusBox.className = "pay-status ready";
+      watchPayment({ functions, box: statusBox, url: redirectUrl, bookingRef, email });
+      return;
+    }
 
     setStatus("ready", `<strong>Redirecting to Absa secure payment…</strong><br>Reference ${bookingRef}`);
     window.location.href = redirectUrl;

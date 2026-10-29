@@ -18,11 +18,13 @@ import {
   saveBooking,
   getWhatsappNumber
 } from "./booking-store.js";
+import { watchPayment } from "./pay-watch.js";
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const createCartCheckout = httpsCallable(getFunctions(app, "us-central1"), "createCartCheckout");
+const functions = getFunctions(app, "us-central1");
+const createCartCheckout = httpsCallable(functions, "createCartCheckout");
 
 const $ = (id) => document.getElementById(id);
 const listEl = $("cartList");
@@ -285,6 +287,19 @@ async function onCheckout(e) {
       throw Object.assign(new Error("No payment data"), { code: "unavailable" });
     }
 
+    if (data.mode === "link") {
+      // Absa payment page opens in a new tab; this page waits for the approval.
+      btn.style.display = "none";
+      watchPayment({
+        functions,
+        box: $("coMessage"),
+        url: data.redirectUrl,
+        bookingRef: data.bookingRef,
+        amountText: money(data.total)
+      });
+      return;
+    }
+
     showCoMessage(`<strong>Redirecting to Absa secure payment…</strong><br>Booking reference ${esc(data.bookingRef)} · ${money(data.total)}`);
     window.location.href = data.redirectUrl;
   } catch (error) {
@@ -300,7 +315,8 @@ async function onCheckout(e) {
     } else {
       // Online payment not active yet: save the order and continue on WhatsApp.
       try {
-        const bookingRef = await saveBooking(db, {
+        const savedRef = error.details?.bookingRef; // order already saved by the server
+        const bookingRef = savedRef || await saveBooking(db, {
           type: "cart",
           package: cartItems.map((i) => i.title).join(" + "),
           name,
