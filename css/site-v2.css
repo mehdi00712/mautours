@@ -587,3 +587,8 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
 .chip.ok { background: #e8f6ec; color: #1e7b3c; }
 .chip.bad { background: #fff1e6; color: #b45309; }
 .cart-list { padding: 0; }
+
+/* Checkout: tick box beside its text; keep spaces inside the pay button */
+.vd-form .pay-check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0; font-size: 0.9rem; line-height: 1.5; font-weight: 600; color: var(--darkblue); }
+.vd-form .pay-check input { width: auto; margin-top: 4px; flex: none; }
+#checkoutBtn { white-space: pre; gap: 0.35em; }
