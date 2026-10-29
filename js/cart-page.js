@@ -209,7 +209,7 @@ function renderCheckout(total, blocked) {
         <a href="travel-info.html#payment" target="_blank">payment terms</a>.</span>
       </label>
       <div id="coMessage" class="vd-message" style="display:none"></div>
-      <button id="checkoutBtn" type="submit" class="btn full-width-btn">Pay <span id="payTotalLabel">${money(total)}</span> securely</button>
+      <button id="checkoutBtn" type="submit" class="btn full-width-btn"><span>Pay</span><span id="payTotalLabel">${money(total)}</span><span>securely</span></button>
       <p class="vd-small">You will enter your card on Absa's secure payment page. We never see your card details.</p>
     </form>`;
 
