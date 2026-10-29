@@ -592,3 +592,11 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
 .vd-form .pay-check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0; font-size: 0.9rem; line-height: 1.5; font-weight: 600; color: var(--darkblue); }
 .vd-form .pay-check input { width: auto; margin-top: 4px; flex: none; }
 #checkoutBtn { white-space: pre; gap: 0.35em; }
+
+/* Absa payment-link panel (cart + Pay Online) */
+.pay-watch { display: grid; gap: 10px; text-align: left; }
+.pay-watch p { margin: 0; line-height: 1.55; }
+.pay-watch-btn { justify-self: start; text-decoration: none; }
+.pay-watch-status { font-weight: 600; color: var(--darkblue, #071827); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pay-watch-dot { width: 10px; height: 10px; border-radius: 50%; background: #c9a227; animation: payPulse 1.2s ease-in-out infinite; flex: none; }
+@keyframes payPulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
