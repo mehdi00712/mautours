@@ -105,7 +105,14 @@ async function fiservRequest(method, path, payload) {
   }
 
   if (!res.ok) {
-    logger.error("Fiserv API error", { status: res.status, path, data });
+    logger.error("Fiserv API error", {
+      status: res.status,
+      path,
+      apiBase: apiBase(),
+      traceId: res.headers.get("Trace-Id") || res.headers.get("trace-id") || "",
+      clientRequestId,
+      data
+    });
     throw new HttpsError("unavailable", "The payment gateway is not available right now. Please try again in a few minutes.");
   }
   return data;
@@ -152,9 +159,6 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
     transactionOrigin: "ECOM",
     transactionType: "SALE",
     transactionAmount: { total: amount, currency },
-    order: {
-      orderDetails: { customerId: clean(email, 60), invoiceNumber: bookingRef }
-    },
     checkoutSettings: {
       locale: "en_GB",
       webHooksUrl: `${FUNCTIONS_URL}/fiservWebhook`,
