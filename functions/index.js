@@ -168,12 +168,28 @@ function makeReceiptNumber() {
 
 /* ---------------- shared: create a Fiserv checkout for a booking ---------------- */
 
-function chargeAmount(amountEur) {
+// Rupee rate: Admin → Settings ("rateMUR") first, then ABSA_EUR_RATE from functions/.env.
+async function eurRate(currency) {
+  if (currency === "MUR") {
+    try {
+      const snap = await db.collection("siteContent").doc("settings").get();
+      const r = Number(snap.exists ? snap.data().rateMUR : 0);
+      if (r > 0) return r;
+    } catch (error) {
+      logger.warn("Could not read rupee rate from settings", { message: String(error?.message || error) });
+    }
+  }
+  return Number(ABSA_EUR_RATE.value() || 0);
+}
+
+async function chargeAmount(amountEur) {
   const currency = ABSA_CURRENCY.value();
   if (currency === "EUR") return { amount: roundMoney(amountEur), currency };
-  const rate = Number(ABSA_EUR_RATE.value() || 0);
+  const rate = await eurRate(currency);
   if (!(rate > 0)) throw new HttpsError("failed-precondition", "Payment currency is not configured. Please contact us.");
-  return { amount: roundMoney(amountEur * rate), currency };
+  // Whole rupees – the same amount the website shows in the cart.
+  const amount = currency === "MUR" ? Math.round(amountEur * rate) : roundMoney(amountEur * rate);
+  return { amount, currency, rate };
 }
 
 const GATEWAY_DOWN = "The payment gateway is not available right now. Please try again in a few minutes.";
@@ -255,7 +271,7 @@ async function signPayment({ bookingRef, amountEur, email, name, amountSource })
   const storeId = FISERV_STORE_ID.value().trim();
   if (!storeId) throw new HttpsError("failed-precondition", "Online payment is not configured yet. Please contact us.");
 
-  const { amount, currency } = chargeAmount(amountEur);
+  const { amount, currency } = await chargeAmount(amountEur);
   const attempt = crypto.randomBytes(3).toString("hex").toUpperCase();
   const merchantTransactionId = `${bookingRef}-${attempt}`;
   const args = { storeId, merchantTransactionId, bookingRef, amount, currency };
