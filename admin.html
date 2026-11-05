@@ -6,6 +6,12 @@
 
   <title>Mautour Holidays – Admin Dashboard</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .rate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+    .rate-grid label { display: flex; align-items: center; gap: 8px; font-weight: 700; white-space: nowrap; }
+    .rate-grid input { flex: 1; min-width: 0; }
+    .field-hint { font-size: 0.85rem; color: #5b6472; margin: 4px 0 10px; line-height: 1.5; }
+  </style>
 </head>
 <body>
 
@@ -472,6 +478,16 @@
         <div class="form-group">
           <label>Regions Served</label>
           <input type="text" id="servedRegions" placeholder="UAE, Saudi Arabia, Qatar, Kuwait" />
+        </div>
+
+        <div class="form-group">
+          <label>Exchange rates (how much 1 € is worth)</label>
+          <p class="field-hint">Prices are entered in euros. Visitors can switch the website to these currencies. <strong>Card payments are charged in rupees at the rupee rate below</strong> – keep it up to date. Leave USD / GBP empty to hide them.</p>
+          <div class="rate-grid">
+            <label>1 € = Rs <input type="number" id="rateMUR" min="1" step="0.01" placeholder="53" required /></label>
+            <label>1 € = $ <input type="number" id="rateUSD" min="0" step="0.0001" placeholder="optional" /></label>
+            <label>1 € = £ <input type="number" id="rateGBP" min="0" step="0.0001" placeholder="optional" /></label>
+          </div>
         </div>
 
         <button type="submit" class="btn">Save Settings</button>
