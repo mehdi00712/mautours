@@ -13,10 +13,13 @@ export function servicePrice(vehicle, key) {
   return Number(vehicle?.[s.field] || 0);
 }
 
+// "From" price for hiring the vehicle (airport / half day / full day).
+// v.price is the add-on price when the vehicle is chosen for a tour package,
+// so it is only used when no hire prices are set.
 export function vehicleFromPrice(v) {
-  const prices = [v.airportPrice, v.halfDayPrice, v.fullDayPrice, v.price]
-    .map((p) => Number(p || 0))
-    .filter((p) => p > 0);
+  const pick = (list) => list.map((p) => Number(p || 0)).filter((p) => p > 0);
+  const hire = pick([v.airportPrice, v.halfDayPrice, v.fullDayPrice]);
+  const prices = hire.length ? hire : pick([v.price]);
   return prices.length ? Math.min(...prices) : 0;
 }
 
