@@ -19,6 +19,7 @@ import {
   getWhatsappNumber
 } from "./booking-store.js";
 import { watchPayment } from "./pay-watch.js";
+import { murAmount, onCurrencyChange } from "./currency.js";
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -167,13 +168,28 @@ function renderList() {
       ${ok.map((p) => `<li><span>${esc(p.item.title)}</span><strong>${money(p.result.total)}</strong></li>`).join("")}
     </ul>
     <div class="cart-total"><span>Total to pay</span><strong id="cartTotal">${money(total)}</strong></div>
-    <p class="v2-note">All prices in euros, taxes included. This is the exact amount charged.</p>
+    <p class="charge-note" id="chargeNote" data-no-convert>${chargeText(total)}</p>
     ${blocked ? `<div class="cart-warning">Remove the items marked "price on request" (or ask us about them on WhatsApp) to check out.</div>` : ""}
   `;
 
   renderCheckout(total, blocked);
   bindListEvents();
 }
+
+// Absa charges card payments in Mauritian rupees (rate from Admin → Settings).
+let lastTotal = 0;
+function chargeText(total) {
+  lastTotal = total;
+  return `Card payments are charged in Mauritian rupees: <strong>Rs ${murAmount(total).toLocaleString("en-GB")}</strong> (€ ${roundMoney(total).toLocaleString("en-GB")}), all taxes included.`;
+}
+const payLabel = (total) => `Rs ${murAmount(total).toLocaleString("en-GB")}`;
+
+onCurrencyChange(() => {
+  const note = $("chargeNote");
+  if (note) note.innerHTML = chargeText(lastTotal);
+  const pay = $("payTotalLabel");
+  if (pay) pay.textContent = payLabel(lastTotal);
+});
 
 function renderCheckout(total, blocked) {
   checkoutEl.style.display = "";
@@ -190,7 +206,7 @@ function renderCheckout(total, blocked) {
   }
 
   if (checkoutEl.dataset.ready === "1") {
-    $("payTotalLabel").textContent = money(total);
+    $("payTotalLabel").textContent = payLabel(total);
     $("checkoutBtn").disabled = blocked || total <= 0;
     return;
   }
@@ -211,7 +227,7 @@ function renderCheckout(total, blocked) {
         <a href="travel-info.html#payment" target="_blank">payment terms</a>.</span>
       </label>
       <div id="coMessage" class="vd-message" style="display:none"></div>
-      <button id="checkoutBtn" type="submit" class="btn full-width-btn"><span>Pay</span><span id="payTotalLabel">${money(total)}</span><span>securely</span></button>
+      <button id="checkoutBtn" type="submit" class="btn full-width-btn"><span>Pay</span><span id="payTotalLabel" data-no-convert>${payLabel(total)}</span><span>securely</span></button>
       <p class="vd-small">You will enter your card on Absa's secure payment page. We never see your card details.</p>
     </form>`;
 
@@ -295,7 +311,7 @@ async function onCheckout(e) {
         box: $("coMessage"),
         url: data.redirectUrl,
         bookingRef: data.bookingRef,
-        amountText: money(data.total)
+        amountText: payLabel(data.total)
       });
       return;
     }

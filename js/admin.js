@@ -606,6 +606,9 @@ if (websiteSettingsForm) {
           mobileNumber: document.getElementById("mobileNumber")?.value.trim() || "",
           businessEmail: document.getElementById("businessEmail")?.value.trim() || "",
           servedRegions: document.getElementById("servedRegions")?.value.trim() || "",
+          rateMUR: Number(document.getElementById("rateMUR")?.value || 0) || 53,
+          rateUSD: Number(document.getElementById("rateUSD")?.value || 0) || 0,
+          rateGBP: Number(document.getElementById("rateGBP")?.value || 0) || 0,
           updatedAt: serverTimestamp()
         },
         { merge: true }
@@ -629,6 +632,12 @@ async function loadWebsiteSettings() {
 
     if (document.getElementById("businessName")) {
       document.getElementById("businessName").value = data.businessName || "";
+    }
+
+    if (document.getElementById("rateMUR")) {
+      document.getElementById("rateMUR").value = data.rateMUR || 53;
+      document.getElementById("rateUSD").value = data.rateUSD || "";
+      document.getElementById("rateGBP").value = data.rateGBP || "";
     }
 
     if (document.getElementById("whatsappNumber")) {

@@ -4,6 +4,7 @@
 
 import { firebaseConfig } from "./firebase-config.js";
 import { onCartChange, getCurrentUser } from "./cart.js";
+import { initCurrency, createCurrencySwitcher, applySettingsRates } from "./currency.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
@@ -15,6 +16,8 @@ async function updateWhatsappLinks() {
   try {
     const snap = await getDoc(doc(db, "siteContent", "settings"));
     if (!snap.exists()) return;
+
+    applySettingsRates(snap.data());
 
     const number = String(snap.data().whatsappNumber || "").replace(/\D/g, "");
     if (!number) return;
@@ -57,6 +60,7 @@ function setupHeaderIcons() {
   cart.setAttribute("aria-label", "Cart");
   if (/cart\.html$/.test(location.pathname)) cart.classList.add("active");
 
+  nav.insertBefore(createCurrencySwitcher(), cta || null);
   nav.insertBefore(account, cta || null);
   nav.insertBefore(cart, cta || null);
 
@@ -81,3 +85,4 @@ function setupHeaderIcons() {
 }
 
 setupHeaderIcons();
+initCurrency();
