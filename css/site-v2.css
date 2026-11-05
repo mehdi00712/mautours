@@ -600,3 +600,27 @@ img.v2-placeholder { object-fit: cover; background: var(--darkblue); }
 .pay-watch-status { font-weight: 600; color: var(--darkblue, #071827); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pay-watch-dot { width: 10px; height: 10px; border-radius: 50%; background: #c9a227; animation: payPulse 1.2s ease-in-out infinite; flex: none; }
 @keyframes payPulse { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* Currency switcher (header) */
+.nav-currency-wrap { display: inline-flex; align-items: center; }
+.nav-currency {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a227' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 8px center;
+  color: #fff;
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  border-radius: 999px;
+  padding: 0.3rem 1.6rem 0.3rem 0.7rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1.2;
+}
+.nav-currency:hover, .nav-currency:focus { border-color: var(--gold, #c9a227); outline: none; }
+.nav-currency option { color: #071827; background: #fff; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.charge-note { margin: 10px 0 0; font-size: 0.88rem; line-height: 1.5; color: var(--darkblue, #071827); background: #fff8e1; border: 1px solid #f0dc9a; border-radius: 12px; padding: 10px 12px; }
+@media (max-width: 768px) {
+  .nav-currency-wrap { padding: 0.4rem 0; }
+}
